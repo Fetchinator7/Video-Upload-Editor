@@ -1,3 +1,6 @@
 [submodule "server/dependencies/FFmpeg-Commands"]
 	path = server/dependencies/FFmpeg-Commands
 	url = https://github.com/Fetchinator7/FFmpeg-Commands
+[submodule "server/dependencies/System-Commands"]
+	path = server/dependencies/System-Commands
+	url = https://github.com/Fetchinator7/System-Commands
