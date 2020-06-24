@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import HomePage from '../HomePage';
-import VideoPlayer from '../VideoPlayer';
+import VideoPlayer from '../VideoPlayer/VideoPlayer';
 import { HashRouter as Router, Route, NavLink } from 'react-router-dom';
 import './App.css';
 
