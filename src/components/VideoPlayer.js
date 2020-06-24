@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 
-class SubmittedFeedback extends Component {
+class VideoPlayer extends Component {
   render() {
     return (
       <>
         <header className='App-header'>
-          <h1>Second</h1>
+          <h1>Video Player</h1>
         </header>
       </>
     );
   }
 }
 
-export default withRouter(SubmittedFeedback);
+export default withRouter(VideoPlayer);
