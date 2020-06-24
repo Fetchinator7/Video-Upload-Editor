@@ -1,3 +1,0 @@
-[submodule "src/dependencies/FFmpeg-Commands"]
-	path = src/dependencies/FFmpeg-Commands
-	url = https://github.com/Fetchinator7/FFmpeg-Commands
