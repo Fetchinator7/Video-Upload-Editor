@@ -14,4 +14,4 @@ jobs:
       uses: jenkins-zh/git-backup-actions@v0.0.1
       env:
         GIT_DEPLOY_KEY: ${{ secrets.GIT_DEPLOY_KEY }}
-        TARGET_GIT: "https://gitee.com/Fetchinator7/Video-Upload-Editor-Backup"
+        TARGET_GIT: "git@gitee.com:Fetchinator7/Video-Upload-Editor-Backup.git"
