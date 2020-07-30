@@ -2,14 +2,16 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const router = require('./routes/video.router');
+const videoRouter = require('./routes/video.router');
+const vimeoRouter = require('../server/routes/vimeo.router');
 const PORT = process.env.PORT || 5000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static('build'));
 
-app.use('/video', router);
+app.use('/video', videoRouter);
+app.use('/video', vimeoRouter);
 
 // Start listening for requests on a specific port.
 app.listen(PORT, () => {
