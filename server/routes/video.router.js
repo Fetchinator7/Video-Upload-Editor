@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const app = express();
-const PORT = process.env.PORT || 5000;
 
 router.post('/', (req, res) => {
   const userName = req.body.userName;
@@ -13,13 +11,8 @@ router.post('/', (req, res) => {
     });
   } else {
     console.log("Error that's an invalid user.");
-    res.sendStatus(500);
+    res.sendStatus(400);
   }
-});
-
-// Start listening for requests on a specific port.
-app.listen(PORT, () => {
-  console.log('Running on port', PORT);
 });
 
 module.exports = router;
