@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 app.use(express.static('build'));
 
 app.use('/video', videoRouter);
-app.use('/video', vimeoRouter);
+app.use('/vimeo', vimeoRouter);
 
 // Start listening for requests on a specific port.
 app.listen(PORT, () => {
