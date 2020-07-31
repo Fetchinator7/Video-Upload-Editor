@@ -18,7 +18,6 @@ if path_to_main_out_save_folder.exists() is False:
 def main(main_out_save_dir):
 	"""Main function to easily see what is being done at a glance."""
 
-	# usr_name, title_with_date, vid_path, = decode_clipboard_info()
 	ren_method_used = 'Davinci Resolve'
 	org_in_vid_path = paths.Path(sys.argv[2])
 	title = sys.argv[3]
@@ -38,7 +37,7 @@ def main(main_out_save_dir):
 		print(f'Error, the output folder "{title}" already exists.')
 		raise FileExistsError
 	else:
-		# fc.FileOperations(renamed_in_path, out_dir_path).reverse()
+		fc.FileOperations(renamed_in_path, out_dir_path).trim('5', '15')
 
 		# The output folder was successfully created so continue.
 		# Run function to write session info to a text file.
@@ -46,11 +45,10 @@ def main(main_out_save_dir):
 
 		# For the sake of convenience, open Davinci Resolve and the input video folder.
 		# syst.Operations().open_path_or_app('Davinci Resolve')
-		syst.Operations().open_path_or_app(renamed_in_path.parent)
+		out_path = paths.Path.joinpath(out_dir_path, title_with_date + '.mp4')
+		print("{" + str(out_path) + "}")
 
-def decode_clipboard_info():
-	"""This function reads the contents of the clipboard and assigns some of those values to variables."""
-	pass
+		syst.Operations().open_path_or_app(renamed_in_path.parent)
 
 def fin_log(usr, title, ren_method_used, renamed_in_path, out_dir_path):
 	"""Create log file."""
