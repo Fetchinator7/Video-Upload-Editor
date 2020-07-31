@@ -13,23 +13,22 @@ router.get('/transcode-status/:uri', (req, res) => {
   const uri = req.params.uri;
   vimeoClient.request(`/videos/${uri}?fields=transcode.status`, function (error, body, statusCode, headers) {
     if (body.transcode.status === 'complete') {
-      console.log('Your video finished transcoding.');
+      res.status(statusCode).send('Your video finished transcoding.');
     } else if (body.transcode.status === 'in_progress') {
-      console.log('Your video is still transcoding.');
+      res.status(statusCode).send('Your video is still transcoding.');
     } else {
-      console.log('Your video encountered an error during transcoding.', error);
+      res.status(statusCode).send('Your video encountered an error during transcoding.', error);
     }
-    res.sendStatus(statusCode);
   });
 });
 
 router.post('/', (req, res) => {
-  const file = req.body.file;
+  const videoPath = req.body.videoPath;
   const title = req.body.title;
   const description = req.body.description;
   console.log('Uploading...');
   vimeoClient.upload(
-    file,
+    videoPath,
     {
       name: title,
       description: description
@@ -69,15 +68,14 @@ router.patch('/', (req, res) => {
       path: `/videos/${uri}`,
       query: privacyObj
     }, function (error, body, statusCode, headers) {
-      const logStr = `Updated privacy level to: "${view}".`;
+      const responseStr = `Updated video privacy level to: "${view}".`;
       if (error) {
-        console.log('Error:', error);
+        res.status(statusCode).send('Error:', error);
       } else if (view === 'password') {
-        console.log(`${logStr} The new password is: "${password}"`);
+        res.status(statusCode).send(`${responseStr} The new password is: "${password}"`);
       } else {
-        console.log(logStr);
+        res.status(statusCode).send(responseStr);
       }
-      res.sendStatus(statusCode);
     });
   }
 });
