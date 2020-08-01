@@ -5,7 +5,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
-import { Button, CircularProgress } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import UsersJsonFile from './users.json';
 import VideosTable from '../VideosTable/VideosTable';
 
@@ -17,7 +17,6 @@ class HomePage extends Component {
           <h1>Homepage</h1>
         </header>
         Select a user:
-        {this.props.loading && <CircularProgress />}
         <FormControl component='fieldset'>
           <RadioGroup
             aria-label='settings'
@@ -40,7 +39,7 @@ class HomePage extends Component {
             color='primary'
             onClick={() => this.props.dispatch({ type: 'OPEN_PYTHON_FILE_PICKER' })}
           >
-            Upload File
+            Add File
           </Button>
         </FormControl>
         <VideosTable />
@@ -49,13 +48,18 @@ class HomePage extends Component {
           color='primary'
           disabled={(!this.props.user || this.props.videos.length === 0)}
           onClick={() =>
-            this.props.dispatch({
-              type: 'UPLOAD_VIDEO_TO_VIMEO',
-              payload: {
-                videoPath: '/vimeo',
-                title: this.state.title,
-                description: this.state.description
-              }
+            this.props.videos.map((videoObj, index) => {
+              this.props.dispatch({ type: 'DISABLE_EDITING' });
+              this.props.dispatch({
+                type: 'UPLOAD_VIDEO_TO_VIMEO_AND_ARCHIVE_SOURCE',
+                payload: {
+                  videoPath: videoObj.path,
+                  title: videoObj.title,
+                  description: videoObj.description,
+                  userName: this.props.user
+                },
+                index: index
+              });
             })}
         >
           Upload Video(s)

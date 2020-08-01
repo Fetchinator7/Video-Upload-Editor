@@ -4,21 +4,13 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import VideosTablePresets from './VideosTableDefaults';
 import MUIDataTable from 'mui-datatables';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { MuiThemeProvider, createMuiTheme, TextField, Button } from '@material-ui/core';
+import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress } from '@material-ui/core';
 
 const useStyles = createMuiTheme(
   VideosTablePresets.theme
 );
 
 class Table extends React.Component {
-  // componentDidMount() {
-  //   this.props.videos.map(videoObj => this.setState({ uploadFilesArr: ...this.state.uploadFilesArr }))
-  // }
-
-  // componentWillUnmount() {
-  //   this.props.dispatch({ type: 'CLEAR_UPLOAD_FILES' });
-  // }
-
   render() {
     // Get the base formatted data then add the "comments" column to the end.
     const columns = [
@@ -34,7 +26,7 @@ class Table extends React.Component {
                   this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
                 }}
                 control={
-                  <TextField color='primary' defaultValue={value} />
+                  <TextField color='primary' defaultValue={value} disabled={!this.props.enableEditing} />
                 }
               />
             );
@@ -53,7 +45,7 @@ class Table extends React.Component {
                   this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
                 }}
                 control={
-                  <TextField color='primary' defaultValue={value} />
+                  <TextField color='primary' defaultValue={value} disabled={!this.props.enableEditing} />
                 }
               />
             );
@@ -71,12 +63,12 @@ class Table extends React.Component {
             return (
               <FormControlLabel
                 control={
-                  <Button variant='contained'>
+                  <Button variant='contained' disabled={!this.props.enableEditing}>
                     <DeleteIcon color='secondary' />
                   </Button>
                 }
                 onClick={() => {
-                  this.props.dispatch({
+                  this.props.enableEditing && this.props.dispatch({
                     type: 'SET_UPLOAD_FILES',
                     payload: this.props.videos.slice(0, tableMeta.rowIndex).concat(this.props.videos.slice(tableMeta.rowIndex + 1, this.props.videos.length))
                   });
@@ -88,11 +80,26 @@ class Table extends React.Component {
       }
     ];
 
-    const data = this.props.videos.map(videoObj => {
+    let data = this.props.videos.map(videoObj => {
       return (
-        [videoObj.title, videoObj.description, `...${videoObj.path.slice(-40)}`]
+        videoObj.path ? [videoObj.title, videoObj.description, `...${videoObj.path.slice(-40)}`] : []
       );
     });
+
+    if (this.props.enableEditing === false) {
+      columns.unshift(
+        {
+          name: 'Status'
+        }
+      );
+      data = this.props.videos.map((vidObj, index) => {
+        if (this.props.loading.includes(index)) {
+          return [<CircularProgress key={`loading-${index}`} />, ...data[index]];
+        } else {
+          return ['yep', ...data[index]];
+        }
+      });
+    }
 
     // Since the user is viewing their games show a trash can to delete that game and
     // a pen to edit the comments for their game.
@@ -108,7 +115,9 @@ class Table extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  videos: state.uploadFiles
+  videos: state.uploadFiles,
+  loading: state.loading,
+  enableEditing: state.enableEditing
 });
 
 export default connect(mapStateToProps)(Table);

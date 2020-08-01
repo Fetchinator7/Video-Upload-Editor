@@ -9,12 +9,16 @@ const user = (state = '', action) => {
   }
 };
 
-const loading = (state = false, action) => {
+const loading = (state = [], action) => {
+  // An array of ints that show which videos are loading by their index.
+  const stateArr = [...state];
   switch (action.type) {
-    case 'SHOW_LOADING':
-      return true;
-    case 'HIDE_LOADING':
-      return false;
+    case 'SET_LOADING':
+      stateArr.push(action.payload);
+      return stateArr;
+    case 'CLEAR_LOADING':
+      stateArr.splice(stateArr.indexOf(action.payload), 1);
+      return stateArr;
     default:
       return state;
   }
@@ -28,6 +32,9 @@ const uploadFiles = (state = [], action) => {
         return state;
       } else if (action.payload.length) {
         return action.payload;
+      // The user removed all of the file they had selected to upload.
+      } else if (action.payload.length === 0) {
+        return [];
       } else {
         return [...state, action.payload];
       }
@@ -38,8 +45,20 @@ const uploadFiles = (state = [], action) => {
   }
 };
 
+const enableEditing = (state = true, action) => {
+  switch (action.type) {
+    case 'ENABLE_EDITING':
+      return true;
+    case 'DISABLE_EDITING':
+      return false;
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   user,
   loading,
-  uploadFiles
+  uploadFiles,
+  enableEditing
 });
