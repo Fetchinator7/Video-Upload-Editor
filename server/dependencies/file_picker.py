@@ -8,7 +8,7 @@ if platform.system() != 'Darwin':
     root.attributes("-topmost", True)
 else:
     import os
-    os.system('''/usr/bin/osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
+    os.system('''osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
 
 root.withdraw()
 # We don't want a full GUI, so keep the root window from appearing

@@ -7,8 +7,6 @@ sys.path.append(str(paths.Path.joinpath(paths.Path(__file__).parent, 'System-Com
 import ffmpeg_cmds as fc
 import system as syst
 
-print('running vimeo file')
-
 # The path to the main output directory (computer specific.)
 path_to_main_out_save_folder = paths.Path(sys.argv[1])
 if path_to_main_out_save_folder.exists() is False:
@@ -37,6 +35,7 @@ def main(main_out_save_dir):
 		print(f'Error, the output folder "{title}" already exists.')
 		raise FileExistsError
 	else:
+		print('Encoding...\n')
 		fc.FileOperations(renamed_in_path, out_dir_path).trim('5', '15')
 
 		# The output folder was successfully created so continue.

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import HomePage from '../HomePage';
+import HomePage from '../HomePage/HomePage';
 import VideoPlayer from '../VideoPlayer/VideoPlayer';
 import { HashRouter as Router, Route, NavLink } from 'react-router-dom';
 import './App.css';

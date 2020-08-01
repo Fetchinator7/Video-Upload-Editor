@@ -6,7 +6,6 @@ function* uploadVideo(action) {
     yield axios.post('/vimeo/', action.payload);
   } catch (error) {
     console.log('Error uploading video', error);
-  } finally {
   }
 }
 
