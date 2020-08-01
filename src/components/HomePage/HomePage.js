@@ -58,6 +58,7 @@ class HomePage extends Component {
                   description: videoObj.description,
                   userName: this.props.user
                 },
+                privacy: videoObj.privacy,
                 index: index
               });
             })}

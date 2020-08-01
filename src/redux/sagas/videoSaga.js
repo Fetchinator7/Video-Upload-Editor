@@ -4,7 +4,7 @@ import { put, takeEvery, delay } from 'redux-saga/effects';
 function* selectVideoFiles(action) {
   try {
     const response = yield axios.get('/video/file-picker', action.payload);
-    yield put({ type: 'SET_UPLOAD_FILES', payload: { path: response.data, title: '', description: '' } });
+    yield put({ type: 'SET_UPLOAD_FILES', payload: { path: response.data, title: '', description: '', privacy: 'anybody', dropDownIsOpen: false } });
   } catch (error) {
     console.log('Error uploading video', error);
   }
@@ -16,6 +16,7 @@ function* uploadVideoFiles(action) {
     const response = yield axios.post('/video/', action.payload);
     const uri = response.data.uri;
     yield put({ type: 'CLEAR_LOADING', payload: action.index });
+    yield put({ type: 'UPDATE_VIDEO_PRIVACY', payload: { uri: uri, view: action.privacy } });
     yield put({ type: 'SET_TRANSCODING', payload: action.index });
     let transCoding = true;
     while (transCoding === true) {
@@ -33,7 +34,6 @@ function* uploadVideoFiles(action) {
   } finally {
     yield put({ type: 'CLEAR_LOADING', payload: action.index });
     yield put({ type: 'CLEAR_TRANSCODING', payload: action.index });
-    yield put({ type: 'ENABLE_EDITING' });
   }
 }
 

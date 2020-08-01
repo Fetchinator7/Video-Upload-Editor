@@ -4,13 +4,19 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import VideosTablePresets from './VideosTableDefaults';
 import MUIDataTable from 'mui-datatables';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress } from '@material-ui/core';
+import PrivacyOptions from './privacyOptions.json';
+import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, Menu, MenuItem, List, ListItem } from '@material-ui/core';
 
 const useStyles = createMuiTheme(
   VideosTablePresets.theme
 );
 
 class Table extends React.Component {
+  updateFile = (newVal, tableMeta, attr) => {
+    const updateArr = this.props.videos.map((videoObj, index) => tableMeta.rowIndex === index ? { ...videoObj, [attr]: newVal } : videoObj);
+    this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+  }
+
   render() {
     // Get the base formatted data then add the "comments" column to the end.
     const columns = [
@@ -21,9 +27,7 @@ class Table extends React.Component {
             return (
               <FormControlLabel
                 onChange={event => {
-                  const text = event.target.value;
-                  const updateArr = this.props.videos.map((videoObj, index) => tableMeta.rowIndex === index ? { ...videoObj, title: text } : videoObj);
-                  this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+                  this.updateFile(event.target.value, tableMeta, 'title');
                 }}
                 control={
                   <TextField color='primary' defaultValue={value} disabled={!this.props.enableEditing} />
@@ -40,13 +44,54 @@ class Table extends React.Component {
             return (
               <FormControlLabel
                 onChange={event => {
-                  const text = event.target.value;
-                  const updateArr = this.props.videos.map((videoObj, index) => tableMeta.rowIndex === index ? { ...videoObj, description: text } : videoObj);
-                  this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+                  this.updateFile(event.target.value, tableMeta, 'description');
                 }}
                 control={
                   <TextField color='primary' defaultValue={value} disabled={!this.props.enableEditing} />
                 }
+              />
+            );
+          }
+        }
+      },
+      {
+        name: 'Privacy',
+        options: {
+          sort: false,
+          customBodyRender: (value, tableMeta) => {
+            console.log(tableMeta);
+            return (
+              <FormControlLabel
+                control={
+                  <>
+                    <Button
+                      aria-controls="simple-menu"
+                      aria-haspopup="true"
+                      onClick={event => {
+                        this.updateFile(event, tableMeta, 'dropDownIsOpen');
+                      }}>
+                      {tableMeta.rowData[2]}
+                    </Button>
+                    <Menu
+                      // id="simple-menu"
+                      anchorEl={tableMeta}
+                      keepMounted
+                      open={Boolean(this.props.videos[tableMeta.rowIndex].dropDownIsOpen)}
+                      onClose={() => this.updateFile(false, tableMeta, 'dropDownIsOpen')}
+                    >
+                      {console.log(PrivacyOptions)}
+                      {PrivacyOptions.privacy.map(option =>
+                        <MenuItem onClick={() => {
+                          this.updateFile(false, tableMeta, 'dropDownIsOpen')
+                          this.updateFile(option, tableMeta, 'privacy')
+                        }}>{option}</MenuItem>
+                      )}
+                    </Menu>
+                  </>
+                }
+              // onChange={event => {
+              //   this.updateFile(event.target.value, tableMeta, 'dropDownIsOpen');
+              // }}
               />
             );
           }
@@ -68,9 +113,10 @@ class Table extends React.Component {
                   </Button>
                 }
                 onClick={() => {
+                  const videos = [...this.props.videos];
                   this.props.enableEditing && this.props.dispatch({
                     type: 'SET_UPLOAD_FILES',
-                    payload: this.props.videos.slice(0, tableMeta.rowIndex).concat(this.props.videos.slice(tableMeta.rowIndex + 1, this.props.videos.length))
+                    payload: videos.slice(0, tableMeta.rowIndex).concat(videos.slice(tableMeta.rowIndex + 1, videos.length))
                   });
                 }}
               />
@@ -82,7 +128,7 @@ class Table extends React.Component {
 
     let data = this.props.videos.map(videoObj => {
       return (
-        videoObj.path ? [videoObj.title, videoObj.description, `...${videoObj.path.slice(-40)}`] : []
+        videoObj.path ? [videoObj.title, videoObj.description, videoObj.privacy, `...${videoObj.path.slice(-40)}`] : []
       );
     });
 
