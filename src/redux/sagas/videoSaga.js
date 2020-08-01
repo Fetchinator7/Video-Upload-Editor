@@ -3,9 +3,8 @@ import { put, takeEvery } from 'redux-saga/effects';
 
 function* uploadVideoFiles(action) {
   try {
-    console.log('saga');
     const response = yield axios.get('/video/file-picker', action.payload);
-    yield put({ type: 'SET_UPLOAD_FILES', payload: response.data });
+    yield put({ type: 'SET_UPLOAD_FILES', payload: { path: response.data, title: '', description: '' } });
   } catch (error) {
     console.log('Error uploading video', error);
   }
