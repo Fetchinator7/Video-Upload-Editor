@@ -11,7 +11,6 @@ router.post('/', (req, res) => {
   const title = req.body.title;
   const userName = req.body.userName;
   const description = req.body.description;
-  console.log('post to video');
   if (userName !== undefined) {
     // TODO Handle error correctly.
     const pyProcess = spawn('python3', ['server/dependencies/local_operations.py', mainOutputFolder, videoPath, title, userName]);
@@ -31,8 +30,8 @@ router.post('/', (req, res) => {
         description: description ? description : ''
       };
       // http://localhost:5000/vimeo
-      axios.post('/vimeo', bodyObj).then(() => {
-        res.status(200).send({ output: output, path: outputVideoPath });
+      axios.post('http://localhost:5000/vimeo', bodyObj).then((response) => {
+        res.status(200).send({ output: output, path: outputVideoPath, uri: response.data });
       }).catch(err => {
         console.log('err', err);
         res.sendStatus(500);
@@ -47,6 +46,19 @@ router.post('/', (req, res) => {
     console.log("Error that's an invalid user.");
     res.sendStatus(400);
   }
+});
+
+router.get('/file-picker', (req, res) => {
+  // TODO Handle error correctly.
+  const pyProcess = spawn('python3', ['server/dependencies/file_picker.py']);
+  pyProcess.stdout.on('data', (data) => {
+    res.status(200).send(data.toString().slice(0, -1));
+  });
+  // res.sendStatus(200)
+  pyProcess.stderr.on('data', (data) => {
+    console.log(data.toString());
+    res.status(500).send({ output: data.toString() });
+  });
 });
 
 module.exports = router;
