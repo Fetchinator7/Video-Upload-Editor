@@ -12,12 +12,16 @@ const vimeoClient = new Vimeo(clientID, clientSecret, accessToken);
 router.get('/transcode-status/:uri', (req, res) => {
   const uri = req.params.uri;
   vimeoClient.request(`/videos/${uri}?fields=transcode.status`, function (error, body, statusCode, headers) {
-    if (body.transcode.status === 'complete') {
-      res.status(statusCode).send('Your video finished transcoding.');
-    } else if (body.transcode.status === 'in_progress') {
-      res.status(statusCode).send('Your video is still transcoding.');
+    if (body.transcode) {
+      if (body.transcode.status === 'complete') {
+        res.status(statusCode).send('Finished');
+      } else if (body.transcode.status === 'in_progress') {
+        res.status(statusCode).send('Transcoding');
+      } else {
+        res.status(statusCode).send('error', error);
+      }
     } else {
-      res.status(statusCode).send('Your video encountered an error during transcoding.', error);
+      res.status(statusCode).send(`Error, the requested video with the uri "${uri}" couldn't be found.`);
     }
   });
 });
@@ -40,11 +44,13 @@ router.post('/', (req, res) => {
     },
     function (bytesUploaded, bytesTotal) {
       const uploadPercentage = (bytesUploaded / bytesTotal * 100).toFixed(2);
+      // res.status(102).send(uploadPercentage + '%');
+      // res.sendStatus(102);
       console.log(uploadPercentage + '%');
     },
     function (error) {
-      console.log('Failed because: ' + error);
-      res.sendStatus(500);
+      res.status(500).send('Failed because: ' + error);
+      // res.sendStatus(102);
     }
   );
 });

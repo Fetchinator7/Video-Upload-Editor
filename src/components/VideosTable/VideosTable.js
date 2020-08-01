@@ -95,6 +95,10 @@ class Table extends React.Component {
       data = this.props.videos.map((vidObj, index) => {
         if (this.props.loading.includes(index)) {
           return [<CircularProgress key={`loading-${index}`} />, ...data[index]];
+        } else if (this.props.transCoding.includes(index)) {
+          return ['code', ...data[index]];
+        } else if (this.props.uploadError.includes(index)) {
+          return ['err', ...data[index]];
         } else {
           return ['yep', ...data[index]];
         }
@@ -117,6 +121,8 @@ class Table extends React.Component {
 const mapStateToProps = state => ({
   videos: state.uploadFiles,
   loading: state.loading,
+  transCoding: state.transCoding,
+  uploadError: state.uploadError,
   enableEditing: state.enableEditing
 });
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { put, takeEvery } from 'redux-saga/effects';
+import { put, takeEvery, delay } from 'redux-saga/effects';
 
 function* selectVideoFiles(action) {
   try {
@@ -14,11 +14,26 @@ function* uploadVideoFiles(action) {
   try {
     yield put({ type: 'SET_LOADING', payload: action.index });
     const response = yield axios.post('/video/', action.payload);
-    console.log('uri', response.data.uri);
+    const uri = response.data.uri;
+    yield put({ type: 'CLEAR_LOADING', payload: action.index });
+    yield put({ type: 'SET_TRANSCODING', payload: action.index });
+    let transCoding = true;
+    while (transCoding === true) {
+      const transCodingResponse = yield axios.get(`/vimeo/transcode-status/${uri}`);
+      yield delay(5000);
+      console.log('transCodingResponse.data', transCodingResponse.data);
+      if (transCodingResponse.data === 'Finished') {
+        transCoding = false;
+      }
+    }
+    yield put({ type: 'CLEAR_TRANSCODING', payload: action.index });
   } catch (error) {
     console.log('Error uploading video', error);
+    yield put({ type: 'SET_UPLOAD_ERROR', payload: action.index });
   } finally {
     yield put({ type: 'CLEAR_LOADING', payload: action.index });
+    yield put({ type: 'CLEAR_TRANSCODING', payload: action.index });
+    yield put({ type: 'ENABLE_EDITING' });
   }
 }
 

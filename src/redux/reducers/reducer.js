@@ -24,6 +24,36 @@ const loading = (state = [], action) => {
   }
 };
 
+const transCoding = (state = [], action) => {
+  // An array of ints that show which videos are transcoding by their index.
+  const stateArr = [...state];
+  switch (action.type) {
+    case 'SET_TRANSCODING':
+      stateArr.push(action.payload);
+      return stateArr;
+    case 'CLEAR_TRANSCODING':
+      stateArr.splice(stateArr.indexOf(action.payload), 1);
+      return stateArr;
+    default:
+      return state;
+  }
+};
+
+const uploadError = (state = [], action) => {
+  // An array of ints that show which videos are transcoding by their index.
+  const stateArr = [...state];
+  switch (action.type) {
+    case 'SET_UPLOAD_ERROR':
+      stateArr.push(action.payload);
+      return stateArr;
+    case 'CLEAR_UPLOAD_ERROR':
+      stateArr.splice(stateArr.indexOf(action.payload), 1);
+      return stateArr;
+    default:
+      return state;
+  }
+};
+
 const uploadFiles = (state = [], action) => {
   switch (action.type) {
     case 'SET_UPLOAD_FILES':
@@ -60,5 +90,7 @@ export default combineReducers({
   user,
   loading,
   uploadFiles,
-  enableEditing
+  enableEditing,
+  transCoding,
+  uploadError
 });
