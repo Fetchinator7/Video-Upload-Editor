@@ -55,35 +55,35 @@ router.post('/', (req, res) => {
   );
 });
 
-// Change the video privacy
-// Possible video privacy levels are: anybody, contact, disable, nobody, password, unlisted, and users.
+// Change the video visibility
+// Possible video visibility levels are: anybody, contact, disable, nobody, password, unlisted, and users.
 router.patch('/', (req, res) => {
   const uri = req.body.uri;
   const view = req.body.view;
   const password = req.body.password;
-  let privacyObj = {
+  let visibilityObj = {
     privacy: {
       view: view
     }
   };
   if (view === 'password') {
-    privacyObj = { ...privacyObj, password: password };
-  } else {
-    vimeoClient.request({
-      method: 'PATCH',
-      path: `/videos/${uri}`,
-      query: privacyObj
-    }, function (error, body, statusCode, headers) {
-      const responseStr = `Updated video privacy level to: "${view}".`;
-      if (error) {
-        res.status(statusCode).send('Error:', error);
-      } else if (view === 'password') {
-        res.status(statusCode).send(`${responseStr} The new password is: "${password}"`);
-      } else {
-        res.status(statusCode).send(responseStr);
-      }
-    });
+    visibilityObj = { ...visibilityObj, password: password };
   }
+  console.log(visibilityObj);
+  vimeoClient.request({
+    method: 'PATCH',
+    path: `/videos/${uri}`,
+    query: visibilityObj
+  }, function (error, body, statusCode, headers) {
+    const responseStr = `Updated video visibility level to: "${view}".`;
+    if (error) {
+      res.status(statusCode).send('Error:', error);
+    } else if (view === 'password') {
+      res.status(statusCode).send(`${responseStr} The new password is: "${password}"`);
+    } else {
+      res.status(statusCode).send(responseStr);
+    }
+  });
 });
 
 module.exports = router;

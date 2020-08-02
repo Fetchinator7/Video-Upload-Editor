@@ -1,0 +1,12 @@
+{
+    "visibility": [{
+        "title": "anybody",
+        "password": false
+    }, {
+        "title": "password",
+        "password": true
+    }, {
+        "title": "nobody",
+        "password": false
+    }]
+}

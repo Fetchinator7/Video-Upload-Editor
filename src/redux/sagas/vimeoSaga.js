@@ -9,17 +9,18 @@ function* uploadVideo(action) {
   }
 }
 
-function* updateVideoPrivacy(action) {
+function* updateVideoVisibility(action) {
   try {
+    console.log(action.payload);
     yield axios.patch('/vimeo/', action.payload);
   } catch (error) {
-    console.log('Error updating video privacy', error);
+    console.log('Error updating video visibility', error);
   }
 }
 
 function* vimeoSaga() {
   yield takeEvery('UPLOAD_VIDEO_TO_VIMEO', uploadVideo);
-  yield takeEvery('UPDATE_VIDEO_PRIVACY', updateVideoPrivacy);
+  yield takeEvery('UPDATE_VIDEO_VISIBILITY', updateVideoVisibility);
 }
 
 export default vimeoSaga;

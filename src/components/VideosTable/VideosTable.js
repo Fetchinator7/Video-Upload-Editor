@@ -4,7 +4,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import VideosTablePresets from './VideosTableDefaults';
 import MUIDataTable from 'mui-datatables';
 import DeleteIcon from '@material-ui/icons/Delete';
-import PrivacyOptions from './privacyOptions.json';
+import VisibilityOptions from './visibilityOptions.json';
 import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, Menu, MenuItem, List, ListItem } from '@material-ui/core';
 
 const useStyles = createMuiTheme(
@@ -55,7 +55,7 @@ class Table extends React.Component {
         }
       },
       {
-        name: 'Privacy',
+        name: 'Visibility',
         options: {
           sort: false,
           customBodyRender: (value, tableMeta) => {
@@ -72,21 +72,21 @@ class Table extends React.Component {
                       }}>
                       {tableMeta.rowData[2]}
                     </Button>
-                    <Menu
+                    {/* <Menu
                       // id="simple-menu"
-                      anchorEl={tableMeta}
+                      // anchorEl={tableMeta}
                       keepMounted
                       open={Boolean(this.props.videos[tableMeta.rowIndex].dropDownIsOpen)}
                       onClose={() => this.updateFile(false, tableMeta, 'dropDownIsOpen')}
                     >
-                      {console.log(PrivacyOptions)}
-                      {PrivacyOptions.privacy.map(option =>
+                      {console.log(visibilityOptions)}
+                      {visibilityOptions.visibility.map(option =>
                         <MenuItem onClick={() => {
                           this.updateFile(false, tableMeta, 'dropDownIsOpen')
-                          this.updateFile(option, tableMeta, 'privacy')
+                          this.updateFile(option, tableMeta, 'visibility')
                         }}>{option}</MenuItem>
                       )}
-                    </Menu>
+                    </Menu> */}
                   </>
                 }
               // onChange={event => {
@@ -128,7 +128,7 @@ class Table extends React.Component {
 
     let data = this.props.videos.map(videoObj => {
       return (
-        videoObj.path ? [videoObj.title, videoObj.description, videoObj.privacy, `...${videoObj.path.slice(-40)}`] : []
+        videoObj.path ? [videoObj.title, videoObj.description, videoObj.visibility, `...${videoObj.path.slice(-40)}`] : []
       );
     });
 
