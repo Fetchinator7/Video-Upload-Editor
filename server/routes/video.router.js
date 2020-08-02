@@ -14,6 +14,10 @@ router.post('/', (req, res) => {
   if (userName !== undefined) {
     // TODO Handle error correctly.
     const pyProcess = spawn('python3', ['server/dependencies/local_operations.py', mainOutputFolder, videoPath, title, userName]);
+    pyProcess.stderr.on('data', (data) => {
+      console.log(data.toString());
+      res.status(500).send({ output: data.toString() });
+    });
     pyProcess.stdout.on('data', (data) => {
       // The data object is what's sent to the python console which has the messages and the
       // output path in {}:
@@ -37,10 +41,6 @@ router.post('/', (req, res) => {
         res.sendStatus(500);
       });
       // res.sendStatus(200)
-    });
-    pyProcess.stderr.on('data', (data) => {
-      console.log(data.toString());
-      res.status(500).send({ output: data.toString() });
     });
   } else {
     console.log("Error that's an invalid user.");
