@@ -9,14 +9,29 @@ const user = (state = '', action) => {
   }
 };
 
-const loading = (state = [], action) => {
+const rendering = (state = [], action) => {
   // An array of ints that show which videos are loading by their index.
   const stateArr = [...state];
   switch (action.type) {
-    case 'SET_LOADING':
+    case 'SET_RENDERING':
       stateArr.push(action.payload);
       return stateArr;
-    case 'CLEAR_LOADING':
+    case 'CLEAR_RENDERING':
+      stateArr.splice(stateArr.indexOf(action.payload), 1);
+      return stateArr;
+    default:
+      return state;
+  }
+};
+
+const uploading = (state = [], action) => {
+  // An array of ints that show which videos are loading by their index.
+  const stateArr = [...state];
+  switch (action.type) {
+    case 'SET_UPLOADING':
+      stateArr.push(action.payload);
+      return stateArr;
+    case 'CLEAR_UPLOADING':
       stateArr.splice(stateArr.indexOf(action.payload), 1);
       return stateArr;
     default:
@@ -88,9 +103,10 @@ const enableEditing = (state = true, action) => {
 
 export default combineReducers({
   user,
-  loading,
+  rendering,
   uploadFiles,
   enableEditing,
   transCoding,
-  uploadError
+  uploadError,
+  uploading
 });

@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { put, takeEvery, delay } from 'redux-saga/effects';
+import { put, takeEvery, delay, select } from 'redux-saga/effects';
 
 function* selectVideoFiles(action) {
   try {
     const response = yield axios.get('/video/file-picker', action.payload);
-    yield put({ type: 'SET_UPLOAD_FILES', payload: { path: response.data, title: '', description: '', visibility: 'anybody', dropDownIsOpen: false } });
+    yield put({ type: 'SET_UPLOAD_FILES', payload: { path: response.data, title: '', description: '', visibility: 'anybody', uri: '', dropDownIsOpen: false } });
   } catch (error) {
     console.log('Error uploading video', error);
   }
@@ -12,10 +12,20 @@ function* selectVideoFiles(action) {
 
 function* uploadVideoFiles(action) {
   try {
-    yield put({ type: 'SET_LOADING', payload: action.index });
-    const response = yield axios.post('/video/', action.payload);
-    const uri = response.data.uri;
-    yield put({ type: 'CLEAR_LOADING', payload: action.index });
+    yield put({ type: 'SET_RENDERING', payload: action.index });
+    const renderResponse = yield axios.post('/video/', action.payload);
+    yield put({ type: 'CLEAR_RENDERING', payload: action.index });
+
+    yield put({ type: 'SET_UPLOADING', payload: action.index });
+    const uploadResponse = yield axios.post('/vimeo', renderResponse.data.bodyObj);
+    console.log('uploadResponse', uploadResponse);
+    const uri = uploadResponse.data;
+    yield put({ type: 'CLEAR_UPLOADING', payload: action.index });
+
+    const globalState = yield select();
+    const updateArr = globalState.uploadFiles.map((videoObj, index) => action.index === index ? { ...videoObj, uri: uri } : videoObj);
+    yield put({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+
     yield put({ type: 'UPDATE_VIDEO_VISIBILITY', payload: { uri: uri, view: action.visibility, password: action.password } });
     yield put({ type: 'SET_TRANSCODING', payload: action.index });
     let transCoding = true;
@@ -33,6 +43,8 @@ function* uploadVideoFiles(action) {
   } finally {
     yield put({ type: 'CLEAR_LOADING', payload: action.index });
     yield put({ type: 'CLEAR_TRANSCODING', payload: action.index });
+    yield put({ type: 'CLEAR_RENDERING', payload: action.index });
+    yield put({ type: 'CLEAR_UPLOADING', payload: action.index });
   }
 }
 

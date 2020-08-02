@@ -34,12 +34,7 @@ router.post('/', (req, res) => {
         description: description ? description : ''
       };
       // http://localhost:5000/vimeo
-      axios.post('http://localhost:5000/vimeo', bodyObj).then((response) => {
-        res.status(200).send({ output: output, path: outputVideoPath, uri: response.data });
-      }).catch(err => {
-        console.log('err', err);
-        res.sendStatus(500);
-      });
+      res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
       // res.sendStatus(200)
     });
   } else {
