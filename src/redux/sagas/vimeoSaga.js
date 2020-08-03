@@ -11,7 +11,6 @@ function* uploadVideo(action) {
 
 function* updateVideoVisibility(action) {
   try {
-    console.log(action.payload);
     yield axios.patch('/vimeo/', action.payload);
   } catch (error) {
     console.log('Error updating video visibility', error);

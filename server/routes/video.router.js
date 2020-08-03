@@ -46,13 +46,12 @@ router.post('/', (req, res) => {
 router.get('/file-picker', (req, res) => {
   // TODO Handle error correctly.
   const pyProcess = spawn('python3', ['server/dependencies/file_picker.py']);
-  pyProcess.stdout.on('data', (data) => {
-    res.status(200).send(data.toString().slice(0, -1));
-  });
-  // res.sendStatus(200)
   pyProcess.stderr.on('data', (data) => {
     console.log(data.toString());
     res.status(500).send({ output: data.toString() });
+  });
+  pyProcess.stdout.on('data', (data) => {
+    res.status(200).send(data.toString().slice(0, -1));
   });
 });
 

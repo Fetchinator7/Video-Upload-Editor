@@ -69,7 +69,6 @@ router.patch('/', (req, res) => {
   if (view === 'password') {
     visibilityObj = { ...visibilityObj, password: password };
   }
-  console.log(visibilityObj);
   vimeoClient.request({
     method: 'PATCH',
     path: `/videos/${uri}`,
