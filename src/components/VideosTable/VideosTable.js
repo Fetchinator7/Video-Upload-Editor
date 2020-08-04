@@ -66,29 +66,40 @@ class Table extends React.Component {
         } : {
           name: 'Description',
         },
-      {
-        name: 'Visibility',
-        options: {
-          sort: false,
-          customBodyRender: (value, tableMeta) => {
-            return (
-              <FormControlLabel
-                control={
-                  <>
-                    <Button
-                      aria-controls="simple-menu"
-                      aria-haspopup="true"
-                      onClick={() => {
-                        this.updateFile(!this.props.videos[tableMeta.rowIndex].dropDownIsOpen, tableMeta, 'dropDownIsOpen');
-                        this.setState({ visibilityLevelOpen: !this.state.visibilityLevelOpen })
-                      }}>
-                      {this.props.videos[tableMeta.rowIndex].visibility}
-                    </Button>
-                  </>
-                }
-              />
-            );
+      this.props.enableEditing ?
+        {
+          name: 'Visibility',
+          options: {
+            sort: false,
+            customBodyRender: (value, tableMeta) => {
+              return (
+                <FormControlLabel
+                  control={
+                    <>
+                      <Button
+                        aria-controls="simple-menu"
+                        aria-haspopup="true"
+                        onClick={() => {
+                          this.updateFile(!this.props.videos[tableMeta.rowIndex].dropDownIsOpen, tableMeta, 'dropDownIsOpen');
+                          this.setState({ visibilityLevelOpen: !this.state.visibilityLevelOpen })
+                        }}>
+                        {this.props.videos[tableMeta.rowIndex].visibility}
+                      </Button>
+                    </>
+                  }
+                />
+              );
+            }
           }
+        } : {
+          name: 'Visibility',
+          options: {
+            sort: false,
+            customBodyRender: (value) => {
+              return (
+                value.toUpperCase()
+              );
+            }
         }
       },
       {
