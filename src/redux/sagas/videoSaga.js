@@ -1,10 +1,11 @@
 import axios from 'axios';
+import moment from 'moment';
 import { put, takeEvery, delay, select } from 'redux-saga/effects';
 
 function* selectVideoFiles(action) {
   try {
     const response = yield axios.get('/video/file-picker', action.payload);
-    yield put({ type: 'SET_UPLOAD_FILES', payload: { path: response.data, title: '', description: '', visibility: 'anybody', uri: '', password: '', dropDownIsOpen: false } });
+    yield put({ type: 'SET_UPLOAD_FILES', payload: { path: response.data, title: `${moment().format('yyyy-MM-DD')} `, description: '', visibility: 'anybody', uri: '', password: '', dropDownIsOpen: false } });
   } catch (error) {
     console.log('Error uploading video', error);
   }

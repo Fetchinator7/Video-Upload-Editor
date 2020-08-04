@@ -13,9 +13,11 @@ router.post('/', (req, res) => {
   const description = req.body.description;
   if (userName !== undefined) {
     // TODO Handle error correctly.
+    let pythonErr = false;
     const pyProcess = spawn('python3', ['server/dependencies/local_operations.py', mainOutputFolder, videoPath, title, userName]);
     pyProcess.stderr.on('data', (data) => {
       console.log(data.toString());
+      pythonErr = true;
       res.status(500).send({ output: data.toString() });
     });
     pyProcess.stdout.on('data', (data) => {
@@ -26,15 +28,15 @@ router.post('/', (req, res) => {
       //   the path is in curly braces then extracted to be: "/...New Title.mp4"
       //   without the path is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application."
       // }
-      const output = data.toString().replace(/{(.*?)}/, '').slice(0, -2);
+      const output = data.toString().replace(/{(.*?)}/, '').replace(/{{(.*?)}}/, '').slice(0, -2);
       const outputVideoPath = data.toString().match(/{(.*?)}/) ? data.toString().match(/{(.*?)}/)[1] : '';
       const bodyObj = {
         videoPath: outputVideoPath,
-        title: moment().format('MM-DD-yyyy') + ' ' + title,
+        title: title,
         description: description ? description : ''
       };
       // http://localhost:5000/vimeo
-      res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
+      !pythonErr && res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
       // res.sendStatus(200)
     });
   } else {

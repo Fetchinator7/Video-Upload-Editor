@@ -10,8 +10,7 @@ import system as syst
 # The path to the main output directory (computer specific.)
 path_to_main_out_save_folder = paths.Path(sys.argv[1])
 if path_to_main_out_save_folder.exists() is False:
-	print(f'Error, output folder "{path_to_main_out_save_folder}" not found.')
-	raise FileNotFoundError
+	raise FileNotFoundError(f'Error, output folder "{path_to_main_out_save_folder}" not found.')
 
 def main(main_out_save_dir):
 	"""Main function to easily see what is being done at a glance."""
@@ -20,10 +19,9 @@ def main(main_out_save_dir):
 	org_in_vid_path = paths.Path(sys.argv[2])
 	title = sys.argv[3]
 	usr_name = sys.argv[4]
-	title_with_date = dates.datetime.now().strftime("%m-%d-%Y ") + title
 
 	# Rename the input file to title_with_date.
-	renamed_in_path = org_in_vid_path.with_name(title_with_date).with_suffix(org_in_vid_path.suffix)
+	renamed_in_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
 	org_in_vid_path.rename(renamed_in_path)
 
 	# Create a folder for the current month (it may already exist) and create a folder named by video title.
@@ -32,19 +30,18 @@ def main(main_out_save_dir):
 	
 	if out_dir_path is False:
 		# The output folder already exists so quit.
-		print(f'Error, the output folder "{title}" already exists.')
-		raise FileExistsError
+		raise FileExistsError(f'Error, the output folder "{title}" already exists.')
 	else:
 		print('Encoding...\n')
 		fc.FileOperations(renamed_in_path, out_dir_path).trim('5', '15')
 
 		# The output folder was successfully created so continue.
 		# Run function to write session info to a text file.
-		fin_log(usr_name, title_with_date, ren_method_used, renamed_in_path, out_dir_path)
+		fin_log(usr_name, title, ren_method_used, renamed_in_path, out_dir_path)
 
 		# For the sake of convenience, open Davinci Resolve and the input video folder.
 		# syst.Operations().open_path_or_app('Davinci Resolve')
-		out_path = paths.Path.joinpath(out_dir_path, title_with_date + '.mp4')
+		out_path = paths.Path.joinpath(out_dir_path, title + '.mp4')
 		print("{" + str(out_path) + "}")
 
 		syst.Operations().open_path_or_app(renamed_in_path.parent)
