@@ -4,7 +4,11 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import VideosTablePresets from './VideosTableDefaults';
 import MUIDataTable from 'mui-datatables';
 import DeleteIcon from '@material-ui/icons/Delete';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import ErrorIcon from '@material-ui/icons/Error';
+import upArrow from '../../icons/up-arrow.gif';
 import visibilityOptions from './visibilityOptions.json';
+import './VideosTable.css';
 import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, Radio, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle } from '@material-ui/core';
 
 const useStyles = createMuiTheme(
@@ -66,29 +70,40 @@ class Table extends React.Component {
         } : {
           name: 'Description',
         },
-      {
-        name: 'Visibility',
-        options: {
-          sort: false,
-          customBodyRender: (value, tableMeta) => {
-            return (
-              <FormControlLabel
-                control={
-                  <>
-                    <Button
-                      aria-controls="simple-menu"
-                      aria-haspopup="true"
-                      onClick={() => {
-                        this.updateFile(!this.props.videos[tableMeta.rowIndex].dropDownIsOpen, tableMeta, 'dropDownIsOpen');
-                        this.setState({ visibilityLevelOpen: !this.state.visibilityLevelOpen })
-                      }}>
-                      {this.props.videos[tableMeta.rowIndex].visibility}
-                    </Button>
-                  </>
-                }
-              />
-            );
+      this.props.enableEditing ?
+        {
+          name: 'Visibility',
+          options: {
+            sort: false,
+            customBodyRender: (value, tableMeta) => {
+              return (
+                <FormControlLabel
+                  control={
+                    <>
+                      <Button
+                        aria-controls="simple-menu"
+                        aria-haspopup="true"
+                        onClick={() => {
+                          this.updateFile(!this.props.videos[tableMeta.rowIndex].dropDownIsOpen, tableMeta, 'dropDownIsOpen');
+                          this.setState({ visibilityLevelOpen: !this.state.visibilityLevelOpen })
+                        }}>
+                        {this.props.videos[tableMeta.rowIndex].visibility}
+                      </Button>
+                    </>
+                  }
+                />
+              );
+            }
           }
+        } : {
+          name: 'Visibility',
+          options: {
+            sort: false,
+            customBodyRender: (value) => {
+              return (
+                value.toUpperCase()
+              );
+            }
         }
       },
       {
@@ -157,15 +172,15 @@ class Table extends React.Component {
       );
       data = this.props.videos.map((vidObj, index) => {
         if (this.props.uploadError.includes(index)) {
-          return ['err', ...data[index]];
+          return [<ErrorIcon style={{ color: '#d31f1f', fontSize: 40 }} />, ...data[index]];
         } else if (this.props.rendering.includes(index)) {
-          return [<CircularProgress key={`loading-${index}`} />, ...data[index]];
+          return [<CircularProgress style={{ color: '#18bc3c' }} key={`loading-${index}`} />, ...data[index]];
         } else if (this.props.uploading.includes(index)) {
-          return ['up', ...data[index]];
+          return [<img alt='Up' src={upArrow} />, ...data[index]];
         } else if (this.props.transCoding.includes(index)) {
-          return ['code', ...data[index]];
+          return [<CircularProgress style={{ color: '#dde238' }} />, ...data[index]];
         } else {
-          return ['yep', ...data[index]];
+          return [<CheckCircleOutlineIcon style={{ color: '#18bc3c', fontSize: 40 }} />, ...data[index]];
         }
       });
     }
@@ -233,7 +248,6 @@ class Table extends React.Component {
               <Button
                 onClick={() => {
                   // If the visibility is password make sure a password has been entered before closing.
-                  // this.state.visibilityLevel === 'password' ? this.state.password !== '' && this.setState({ visibilityLevelOpen: false }) : this.setState({ visibilityLevelOpen: false })
                   const vidVisArr = this.props.videos.filter(videoObj => (videoObj.dropDownIsOpen === true));
                   if (vidVisArr[0].visibility === 'password' && vidVisArr[0].password.length === 0) {
                     return;
