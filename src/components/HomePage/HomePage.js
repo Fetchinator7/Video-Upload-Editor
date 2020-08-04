@@ -29,20 +29,31 @@ class HomePage extends Component {
               name='settings1'
               value={this.props.user}
               onChange={
-                event => this.props.dispatch({
+                event => this.props.enableEditing && this.props.dispatch({
                   type: 'SET_USER',
                   payload: event.target.value
                 })
               }
             >
               <br />
-              {UsersJsonFile.users.map((user, index) =>
-                <FormControlLabel value={user} control={<Radio />} label={user} key={`user-options-${index}`} />
+              {UsersJsonFile.users.map((users, index) =>
+                <FormControlLabel
+                  value={users}
+                  control={<Radio />}
+                  label={users}
+                  key={`user-options-${index}`}
+                />
               )}
+              <FormControlLabel
+                value='Other'
+                control={<Radio />}
+                label='Other'
+              />
             </RadioGroup>
             <Button
               variant='contained'
               color='primary'
+              disabled={!this.props.enableEditing}
               onClick={() => this.props.dispatch({ type: 'OPEN_PYTHON_FILE_PICKER' })}
             >
               Add File
@@ -54,7 +65,7 @@ class HomePage extends Component {
             color='primary'
             // Confirm that a user has been selected, there's at least one video to upload,
             // and each video has a title (not an empty string).
-            disabled={(!this.props.user || this.props.videos.length === 0 || this.props.videos.some(videoObj => videoObj.title === ''))}
+            disabled={(!this.props.user || this.props.videos.length === 0 || this.props.videos.some(videoObj => videoObj.title === '') || !this.props.enableEditing)}
             onClick={() => {
               this.props.dispatch({ type: 'DISABLE_EDITING' });
               this.props.videos.map((videoObj, index) => {
@@ -83,6 +94,7 @@ class HomePage extends Component {
 
 const mapStateToProps = state => ({
   user: state.user,
+  enableEditing: state.enableEditing,
   loading: state.loading,
   videos: state.uploadFiles
 });
