@@ -37,7 +37,7 @@ class Table extends React.Component {
                     this.updateFile(event.target.value, tableMeta, 'title');
                   }}
                   control={
-                    <TextField color='primary' defaultValue={value} />
+                    <TextField color='primary' value={this.props.videos[tableMeta.rowIndex].title} />
                   }
                 />
               );
@@ -57,7 +57,7 @@ class Table extends React.Component {
                     this.updateFile(event.target.value, tableMeta, 'description');
                   }}
                   control={
-                    <TextField color='primary' defaultValue={value} />
+                    <TextField color='primary' value={this.props.videos[tableMeta.rowIndex].description} />
                   }
                 />
               );
