@@ -52,7 +52,9 @@ class HomePage extends Component {
           <Button
             variant='contained'
             color='primary'
-            disabled={(!this.props.user || this.props.videos.length === 0)}
+            // Confirm that a user has been selected, there's at least one video to upload,
+            // and each video has a title (not an empty string).
+            disabled={(!this.props.user || this.props.videos.length === 0 || this.props.videos.some(videoObj => videoObj.title === ''))}
             onClick={() => {
               this.props.dispatch({ type: 'DISABLE_EDITING' });
               this.props.videos.map((videoObj, index) => {
