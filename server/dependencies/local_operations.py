@@ -41,10 +41,9 @@ def main(main_out_save_dir):
 
 		# For the sake of convenience, open Davinci Resolve and the input video folder.
 		# syst.Operations().open_path_or_app('Davinci Resolve')
+		# syst.Operations().open_path_or_app(renamed_in_path.parent)
 		out_path = paths.Path.joinpath(out_dir_path, title + '.mp4')
 		print("{" + str(out_path) + "}")
-
-		syst.Operations().open_path_or_app(renamed_in_path.parent)
 
 def fin_log(usr, title, ren_method_used, renamed_in_path, out_dir_path):
 	"""Create log file."""

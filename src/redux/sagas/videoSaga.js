@@ -19,7 +19,7 @@ function* uploadVideoFiles(action) {
 
     yield put({ type: 'SET_UPLOADING', payload: action.index });
     const uploadResponse = yield axios.post('/vimeo', renderResponse.data.bodyObj);
-    console.log('uploadResponse', uploadResponse);
+
     const uri = uploadResponse.data;
     yield put({ type: 'CLEAR_UPLOADING', payload: action.index });
 
