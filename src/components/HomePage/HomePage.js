@@ -64,7 +64,7 @@ class HomePage extends Component {
                     description: videoObj.description,
                     userName: this.props.user
                   },
-                  visibility: videoObj.visibilityLevel,
+                  visibility: videoObj.visibility,
                   index: index,
                   password: videoObj.password
                 });
