@@ -1,25 +1,58 @@
 const express = require('express');
 const router = express.Router();
-const app = express();
-const PORT = process.env.PORT || 5000;
+const axios = require('axios');
+const moment = require('moment');
+const { spawn } = require('child_process');
+
+const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
 
 router.post('/', (req, res) => {
+  const videoPath = req.body.videoPath;
+  const title = req.body.title;
   const userName = req.body.userName;
-  const videoTitle = req.body.videoTitle;
+  const description = req.body.description;
   if (userName !== undefined) {
-    const pyProcess = spawn('python3', ['local_operations.py', userName, videoTitle]);
+    // TODO Handle error correctly.
+    const pyProcess = spawn('python3', ['server/dependencies/local_operations.py', mainOutputFolder, videoPath, title, userName]);
+    pyProcess.stderr.on('data', (data) => {
+      console.log(data.toString());
+      res.status(500).send({ output: data.toString() });
+    });
     pyProcess.stdout.on('data', (data) => {
-      res.status(200).send({ output: data.toString() });
+      // The data object is what's sent to the python console which has the messages and the
+      // output path in {}:
+      // {
+      //   the raw output is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application.\n{/...New Title.mp4}\n"
+      //   the path is in curly braces then extracted to be: "/...New Title.mp4"
+      //   without the path is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application."
+      // }
+      const output = data.toString().replace(/{(.*?)}/, '').slice(0, -2);
+      const outputVideoPath = data.toString().match(/{(.*?)}/) ? data.toString().match(/{(.*?)}/)[1] : '';
+      const bodyObj = {
+        videoPath: outputVideoPath,
+        title: moment().format('MM-DD-yyyy') + ' ' + title,
+        description: description ? description : ''
+      };
+      // http://localhost:5000/vimeo
+      res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
+      // res.sendStatus(200)
     });
   } else {
     console.log("Error that's an invalid user.");
-    res.sendStatus(500);
+    res.sendStatus(400);
   }
 });
 
-// Start listening for requests on a specific port.
-app.listen(PORT, () => {
-  console.log('Running on port', PORT);
+router.get('/file-picker', (req, res) => {
+  // TODO Handle error correctly.
+  const pyProcess = spawn('python3', ['server/dependencies/file_picker.py']);
+  pyProcess.stderr.on('data', (data) => {
+    console.log(data.toString());
+    res.status(500).send({ output: data.toString() });
+  });
+  pyProcess.stdout.on('data', (data) => {
+    res.status(200).send(data.toString().slice(0, -1));
+  });
 });
 
 module.exports = router;

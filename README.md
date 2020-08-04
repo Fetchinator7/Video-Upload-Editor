@@ -2,6 +2,10 @@
 
 This will be an interface for doing basic video editing before uploading to Vimeo.
 
-new line.
+To add users as options make a users.json file inside of the HomePage folder with this structure:
 
-git hub change
+```json
+{
+    "users": ["user 1", "user 2"]
+}
+```
