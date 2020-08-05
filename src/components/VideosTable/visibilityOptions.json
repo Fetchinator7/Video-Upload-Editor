@@ -1,12 +1,15 @@
 {
     "visibility": [{
-        "title": "anybody",
-        "password": false
+        "title": "anybody"
     }, {
-        "title": "password",
-        "password": true
+        "title": "contact"
     }, {
-        "title": "nobody",
-        "password": false
+        "title": "disable"
+    }, {
+        "title": "nobody"
+    }, {
+        "title": "password"
+    }, {
+        "title": "users"
     }]
 }
