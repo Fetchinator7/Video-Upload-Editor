@@ -57,7 +57,11 @@ router.get('/file-picker', (req, res) => {
 });
 
 router.get('/exit-process', (req, res) => {
-  process.exit();
+  try {
+    spawn('killall', ['node']);
+  } catch (error) {
+    console.log('killall error', error);
+  }
 });
 
 module.exports = router;

@@ -54,7 +54,7 @@ function* exitProcess() {
   try {
     yield axios.get('/video/exit-process');
   } catch (error) {
-    // process.exit(0);
+    console.log('Clean exit.');
   }
 }
 
