@@ -6,6 +6,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
+import Checkbox from '@material-ui/core/Checkbox';
 import { Button, createMuiTheme, MuiThemeProvider } from '@material-ui/core';
 import UsersJsonFile from './users.json';
 import VideosTable from '../VideosTable/VideosTable';
@@ -15,6 +16,10 @@ const useStyles = createMuiTheme(
 );
 
 class HomePage extends Component {
+  state = {
+    exportSeparateAudio: true
+  }
+
   render() {
     return (
       <>
@@ -50,6 +55,13 @@ class HomePage extends Component {
                 label='Other'
               />
             </RadioGroup>
+            Export audio
+            <Checkbox
+              color='primary'
+              checked={this.state.exportSeparateAudio}
+              value={this.state.exportSeparateAudio}
+              onClick={() => this.setState({ exportSeparateAudio: !this.state.exportSeparateAudio })}
+            />
             <Button
               variant='contained'
               color='primary'
@@ -75,12 +87,14 @@ class HomePage extends Component {
                     videoPath: videoObj.path,
                     title: videoObj.title,
                     description: videoObj.description,
-                    userName: this.props.user
+                    userName: this.props.user,
+                    exportSeparateAudio: Boolean(this.state.exportSeparateAudio)
                   },
                   visibility: videoObj.visibility,
                   index: index,
                   password: videoObj.password
                 });
+                return;
               });
             }}
           >

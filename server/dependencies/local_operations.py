@@ -19,6 +19,7 @@ def main(main_out_save_dir):
 	org_in_vid_path = paths.Path(sys.argv[2])
 	title = sys.argv[3]
 	usr_name = sys.argv[4]
+	export_audio = sys.argv[5]
 
 	# Rename the input file to title_with_date.
 	renamed_in_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
@@ -43,6 +44,8 @@ def main(main_out_save_dir):
 		# syst.Operations().open_path_or_app('Davinci Resolve')
 		# syst.Operations().open_path_or_app(renamed_in_path.parent)
 		out_path = paths.Path.joinpath(out_dir_path, title + '.mp4')
+		if export_audio == 'true':
+			fc.FileOperations(out_path, out_dir_path).change_ext('.mp3')
 		print("{" + str(out_path) + "}")
 
 def fin_log(usr, title, ren_method_used, renamed_in_path, out_dir_path):

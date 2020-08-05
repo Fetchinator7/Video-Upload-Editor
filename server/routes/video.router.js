@@ -8,11 +8,12 @@ router.post('/', (req, res) => {
   const videoPath = req.body.videoPath;
   const title = req.body.title;
   const userName = req.body.userName;
+  const exportSeparateAudio = req.body.exportSeparateAudio;
   const description = req.body.description;
   if (userName !== undefined) {
     // TODO Handle error correctly.
     let pythonErr = false;
-    const pyProcess = spawn('python3', ['server/dependencies/local_operations.py', mainOutputFolder, videoPath, title, userName]);
+    const pyProcess = spawn('python3', ['server/dependencies/local_operations.py', mainOutputFolder, videoPath, title, userName, exportSeparateAudio]);
     pyProcess.stderr.on('data', (data) => {
       console.log(data.toString());
       pythonErr = true;
