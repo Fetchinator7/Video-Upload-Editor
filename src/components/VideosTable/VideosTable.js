@@ -183,6 +183,7 @@ class Table extends React.Component {
           return [<CheckCircleOutlineIcon style={{ color: '#18bc3c', fontSize: 40 }} />, ...data[index]];
         }
       });
+      this.props.uploaded.length === this.props.videos.length && this.props.dispatch({ type: 'EXIT_PROCESS' });
     }
 
     // Find all the objects in the videos array that have dropDownIsOpen === true to get the
@@ -273,6 +274,7 @@ const mapStateToProps = state => ({
   videos: state.uploadFiles,
   rendering: state.rendering,
   uploading: state.uploading,
+  uploaded: state.uploaded,
   transCoding: state.transCoding,
   uploadError: state.uploadError,
   enableEditing: state.enableEditing

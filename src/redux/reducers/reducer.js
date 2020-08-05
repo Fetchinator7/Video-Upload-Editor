@@ -54,6 +54,18 @@ const transCoding = (state = [], action) => {
   }
 };
 
+const uploaded = (state = [], action) => {
+  // An array of ints that show which videos are transcoding by their index.
+  const stateArr = [...state];
+  switch (action.type) {
+    case 'SET_UPLOADED':
+      stateArr.push(action.payload);
+      return stateArr;
+    default:
+      return state;
+  }
+};
+
 const uploadError = (state = [], action) => {
   // An array of ints that show which videos are transcoding by their index.
   const stateArr = [...state];
@@ -108,5 +120,6 @@ export default combineReducers({
   enableEditing,
   transCoding,
   uploadError,
-  uploading
+  uploading,
+  uploaded
 });

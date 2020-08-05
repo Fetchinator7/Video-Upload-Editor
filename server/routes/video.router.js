@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
-const moment = require('moment');
 const { spawn } = require('child_process');
 
 const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
@@ -55,6 +53,10 @@ router.get('/file-picker', (req, res) => {
   pyProcess.stdout.on('data', (data) => {
     res.status(200).send(data.toString().slice(0, -1));
   });
+});
+
+router.get('/exit-process', (req, res) => {
+  process.exit();
 });
 
 module.exports = router;
