@@ -290,6 +290,22 @@ class Table extends React.Component {
             </DialogActions>
           </Dialog>
         </MuiThemeProvider>
+        {!this.props.enableEditing &&
+          (<>
+            <br />
+            <br />
+            <br />
+            <CircularProgress style={{ color: '#18bc3c' }} />: Rendering Locally
+            <br />
+            <img alt='Up' src={upArrow} />: Uploading To Vimeo
+            <br />
+            <CircularProgress style={{ color: '#dde238' }} />: Transcoding On Vimeo
+            <br />
+            <CheckCircleOutlineIcon style={{ color: '#18bc3c', fontSize: 45 }} />: Successfully Uploaded
+            <br />
+            <ErrorIcon style={{ color: '#d31f1f', fontSize: 45 }} />: Error
+          </>)
+        }
       </>
     );
   }
