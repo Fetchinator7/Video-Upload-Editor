@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
-const moment = require('moment');
 const { spawn } = require('child_process');
 
 const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
@@ -10,11 +8,12 @@ router.post('/', (req, res) => {
   const videoPath = req.body.videoPath;
   const title = req.body.title;
   const userName = req.body.userName;
+  const exportSeparateAudio = req.body.exportSeparateAudio;
   const description = req.body.description;
   if (userName !== undefined) {
     // TODO Handle error correctly.
     let pythonErr = false;
-    const pyProcess = spawn('python3', ['server/dependencies/local_operations.py', mainOutputFolder, videoPath, title, userName]);
+    const pyProcess = spawn('python3', ['server/dependencies/local_operations.py', mainOutputFolder, videoPath, title, userName, exportSeparateAudio]);
     pyProcess.stderr.on('data', (data) => {
       console.log(data.toString());
       pythonErr = true;
@@ -53,8 +52,16 @@ router.get('/file-picker', (req, res) => {
     res.status(500).send({ output: data.toString() });
   });
   pyProcess.stdout.on('data', (data) => {
-    res.status(200).send(data.toString().slice(0, -1));
+    res.status(200).send(String(data.toString().slice(0, -1)));
   });
+});
+
+router.get('/exit-process', (req, res) => {
+  try {
+    spawn('killall', ['node']);
+  } catch (error) {
+    console.log('killall error', error);
+  }
 });
 
 module.exports = router;

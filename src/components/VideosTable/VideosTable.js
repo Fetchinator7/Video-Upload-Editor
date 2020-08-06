@@ -9,7 +9,7 @@ import ErrorIcon from '@material-ui/icons/Error';
 import upArrow from '../../icons/up-arrow.gif';
 import visibilityOptions from './visibilityOptions.json';
 import './VideosTable.css';
-import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, Radio, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle } from '@material-ui/core';
+import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, Radio, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle, Checkbox } from '@material-ui/core';
 
 const useStyles = createMuiTheme(
   VideosTablePresets.theme
@@ -30,6 +30,30 @@ class Table extends React.Component {
   render() {
     // Get the base formatted data then add the "comments" column to the end.
     const columns = [
+      this.props.enableEditing ?
+        {
+          name: 'Export Audio',
+          options: {
+            customBodyRender: (value, tableMeta) => {
+              return (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      color='primary'
+                      checked={this.props.videos[tableMeta.rowIndex].exportSeparateAudio}
+                      value={this.props.videos[tableMeta.rowIndex].exportSeparateAudio}
+                    />
+                  }
+                  onChange={() => {
+                    this.updateFile(!value, tableMeta, 'exportSeparateAudio');
+                  }}
+                />
+              );
+            }
+          }
+        } : {
+          name: 'Status',
+        },
       this.props.enableEditing ?
         {
           name: 'Title',
@@ -81,8 +105,6 @@ class Table extends React.Component {
                   control={
                     <>
                       <Button
-                        aria-controls="simple-menu"
-                        aria-haspopup="true"
                         onClick={() => {
                           this.updateFile(!this.props.videos[tableMeta.rowIndex].dropDownIsOpen, tableMeta, 'dropDownIsOpen');
                           this.setState({ visibilityLevelOpen: !this.state.visibilityLevelOpen })
@@ -104,8 +126,8 @@ class Table extends React.Component {
                 value.toUpperCase()
               );
             }
-        }
-      },
+          }
+        },
       {
         name: 'File Path'
       },
@@ -160,29 +182,29 @@ class Table extends React.Component {
 
     let data = this.props.videos.map(videoObj => {
       return (
-        videoObj.path ? [videoObj.title, videoObj.description, videoObj.visibility, `...${videoObj.path.slice(-40)}`, ''] : []
+        videoObj.path ? [videoObj.exportSeparateAudio, videoObj.title, videoObj.description, videoObj.visibility, `...${videoObj.path.slice(-70)}`, ''] : []
       );
     });
 
     if (this.props.enableEditing === false) {
-      columns.unshift(
-        {
-          name: 'Status'
-        }
-      );
-      data = this.props.videos.map((vidObj, index) => {
+      data = data.map((vidObj, index) => {
+        // Remove the export audio indicator at the beginning of the array and replace it
+        // with the upload status indicator.
+        const vidData = [...data[index]];
+        vidData.shift();
         if (this.props.uploadError.includes(index)) {
-          return [<ErrorIcon style={{ color: '#d31f1f', fontSize: 40 }} />, ...data[index]];
+          return [<ErrorIcon style={{ color: '#d31f1f', fontSize: 40 }} />, ...vidData];
         } else if (this.props.rendering.includes(index)) {
-          return [<CircularProgress style={{ color: '#18bc3c' }} key={`loading-${index}`} />, ...data[index]];
+          return [<CircularProgress style={{ color: '#18bc3c' }} key={`loading-${index}`} />, ...vidData];
         } else if (this.props.uploading.includes(index)) {
-          return [<img alt='Up' src={upArrow} />, ...data[index]];
+          return [<img alt='Up' src={upArrow} />, ...vidData];
         } else if (this.props.transCoding.includes(index)) {
-          return [<CircularProgress style={{ color: '#dde238' }} />, ...data[index]];
+          return [<CircularProgress style={{ color: '#dde238' }} />, ...vidData];
         } else {
-          return [<CheckCircleOutlineIcon style={{ color: '#18bc3c', fontSize: 40 }} />, ...data[index]];
+          return [<CheckCircleOutlineIcon style={{ color: '#18bc3c', fontSize: 40 }} />, ...vidData];
         }
       });
+      this.props.uploaded.length === this.props.videos.length && this.props.dispatch({ type: 'EXIT_PROCESS' });
     }
 
     // Find all the objects in the videos array that have dropDownIsOpen === true to get the
@@ -273,6 +295,7 @@ const mapStateToProps = state => ({
   videos: state.uploadFiles,
   rendering: state.rendering,
   uploading: state.uploading,
+  uploaded: state.uploaded,
   transCoding: state.transCoding,
   uploadError: state.uploadError,
   enableEditing: state.enableEditing

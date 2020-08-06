@@ -6,6 +6,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
+import Checkbox from '@material-ui/core/Checkbox';
 import { Button, createMuiTheme, MuiThemeProvider } from '@material-ui/core';
 import UsersJsonFile from './users.json';
 import VideosTable from '../VideosTable/VideosTable';
@@ -75,7 +76,8 @@ class HomePage extends Component {
                     videoPath: videoObj.path,
                     title: videoObj.title,
                     description: videoObj.description,
-                    userName: this.props.user
+                    userName: this.props.user,
+                    exportSeparateAudio: videoObj.exportSeparateAudio
                   },
                   visibility: videoObj.visibility,
                   index: index,

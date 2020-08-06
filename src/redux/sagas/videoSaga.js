@@ -5,7 +5,19 @@ import { put, takeEvery, delay, select } from 'redux-saga/effects';
 function* selectVideoFiles(action) {
   try {
     const response = yield axios.get('/video/file-picker', action.payload);
-    yield put({ type: 'SET_UPLOAD_FILES', payload: { path: response.data, title: `${moment().format('yyyy-MM-DD')} `, description: '', visibility: 'anybody', uri: '', password: '', dropDownIsOpen: false } });
+    yield put({
+      type: 'SET_UPLOAD_FILES',
+      payload: {
+        path: response.data,
+        title: `${moment().format('yyyy-MM-DD')} `,
+        description: '',
+        visibility: 'anybody',
+        uri: '',
+        password: '',
+        exportSeparateAudio: true,
+        dropDownIsOpen: false
+      }
+    });
   } catch (error) {
     console.log('Error uploading video', error);
   }
@@ -38,6 +50,7 @@ function* uploadVideoFiles(action) {
       }
     }
     yield put({ type: 'CLEAR_TRANSCODING', payload: action.index });
+    yield put({ type: 'SET_UPLOADED', payload: action.index });
   } catch (error) {
     console.log('Error uploading video', error);
     yield put({ type: 'SET_UPLOAD_ERROR', payload: action.index });
@@ -49,9 +62,18 @@ function* uploadVideoFiles(action) {
   }
 }
 
+function* exitProcess() {
+  try {
+    yield axios.get('/video/exit-process');
+  } catch (error) {
+    console.log('Clean exit.');
+  }
+}
+
 function* videoSaga() {
   yield takeEvery('OPEN_PYTHON_FILE_PICKER', selectVideoFiles);
   yield takeEvery('UPLOAD_VIDEO_TO_VIMEO_AND_ARCHIVE_SOURCE', uploadVideoFiles);
+  yield takeEvery('EXIT_PROCESS', exitProcess);
 }
 
 export default videoSaga;
