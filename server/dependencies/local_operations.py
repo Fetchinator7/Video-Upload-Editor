@@ -42,7 +42,8 @@ def main(main_out_save_dir):
 
 		# Run the ffmpeg command to normalize the input video audio and compress it.
 		# fc.FileOperations(renamed_in_path, norm_aud_dir).compress_using_h265_and_norm_aud()
-		fc.FileOperations(renamed_in_path, out_dir_path).trim('5', '15')
+		# fc.FileOperations(renamed_in_path, out_dir_path).trim('5', '15')
+		fc.FileOperations(renamed_in_path, out_dir_path).loudnorm_stereo()
 
 		# Get the path of the output file.
 		out_path = paths.Path.joinpath(out_dir_path, title + '.mp4')
