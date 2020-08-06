@@ -34,6 +34,7 @@ class Table extends React.Component {
         {
           name: 'Export Audio',
           options: {
+            sort: false,
             customBodyRender: (value, tableMeta) => {
               return (
                 <FormControlLabel
@@ -53,6 +54,9 @@ class Table extends React.Component {
           }
         } : {
           name: 'Status',
+          options: {
+            sort: false
+          }
         },
       this.props.enableEditing ?
         {
