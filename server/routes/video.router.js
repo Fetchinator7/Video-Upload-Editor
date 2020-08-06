@@ -52,7 +52,7 @@ router.get('/file-picker', (req, res) => {
     res.status(500).send({ output: data.toString() });
   });
   pyProcess.stdout.on('data', (data) => {
-    res.status(200).send(data.toString().slice(0, -1));
+    res.status(200).send(String(data.toString().slice(0, -1)));
   });
 });
 
