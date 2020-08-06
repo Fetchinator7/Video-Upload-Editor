@@ -16,10 +16,6 @@ const useStyles = createMuiTheme(
 );
 
 class HomePage extends Component {
-  state = {
-    exportSeparateAudio: true
-  }
-
   render() {
     return (
       <>
@@ -55,13 +51,6 @@ class HomePage extends Component {
                 label='Other'
               />
             </RadioGroup>
-            Export audio
-            <Checkbox
-              color='primary'
-              checked={this.state.exportSeparateAudio}
-              value={this.state.exportSeparateAudio}
-              onClick={() => this.setState({ exportSeparateAudio: !this.state.exportSeparateAudio })}
-            />
             <Button
               variant='contained'
               color='primary'
@@ -88,13 +77,12 @@ class HomePage extends Component {
                     title: videoObj.title,
                     description: videoObj.description,
                     userName: this.props.user,
-                    exportSeparateAudio: Boolean(this.state.exportSeparateAudio)
+                    exportSeparateAudio: videoObj.exportSeparateAudio
                   },
                   visibility: videoObj.visibility,
                   index: index,
                   password: videoObj.password
                 });
-                return;
               });
             }}
           >
