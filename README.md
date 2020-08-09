@@ -16,7 +16,35 @@ This will be a basic interface for automatically rendering then uploading videos
 
     - Once you specify a parent folder all the videos will automatically be put inside a folder for the current year and te current month.
 
-## SETUP
+## Installation
+
+### Mac
+
+All the dependencies can be installed using [Homebrew](https://brew.sh/)
+
+```shell
+brew install python3
+brew install ffmpeg
+brew install node
+```
+
+### Windows
+
+[Install Python3](https://installpython3.com/windows/)
+
+[Install ffmpeg](https://www.wikihow.com/Install-FFmpeg-on-Windows)
+
+Go to [NodeJs Downloads](https://nodejs.org/en/download/) and click the button that says "Windows Installer"
+
+This'll download the .msi which will do all the installation and paths for you.
+
+### Both
+
+If you don't have git you can download this project as a zip file and move that folder to the folder where you'd like to store this project in. Once that's done open a terminal window, enter `cd`, drag-and-drop the folder on top of the terminal window, and press enter. Then run `npm install`
+
+To run the application double-click/open the `run.sh` file. You can also add an alias to that file on the dock or desktop to speed up the start process. The application window should open automatically in the computer's default web browser, but it may take a few seconds. If it doesn't open automatically open it by manually going to [localhost:3000](http://localhost:3000/) (just click this link).
+
+## Setup
 
 Unfortunately you need to register an app and have it be approved before you can start uploading to Vimeo which may take up to 5 business days so let's get the ball rolling by [creating a new app](https://developer.vimeo.com/apps/new)!
 
