@@ -12,6 +12,7 @@ router.post('/', (req, res) => {
   const compress = Boolean(process.env.COMPRESSION) || false;
   const trimStart = req.body.trimStart;
   const trimEnd = req.body.trimEnd;
+  const codecCopy = Boolean(process.env.TRIM_CODEC_COPY) || true;
   const description = req.body.description;
   if (userName !== undefined) {
     // TODO Handle error correctly.
@@ -25,7 +26,8 @@ router.post('/', (req, res) => {
         exportSeparateAudio,
         compress,
         trimStart,
-        trimEnd
+        trimEnd,
+        codecCopy
       ]);
     pyProcess.stderr.on('data', (data) => {
       console.log(data.toString());

@@ -24,6 +24,7 @@ def main(main_out_save_dir):
 	compress = sys.argv[6]
 	start_time = sys.argv[7]
 	end_time = sys.argv[8]
+	codec_copy = sys.argv[9]
 
 	# Rename the input file to be the input title.
 	renamed_in_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
@@ -59,7 +60,7 @@ def main(main_out_save_dir):
 			# (The output can't be in the same directory as the input so make this temp folder)
 			trim_dir = tempfile.TemporaryDirectory()
 			trim_dir_path = paths.Path(trim_dir.name)
-			fc.FileOperations(renamed_in_path, trim_dir_path).trim(start_time, end_time)
+			fc.FileOperations(renamed_in_path, trim_dir_path).trim(start_time, end_time, codec_copy=bool(codec_copy))
 			out_trim_path = paths.Path.joinpath(trim_dir_path, renamed_in_path.name)
 			render(out_trim_path)
 		else:
