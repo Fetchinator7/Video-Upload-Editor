@@ -6,7 +6,6 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
-import Checkbox from '@material-ui/core/Checkbox';
 import { Button, createMuiTheme, MuiThemeProvider } from '@material-ui/core';
 import UsersJsonFile from './users.json';
 import VideosTable from '../VideosTable/VideosTable';
@@ -21,14 +20,14 @@ class HomePage extends Component {
       <>
         <MuiThemeProvider theme={useStyles}>
           <header className='App-header'>
-            <h1>Homepage</h1>
+            <h1>Select Videos To Upload</h1>
           </header>
-          Select a user:
+          <h2 className='test'>Select a user:</h2>
           <FormControl component='fieldset'>
             <RadioGroup
-              aria-label='settings'
-              name='settings1'
               value={this.props.user}
+              style={{ root: { background: '#18bc3c', fontSize: 40 } }}
+              disabled={!this.props.enableEditing}
               onChange={
                 event => this.props.enableEditing && this.props.dispatch({
                   type: 'SET_USER',
@@ -36,7 +35,6 @@ class HomePage extends Component {
                 })
               }
             >
-              <br />
               {UsersJsonFile.users.map((users, index) =>
                 <FormControlLabel
                   value={users}
@@ -51,16 +49,16 @@ class HomePage extends Component {
                 label='Other'
               />
             </RadioGroup>
-            <Button
-              variant='contained'
-              color='primary'
-              disabled={!this.props.enableEditing}
-              onClick={() => this.props.dispatch({ type: 'OPEN_PYTHON_FILE_PICKER' })}
-            >
-              Add File
-            </Button>
           </FormControl>
-          <VideosTable />
+          <br />
+          <Button
+            variant='contained'
+            color='primary'
+            disabled={!this.props.enableEditing}
+            onClick={() => this.props.dispatch({ type: 'OPEN_PYTHON_FILE_PICKER' })}
+          >
+            Add File
+          </Button>
           <Button
             variant='contained'
             color='primary'
@@ -77,7 +75,9 @@ class HomePage extends Component {
                     title: videoObj.title,
                     description: videoObj.description,
                     userName: this.props.user,
-                    exportSeparateAudio: videoObj.exportSeparateAudio
+                    exportSeparateAudio: videoObj.exportSeparateAudio,
+                    trimStart: videoObj.trimStart,
+                    trimEnd: videoObj.trimEnd
                   },
                   visibility: videoObj.visibility,
                   index: index,
@@ -88,6 +88,7 @@ class HomePage extends Component {
           >
             Upload Video(s)
           </Button>
+          <VideosTable />
         </MuiThemeProvider>
       </>
     );

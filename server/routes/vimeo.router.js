@@ -66,9 +66,22 @@ router.patch('/', (req, res) => {
       view: view
     }
   };
-  if (view === 'password') {
-    visibilityObj = { ...visibilityObj, password: password };
+
+  if (!uri || !view) {
+    res.sendStatus(400);
+    return;
   }
+  if (view === 'password') {
+    if (!password) {
+      // Since the visibility level is password an actual password is required, but it
+      // wasn't provided so send a bad request error.
+      res.sendStatus(400);
+      return;
+    } else {
+      visibilityObj = { ...visibilityObj, password: password };
+    }
+  }
+  
   vimeoClient.request({
     method: 'PATCH',
     path: `/videos/${uri}`,
