@@ -19,6 +19,7 @@ class Table extends React.Component {
   state = {
     visibilityLevelOpen: false,
     showTextField: false,
+    trimDropDownIsOpen: false,
     visibleTableMeta: ''
   }
 
@@ -32,7 +33,7 @@ class Table extends React.Component {
     const columns = [
       this.props.enableEditing ?
         {
-          name: 'Export Audio',
+          name: 'Plus Audio Only',
           options: {
             sort: false,
             customBodyRender: (value, tableMeta) => {
@@ -110,7 +111,7 @@ class Table extends React.Component {
                     <>
                       <Button
                         onClick={() => {
-                          this.updateFile(!this.props.videos[tableMeta.rowIndex].dropDownIsOpen, tableMeta, 'dropDownIsOpen');
+                          this.updateFile(!this.props.videos[tableMeta.rowIndex].visibilityDropDownIsOpen, tableMeta, 'visibilityDropDownIsOpen');
                           this.setState({ visibilityLevelOpen: !this.state.visibilityLevelOpen })
                         }}>
                         {this.props.videos[tableMeta.rowIndex].visibility}
@@ -133,7 +134,34 @@ class Table extends React.Component {
           }
         },
       {
-        name: 'File Path'
+        name: 'File Path',
+        options: {
+          sort: false,
+        }
+      },
+      this.props.enableEditing &&
+      {
+        name: 'Trim',
+        options: {
+          sort: false,
+          customBodyRender: (value, tableMeta) => {
+            return (
+              <FormControlLabel
+                control={
+                  <>
+                    <Button
+                      onClick={() => {
+                        this.updateFile(!this.props.videos[tableMeta.rowIndex].trimDropDownIsOpen, tableMeta, 'trimDropDownIsOpen');
+                        this.setState({ trimDropDownIsOpen: !this.state.trimDropDownIsOpen })
+                      }}>
+                      Trim
+                      </Button>
+                  </>
+                }
+              />
+            );
+          }
+        }
       },
       this.props.enableEditing ?
         {
@@ -186,7 +214,7 @@ class Table extends React.Component {
 
     let data = this.props.videos.map(videoObj => {
       return (
-        videoObj.path ? [videoObj.exportSeparateAudio, videoObj.title, videoObj.description, videoObj.visibility, `...${videoObj.path.slice(-70)}`, ''] : []
+        videoObj.path ? [videoObj.exportSeparateAudio, videoObj.title, videoObj.description, videoObj.visibility, `...${videoObj.path.slice(-70)}`, '', ''] : []
       );
     });
 
@@ -211,10 +239,10 @@ class Table extends React.Component {
       this.props.uploaded.length === this.props.videos.length && this.props.dispatch({ type: 'EXIT_PROCESS' });
     }
 
-    // Find all the objects in the videos array that have dropDownIsOpen === true to get the
+    // Find all the objects in the videos array that have visibilityDropDownIsOpen === true to get the
     // default radio button value.
-    const getOpenVidAttr = (attr) => {
-      const val = this.props.videos.filter(videoObj => (videoObj.dropDownIsOpen === true))
+    const getOpenVidAttr = (attr, dropDown) => {
+      const val = this.props.videos.filter(videoObj => (videoObj[dropDown] === true))
       if (val.length !== 0) {
         return val[0][attr];
       }
@@ -232,14 +260,14 @@ class Table extends React.Component {
             <DialogTitle id="confirmation-dialog-title">Video Visibility</DialogTitle>
             <DialogContent dividers>
               <RadioGroup
-                value={getOpenVidAttr('visibility')}
+                value={getOpenVidAttr('visibility', 'visibilityDropDownIsOpen')}
                 onChange={event => {
-                  const updateArr = this.props.videos.map(videoObj => (videoObj.dropDownIsOpen === true) ? { ...videoObj, visibility: event.target.value } : videoObj);
+                  const updateArr = this.props.videos.map(videoObj => (videoObj.visibilityDropDownIsOpen === true) ? { ...videoObj, visibility: event.target.value } : videoObj);
                   this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
                 }}
               >
                 {visibilityOptions.visibility.map((option) => {
-                  const vidVisArr = this.props.videos.filter(videoObj => (videoObj.dropDownIsOpen === true));
+                  const vidVisArr = this.props.videos.filter(videoObj => (videoObj.visibilityDropDownIsOpen === true));
                   if (vidVisArr.length !== 0) {
                     if (vidVisArr[0].visibility === 'password' && this.state.showTextField === false) {
                       this.setState({ showTextField: true })
@@ -258,12 +286,11 @@ class Table extends React.Component {
                   label="Password:"
                   type="text"
                   fullWidth
-                  defaultValue={this.state.message}
-                  value={getOpenVidAttr('password')}
+                  value={getOpenVidAttr('password', 'visibilityDropDownIsOpen')}
                   onChange={
                     // Set maximum number of message characters to 100.
                     event => {
-                      const updateArr = this.props.videos.map(videoObj => (videoObj.dropDownIsOpen === true) ? { ...videoObj, password: event.target.value } : videoObj);
+                      const updateArr = this.props.videos.map(videoObj => (videoObj.visibilityDropDownIsOpen === true) ? { ...videoObj, password: event.target.value } : videoObj);
                       this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
                     }
                   }
@@ -274,11 +301,11 @@ class Table extends React.Component {
               <Button
                 onClick={() => {
                   // If the visibility is password make sure a password has been entered before closing.
-                  const vidVisArr = this.props.videos.filter(videoObj => (videoObj.dropDownIsOpen === true));
+                  const vidVisArr = this.props.videos.filter(videoObj => (videoObj.visibilityDropDownIsOpen === true));
                   if (vidVisArr[0].visibility === 'password' && vidVisArr[0].password.length === 0) {
                     return;
                   } else {
-                    const updateArr = this.props.videos.map(videoObj => (videoObj.dropDownIsOpen === true) ? { ...videoObj, dropDownIsOpen: false } : videoObj);
+                    const updateArr = this.props.videos.map(videoObj => (videoObj.visibilityDropDownIsOpen === true) ? { ...videoObj, visibilityDropDownIsOpen: false } : videoObj);
                     this.setState({ visibilityLevelOpen: !this.state.visibilityLevelOpen })
                     this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
                   }
@@ -288,6 +315,58 @@ class Table extends React.Component {
                 Ok
                 </Button>
             </DialogActions>
+          </Dialog>
+          <Dialog
+            open={this.state.trimDropDownIsOpen}
+          >
+            <DialogTitle id="confirmation-dialog-title">Trim Video</DialogTitle>
+            <DialogContent dividers>
+              <>
+                <TextField
+                  focused
+                  autoFocus
+                  margin="dense"
+                  label="Trim Start Timecode:"
+                  type="text"
+                  fullWidth
+                  value={getOpenVidAttr('trimStart', 'trimDropDownIsOpen')}
+                  onChange={
+                    // Set maximum number of message characters to 100.
+                    event => {
+                      const updateArr = this.props.videos.map(videoObj => (videoObj.trimDropDownIsOpen === true) ? { ...videoObj, trimStart: event.target.value } : videoObj);
+                      this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+                    }
+                  }
+                />
+                <TextField
+                  focused
+                  margin="dense"
+                  label="Trim End Timecode:"
+                  type="text"
+                  fullWidth
+                  value={getOpenVidAttr('trimEnd', 'trimDropDownIsOpen')}
+                  onChange={
+                    // Set maximum number of message characters to 100.
+                    event => {
+                      const updateArr = this.props.videos.map(videoObj => (videoObj.trimDropDownIsOpen === true) ? { ...videoObj, trimEnd: event.target.value } : videoObj);
+                      this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+                    }
+                  }
+                />
+              </>
+            </DialogContent>
+            <Button
+              onClick={() => {
+                // If the visibility is password make sure a password has been entered before closing.
+                const updateArr = this.props.videos.map(videoObj => (videoObj.trimDropDownIsOpen === true) ? { ...videoObj, trimDropDownIsOpen: false } : videoObj);
+                this.setState({ trimDropDownIsOpen: !this.state.trimDropDownIsOpen })
+                this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+              }
+              }
+              color="primary"
+            >
+              Ok
+                </Button>
           </Dialog>
         </MuiThemeProvider>
         {!this.props.enableEditing &&

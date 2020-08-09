@@ -75,7 +75,9 @@ class HomePage extends Component {
                     title: videoObj.title,
                     description: videoObj.description,
                     userName: this.props.user,
-                    exportSeparateAudio: videoObj.exportSeparateAudio
+                    exportSeparateAudio: videoObj.exportSeparateAudio,
+                    trimStart: videoObj.trimStart,
+                    trimEnd: videoObj.trimEnd
                   },
                   visibility: videoObj.visibility,
                   index: index,

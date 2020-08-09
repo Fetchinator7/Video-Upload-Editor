@@ -15,18 +15,21 @@ function* selectVideoFiles(action) {
         uri: '',
         password: '',
         exportSeparateAudio: true,
-        dropDownIsOpen: false
+        visibilityDropDownIsOpen: false,
+        trimDropDownIsOpen: false,
+        trimStart: '',
+        trimEnd: ''
       }
     });
   } catch (error) {
-    console.log('Error uploading video', error);
+    console.log('Error selecting video', error);
   }
 }
 
 function* uploadVideoFiles(action) {
   try {
     yield put({ type: 'SET_RENDERING', payload: action.index });
-    const renderResponse = yield axios.post('/video/', action.payload);
+    const renderResponse = yield axios.post('/video', action.payload);
     yield put({ type: 'CLEAR_RENDERING', payload: action.index });
 
     yield put({ type: 'SET_UPLOADING', payload: action.index });

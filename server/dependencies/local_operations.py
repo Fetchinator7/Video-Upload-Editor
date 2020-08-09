@@ -1,7 +1,6 @@
 import pathlib as paths
 import datetime as dates
-import subprocess as sub
-import shutil
+import tempfile
 import sys
 # Append these submodules to the system path so they can be imported.
 sys.path.append(str(paths.Path.joinpath(paths.Path(__file__).parent, 'FFmpeg-Commands')))
@@ -22,6 +21,9 @@ def main(main_out_save_dir):
 	title = sys.argv[3]
 	usr_name = sys.argv[4]
 	export_audio = sys.argv[5]
+	compress = sys.argv[6]
+	start_time = sys.argv[7]
+	end_time = sys.argv[8]
 
 	# Rename the input file to be the input title.
 	renamed_in_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
@@ -37,13 +39,31 @@ def main(main_out_save_dir):
 		raise FileExistsError(f'Error, the output folder "{title}" already exists.')
 	else:
 		print('Encoding...\n')
-		# Record the rendering start time for the log.
+
+		# Record the render start time for the log.
 		start_render = dates.datetime.now().strftime("%I:%M:%S%p on %m/%d/%Y")
 
-		# Run the ffmpeg command to normalize the input video audio and compress it.
-		# fc.FileOperations(renamed_in_path, norm_aud_dir).compress_using_h265_and_norm_aud()
-		# fc.FileOperations(renamed_in_path, out_dir_path).trim('5', '15')
-		fc.FileOperations(renamed_in_path, out_dir_path).loudnorm_stereo()
+		def render(input_file):
+			if compress == 'true':
+				# Compressionion enabled so use a different ffmpeg command
+				# to compress the input video.
+				fc.FileOperations(input_file, out_dir_path).compress_using_h265_and_norm_aud()
+			else:
+				# Run the ffmpeg command to normalize the input video audio.
+				# This is done by scanning the input to see how many decibels it can
+				# be raised by before clipping occurs, then raising it by that amount.
+				fc.FileOperations(input_file, out_dir_path).loudnorm_stereo()
+
+		if start_time != "" or end_time != "":
+			# Make a temporary folder where the output of the audio normalization wil be sent
+			# (The output can't be in the same directory as the input so make this temp folder)
+			trim_dir = tempfile.TemporaryDirectory()
+			trim_dir_path = paths.Path(trim_dir.name)
+			fc.FileOperations(renamed_in_path, trim_dir_path).trim(start_time, end_time)
+			out_trim_path = paths.Path.joinpath(trim_dir_path, renamed_in_path.name)
+			render(out_trim_path)
+		else:
+			render(renamed_in_path)
 
 		# Get the path of the output file.
 		out_path = paths.Path.joinpath(out_dir_path, title + '.mp4')

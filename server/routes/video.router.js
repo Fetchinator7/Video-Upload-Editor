@@ -9,11 +9,24 @@ router.post('/', (req, res) => {
   const title = req.body.title;
   const userName = req.body.userName;
   const exportSeparateAudio = req.body.exportSeparateAudio;
+  const compress = Boolean(process.env.COMPRESSION) || false;
+  const trimStart = req.body.trimStart;
+  const trimEnd = req.body.trimEnd;
   const description = req.body.description;
   if (userName !== undefined) {
     // TODO Handle error correctly.
     let pythonErr = false;
-    const pyProcess = spawn('python3', ['server/dependencies/local_operations.py', mainOutputFolder, videoPath, title, userName, exportSeparateAudio]);
+    const pyProcess = spawn('python3',
+      ['server/dependencies/local_operations.py',
+        mainOutputFolder,
+        videoPath,
+        title,
+        userName,
+        exportSeparateAudio,
+        compress,
+        trimStart,
+        trimEnd
+      ]);
     pyProcess.stderr.on('data', (data) => {
       console.log(data.toString());
       pythonErr = true;
@@ -27,6 +40,7 @@ router.post('/', (req, res) => {
       //   the path is in curly braces then extracted to be: "/...New Title.mp4"
       //   without the path is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application."
       // }
+      // TODO see if the python output contains the word "Error, " and if so raise an error.
       const output = data.toString().replace(/{(.*?)}/, '').replace(/{{(.*?)}}/, '').slice(0, -2);
       const outputVideoPath = data.toString().match(/{(.*?)}/) ? data.toString().match(/{(.*?)}/)[1] : '';
       const bodyObj = {
