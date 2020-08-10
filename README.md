@@ -96,7 +96,7 @@ TRIM_CODEC_COPY=false
 
 ### Customizing the users
 
-You can also customize/add to the uploading user's name radio button(s) by adding a `users.json` file in the root directory with this structure:
+You can also customize/add to the uploading user's name radio button(s) by adding a `users.json` file in the src directory with this structure:
 
 ```json
 {

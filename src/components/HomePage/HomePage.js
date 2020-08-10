@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
 import SearchTablePresets from '../VideosTable/VideosTableDefaults';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
 import { Button, createMuiTheme, MuiThemeProvider } from '@material-ui/core';
-import UsersJsonFile from '../../../users.json';
+import UsersJsonFile from '../../users.json';
 import VideosTable from '../VideosTable/VideosTable';
 
 const useStyles = createMuiTheme(
@@ -102,4 +101,4 @@ const mapStateToProps = state => ({
   videos: state.uploadFiles
 });
 
-export default connect(mapStateToProps)(withRouter(HomePage));
+export default connect(mapStateToProps)(HomePage);
