@@ -8,8 +8,8 @@ sys.path.append(str(paths.Path.joinpath(paths.Path(__file__).parent, 'System-Com
 import ffmpeg_cmds as fc
 import system as syst
 
-# The path to the main output directory. This is where folders for the current
-# month and year will be generated.
+# The path to the main output directory.
+# This is where folders for the current month and year will be generated.
 path_to_main_out_save_folder = paths.Path(sys.argv[1])
 if path_to_main_out_save_folder.exists() is False:
 	raise FileNotFoundError(f'Error, output folder "{path_to_main_out_save_folder}" not found.')

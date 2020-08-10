@@ -1,17 +1,15 @@
 from tkinter.filedialog import askopenfilename
 from tkinter import Tk
-import platform
 
+# Make the root gui element.
 root = Tk()
-if platform.system() != 'Darwin':
-    root.lift()
-    root.attributes("-topmost", True)
-else:
-    import os
-    os.system('''osascript -e 'tell app "Finder" to set frontmost of process "Python" to true' ''')
+# Bring the window to the front.
+root.lift()
+root.attributes("-topmost", True)
 
+# We don't want a full GUI so keep the root window from appearing.
 root.withdraw()
-# We don't want a full GUI, so keep the root window from appearing
-# show an "Open" dialog box and return the path to the selected file
+# Show an "Open" dialog box and return the path to the selected file.
 filename = askopenfilename(filetypes=[("Video files", ".mp4 .mov")])
+# Print the file path which will be read by the server.
 print(filename)
