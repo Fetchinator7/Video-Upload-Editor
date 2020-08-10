@@ -1,16 +1,50 @@
 # Purpose
 
-This will be an interface for doing basic video editing before uploading to Vimeo.
+This will be a basic interface for automatically rendering then uploading videos to Vimeo geared towards people who do a lot of recordings but little to no editing the videos afterwards such as publishing video conferences. I know the main question is, "Why shouldn't I just upload to Vimeo directly?" Well, there are a few reasons;
 
-To add users as options make a users.json file inside of the HomePage folder with this structure:
+1. It's designed to work with teams
 
-```json
-{
-    "users": ["user 1", "user 2"]
-}
+    - Do you want to allow someone else to upload to your Vimeo account, but don't want to five them full access (such as not allowing them to delete videos)? That's what this was built for! Once it's configured, this application allows the computer to only upload videos to Vimeo without providing it any other editing or viewing access.
+
+2. This automatically adds some rendering optimizations
+
+    - Do you have a conference recording that you want to upload but the volume isn't loud enough? Well don't worry, this has got you covered. The output is automatically run through a loudness normalization filter so it's the right loudness but still maintains the dynamics of the loud and quit points. This also has the option of automatically compressing the output under H265 so the final video will be about a third the size of the original while still maintaining quality, as long as you can stand waiting about three times as long for it to render. But that's the beauty of this, you can set it up and it'll just work without any further input required.
+
+    - Do you have a few seconds at the beginning and end of the recording that you don't want to keep? Well, just put in the start and/or end timecode(s) so the output will only contain that range.
+
+3. Saves the output file(s) in folders that are organized by date
+
+    - Once you specify a parent folder all the videos will automatically be put inside a folder for the current year and te current month.
+
+## Installation
+
+### Mac
+
+All the dependencies can be installed using [Homebrew](https://brew.sh/)
+
+```shell
+brew install python3
+brew install ffmpeg
+brew install node
 ```
 
-## SETUP
+### Windows
+
+[Install Python3](https://installpython3.com/windows/)
+
+[Install ffmpeg](https://www.wikihow.com/Install-FFmpeg-on-Windows)
+
+Go to [NodeJs Downloads](https://nodejs.org/en/download/) and click the button that says "Windows Installer"
+
+This'll download the .msi which will do all the installation and paths for you.
+
+### Both
+
+If you don't have git you can download this project as a zip file and move that folder to the folder where you'd like to store this project in. Once that's done open a terminal window, enter `cd`, drag-and-drop the folder on top of the terminal window, and press enter. Then run `npm install`
+
+To run the application double-click/open the `run.sh` file. You can also add an alias to that file on the dock or desktop to speed up the start process. The application window should open automatically in the computer's default web browser, but it may take a few seconds. If it doesn't open automatically open it by manually going to [localhost:3000](http://localhost:3000/) (just click this link).
+
+## Setup
 
 Unfortunately you need to register an app and have it be approved before you can start uploading to Vimeo which may take up to 5 business days so let's get the ball rolling by [creating a new app](https://developer.vimeo.com/apps/new)!
 
@@ -58,4 +92,14 @@ MAIN_OUTPUT_FOLDER=/Path/To/Main/Output/Folder/
 
 COMPRESSION=true
 TRIM_CODEC_COPY=false
+```
+
+### Customizing the users
+
+You can also customize/add to the uploading user's name radio button(s) by adding a `users.json` file in the root directory with this structure:
+
+```json
+{
+    "users": ["user 1", "user 2", "user 3"]
+}
 ```

@@ -7,7 +7,7 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
 import { Button, createMuiTheme, MuiThemeProvider } from '@material-ui/core';
-import UsersJsonFile from './users.json';
+import UsersJsonFile from '../../../users.json';
 import VideosTable from '../VideosTable/VideosTable';
 
 const useStyles = createMuiTheme(
