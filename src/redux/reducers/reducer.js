@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 
 const user = (state = '', action) => {
+  // The string of which user is uploading.
   switch (action.type) {
     case 'SET_USER':
       return action.payload;
@@ -10,7 +11,7 @@ const user = (state = '', action) => {
 };
 
 const rendering = (state = [], action) => {
-  // An array of ints that show which videos are loading by their index.
+  // An array of ints that show which videos are rendering by their index.
   const stateArr = [...state];
   switch (action.type) {
     case 'SET_RENDERING':
@@ -25,7 +26,7 @@ const rendering = (state = [], action) => {
 };
 
 const uploading = (state = [], action) => {
-  // An array of ints that show which videos are loading by their index.
+  // An array of ints that show which videos are uploading by their index.
   const stateArr = [...state];
   switch (action.type) {
     case 'SET_UPLOADING':
@@ -55,7 +56,7 @@ const transCoding = (state = [], action) => {
 };
 
 const uploaded = (state = [], action) => {
-  // An array of ints that show which videos are transcoding by their index.
+  // An array of ints that show which videos have uploaded by their index.
   const stateArr = [...state];
   switch (action.type) {
     case 'SET_UPLOADED':
@@ -67,7 +68,7 @@ const uploaded = (state = [], action) => {
 };
 
 const uploadError = (state = [], action) => {
-  // An array of ints that show which videos are transcoding by their index.
+  // An array of ints that show which videos had an error based on their index.
   const stateArr = [...state];
   switch (action.type) {
     case 'SET_UPLOAD_ERROR':
@@ -103,6 +104,8 @@ const uploadFiles = (state = [], action) => {
 };
 
 const enableEditing = (state = true, action) => {
+  // A boolean that uses conditional rendering to either show or hide things based on it the
+  // user started the upload process.
   switch (action.type) {
     case 'ENABLE_EDITING':
       return true;

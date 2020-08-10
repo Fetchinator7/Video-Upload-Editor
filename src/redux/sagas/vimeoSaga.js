@@ -2,6 +2,7 @@ import axios from 'axios';
 import { takeEvery } from 'redux-saga/effects';
 
 function* uploadVideo(action) {
+  // Upload the input video to Vimeo.
   try {
     yield axios.post('/vimeo/', action.payload);
   } catch (error) {
@@ -10,6 +11,7 @@ function* uploadVideo(action) {
 }
 
 function* updateVideoVisibility(action) {
+  // Update the visibility for a video based of the uri.
   try {
     yield axios.patch('/vimeo/', action.payload);
   } catch (error) {
