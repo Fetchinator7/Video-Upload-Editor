@@ -1,6 +1,12 @@
 # Purpose
 
-This is a basic interface for automatically rendering then uploading videos to Vimeo that's geared towards people who do a lot of recordings but little to no editing the videos afterwards such as publishing video conferences. I know the main question is, "Why shouldn't I just upload to Vimeo directly?" Well, there are a few reasons;
+This is a basic interface for automatically rendering then uploading videos to Vimeo that's geared towards people who do a lot of recordings but little to no editing the videos afterwards such as publishing video conferences.
+
+![Game Dropdown](readme-images/preparing.png?raw=true)
+
+![Game Dropdown](readme-images/uploading.png?raw=true)
+
+### I know the main question is, "Why shouldn't I just upload to Vimeo directly?" Well, there are a few reasons;
 
 1. It's designed to work with teams
 
