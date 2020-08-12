@@ -19,14 +19,15 @@
     "react-scripts": "3.4.1",
     "redux": "^4.0.5",
     "redux-saga": "^1.1.3",
+    "supertest": "^4.0.2",
     "vimeo": "^2.1.1"
   },
   "scripts": {
     "start": "npm run server & react-scripts start",
     "client": "react-scripts start",
-    "server": "nodemon --watch server server/server.js",
+    "server": "nodemon --watch server server/start.js",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest --detectOpenHandles --forceExit",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
