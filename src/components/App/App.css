@@ -2,9 +2,9 @@ body {
   background-color: #313131;
 }
 
-button:active {
-  color: #000000;
-  background-color: #27b827;
+img {
+  width: 40px;
+  object-fit: contain;
 }
 
 .text {
