@@ -1,5 +1,5 @@
 body {
-  background-color: #4b4b4b;
+  background-color: #313131;
 }
 
 button:active {
@@ -8,5 +8,5 @@ button:active {
 }
 
 .text {
-  color: white
+  color: rgb(240, 240, 240)
 }

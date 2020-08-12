@@ -5,9 +5,10 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
-import { Button, createMuiTheme, MuiThemeProvider } from '@material-ui/core';
+import { Button, createMuiTheme, MuiThemeProvider, FormLabel } from '@material-ui/core';
 import UsersJsonFile from '../../users.json';
 import VideosTable from '../VideosTable/VideosTable';
+import './App.css';
 
 const useStyles = createMuiTheme(
   SearchTablePresets.theme
@@ -21,8 +22,8 @@ class HomePage extends Component {
           <header className='text'>
             <h1>Select Video(s) To Upload:</h1>
           </header>
-          <h2 className='text'>Select a user:</h2>
           <FormControl component='fieldset'>
+            <FormLabel component='legend'>Select a user:</FormLabel>
             <RadioGroup
               value={this.props.user}
               disabled={!this.props.enableEditing}
@@ -38,12 +39,14 @@ class HomePage extends Component {
                   value={users}
                   control={<Radio />}
                   label={users}
+                  className='text'
                   key={`user-options-${index}`}
                 />
               )}
               <FormControlLabel
                 value='Other'
                 control={<Radio />}
+                className='text'
                 label='Other'
               />
             </RadioGroup>

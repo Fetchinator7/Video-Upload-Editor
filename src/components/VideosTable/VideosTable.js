@@ -9,6 +9,7 @@ import ErrorIcon from '@material-ui/icons/Error';
 import upArrow from '../../icons/up-arrow.gif';
 import visibilityOptions from './visibilityOptions.json';
 import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, Radio, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle, Checkbox } from '@material-ui/core';
+import '../App/App.css';
 
 const useStyles = createMuiTheme(
   VideosTablePresets.theme
@@ -318,7 +319,7 @@ class Table extends React.Component {
           <Dialog
             open={this.state.trimDropDownIsOpen}
           >
-            <DialogTitle id="confirmation-dialog-title">Trim Video</DialogTitle>
+            <DialogTitle id="confirmation-dialog-title">Timecode format = "00:00:00.00" (hours, minutes, seconds, and fractions of a second.)</DialogTitle>
             <DialogContent dividers>
               <>
                 <TextField
@@ -373,17 +374,17 @@ class Table extends React.Component {
             <br />
             <br />
             <br />
-            <CircularProgress style={{ color: '#18bc3c' }} />: Rendering Locally
+            <div className='text'><CircularProgress style={{ color: '#18bc3c' }} />: Rendering Locally</div>
             <br />
-            <img alt='Up' src={upArrow} />: Uploading To Vimeo
+            <div className='text'><img alt='Up' src={upArrow} />: Uploading To Vimeo</div>
             <br />
-            <CircularProgress style={{ color: '#dde238' }} />: Transcoding On Vimeo
+            <div className='text'><CircularProgress style={{ color: '#dde238' }} />: Transcoding On Vimeo</div>
             <br />
-            <CheckCircleOutlineIcon style={{ color: '#18bc3c', fontSize: 45 }} />: Successfully Uploaded
+            <div className='text'><CheckCircleOutlineIcon style={{ color: '#18bc3c', fontSize: 45 }} />: Successfully Uploaded</div>
             <br />
-            <ErrorIcon style={{ color: '#d31f1f', fontSize: 45 }} />: Error
+            <div className='text'><ErrorIcon style={{ color: '#d31f1f', fontSize: 45 }} />: Error</div>
           </>)
-        }
+  }
       </>
     );
   }
