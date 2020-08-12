@@ -1,6 +1,6 @@
 # Purpose
 
-This will be a basic interface for automatically rendering then uploading videos to Vimeo geared towards people who do a lot of recordings but little to no editing the videos afterwards such as publishing video conferences. I know the main question is, "Why shouldn't I just upload to Vimeo directly?" Well, there are a few reasons;
+This is a basic interface for automatically rendering then uploading videos to Vimeo that's geared towards people who do a lot of recordings but little to no editing the videos afterwards such as publishing video conferences. I know the main question is, "Why shouldn't I just upload to Vimeo directly?" Well, there are a few reasons;
 
 1. It's designed to work with teams
 
@@ -35,7 +35,6 @@ brew install node
 [Install ffmpeg](https://www.wikihow.com/Install-FFmpeg-on-Windows)
 
 Go to [NodeJs Downloads](https://nodejs.org/en/download/) and click the button that says "Windows Installer"
-
 This'll download the .msi which will do all the installation and paths for you.
 
 ### Both

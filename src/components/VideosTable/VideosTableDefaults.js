@@ -16,7 +16,6 @@ const tablePreferences = {
     palette: { type: 'dark' },
     typography: { useNextVariants: true }
   })
-  // clear option: this.props.dispatch({ type: 'CLEAR_UPLOAD_FILES' });
 };
 
 export default tablePreferences;
