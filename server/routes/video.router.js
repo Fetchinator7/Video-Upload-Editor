@@ -4,6 +4,21 @@ const { spawn } = require('child_process');
 
 const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
 
+// Confirm the input environment variable isn't undefined.
+router.get('/verify-output-path/:path', (req, res) => {
+  const path = req.params.path;
+  try {
+    if (process.env[path] === undefined) {
+      console.log('req.body', path);
+      res.status(200).send(`Heads up! The main output path ${path} is undefined so this will application will fail to run until that's been specified.`);
+    } else {
+      res.status(200).send('');
+    }
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
 router.post('/', (req, res) => {
   const videoPath = req.body.videoPath;
   const title = req.body.title;

@@ -116,6 +116,16 @@ const enableEditing = (state = true, action) => {
   }
 };
 
+const errorMessage = (state = '', action) => {
+  // A string to displays an error message if at least one of the environment variables is undefined.
+  switch (action.type) {
+    case 'SET_MISSING_ENV_ERROR_MESSAGE':
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   user,
   rendering,
@@ -124,5 +134,6 @@ export default combineReducers({
   transCoding,
   uploadError,
   uploading,
-  uploaded
+  uploaded,
+  errorMessage
 });

@@ -15,9 +15,16 @@ const useStyles = createMuiTheme(
 );
 
 class HomePage extends Component {
+  componentDidMount() {
+    this.props.dispatch({ type: 'CONFIRM_VIDEO_CREDENTIALS_EXIST' });
+  }
+
   render() {
     return (
       <>
+        {/* If an environment variable is undefined show warning text
+        but still allow the application to be used as normal. */}
+        <h2 className='text'>{this.props.errorMessage}</h2>
         <MuiThemeProvider theme={useStyles}>
           <header className='text'>
             <h1>Select Video(s) To Upload:</h1>
@@ -100,7 +107,8 @@ const mapStateToProps = state => ({
   user: state.user,
   enableEditing: state.enableEditing,
   loading: state.loading,
-  videos: state.uploadFiles
+  videos: state.uploadFiles,
+  errorMessage: state.errorMessage
 });
 
 export default connect(mapStateToProps)(HomePage);

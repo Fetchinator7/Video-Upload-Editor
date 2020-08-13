@@ -10,6 +10,20 @@ const accessToken = process.env.ACCESS_TOKEN;
 const Vimeo = require('vimeo').Vimeo;
 const vimeoClient = new Vimeo(clientID, clientSecret, accessToken);
 
+// Confirm the input environment variable isn't undefined.
+router.get('/verify-vimeo-credentials/:credential', (req, res) => {
+  const credential = req.params.credential;
+  try {
+    if (process.env[credential] === undefined) {
+      res.status(200).send(`Heads up! ${credential} is undefined so you can still select videos but you won't be able to upload them until that's been entered. `);
+    } else {
+      res.status(200).send('');
+    }
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
 // Get the transcode status for the given video uri from Vimeo.
 router.get('/transcode-status/:uri', (req, res) => {
   const uri = req.params.uri;
