@@ -91,6 +91,8 @@ class HomePage extends Component {
                   index: index,
                   password: videoObj.password
                 });
+                // Suppress "Expected to return a value in arrow function" compile warning.
+                return '';
               });
             }}
           >
