@@ -25,6 +25,9 @@ def main(main_out_save_dir):
 	start_time = sys.argv[7]
 	end_time = sys.argv[8]
 	codec_copy = sys.argv[9]
+	add_pixel_format = sys.argv[10]
+
+	output_video_extension = '.mp4'
 
 	# Rename the input file to be the input title.
 	renamed_in_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
@@ -48,7 +51,7 @@ def main(main_out_save_dir):
 			if compress == 'true':
 				# Compressionion enabled so use a different ffmpeg command
 				# to compress the input video.
-				fc.FileOperations(input_file, out_dir_path).compress_using_h265_and_norm_aud()
+				fc.FileOperations(input_file, out_dir_path).compress_using_h265_and_norm_aud(new_ext=output_video_extension, insert_pixel_format=add_pixel_format)
 			else:
 				# Run the ffmpeg command to normalize the input video audio.
 				# This is done by scanning the input to see how many decibels it can

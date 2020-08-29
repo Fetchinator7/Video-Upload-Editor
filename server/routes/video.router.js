@@ -28,6 +28,7 @@ router.post('/', (req, res) => {
   const trimStart = req.body.trimStart;
   const trimEnd = req.body.trimEnd;
   const codecCopy = Boolean(process.env.TRIM_CODEC_COPY) || true;
+  const specifyPixelFormat = Boolean(process.env.SPECIFY_PIXEL_FORMAT) || false;
   const description = req.body.description;
   let pythonErr = false;
   // Run the python file from the command line and pass it these arguments:
@@ -41,7 +42,8 @@ router.post('/', (req, res) => {
       compress,
       trimStart,
       trimEnd,
-      codecCopy
+      codecCopy,
+      specifyPixelFormat
     ]);
   // This is the process standard error. If there's text here send back a status code of
   // 500 along with the error message. And set the pythonErr conditional bool to true so
