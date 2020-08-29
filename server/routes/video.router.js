@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { spawn } = require('child_process');
 
-const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
-
 // Confirm the input environment variable isn't undefined.
 router.get('/verify-output-path/:path', (req, res) => {
   const path = req.params.path;
@@ -20,6 +18,7 @@ router.get('/verify-output-path/:path', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+  const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
   const videoPath = req.body.videoPath;
   const title = req.body.title;
   const userName = req.body.userName;
