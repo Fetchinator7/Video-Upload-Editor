@@ -16,15 +16,33 @@ if path_to_main_out_save_folder.exists() is False:
 
 
 def main(main_out_save_dir):
+	def set_bool(argv):
+		if argv == 'false':
+			return False
+		elif argv == 'true':
+			return True
+		else:
+			raise NameError(f'''Error, the input args can only be "true" or "false", not '{argv}'.''')
 	# These arguments come in from from the command line that called this process.
 	org_in_vid_path = paths.Path(sys.argv[2])
 	title = sys.argv[3]
 	usr_name = sys.argv[4]
-	export_audio = sys.argv[5]
-	compress = sys.argv[6]
+	export_audio = set_bool(sys.argv[5])
+	compress = set_bool(sys.argv[6])
 	start_time = sys.argv[7]
 	end_time = sys.argv[8]
-	codec_copy = sys.argv[9]
+	codec_copy = set_bool(sys.argv[9])
+	add_pixel_format = set_bool(sys.argv[10])
+
+	# There's currently no option to change if the output will by .mp4
+	# but I put the boolean here to make it easy to disable.
+	export_to_mp4 = True
+	new_out_video_ext = '.mp4'
+	out_aud_ext = '.mp3'
+	if export_to_mp4 == True:
+		output_video_extension = new_out_video_ext
+	else:
+		output_video_extension = org_in_vid_path.suffix
 
 	# Rename the input file to be the input title.
 	renamed_in_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
@@ -43,34 +61,56 @@ def main(main_out_save_dir):
 
 		# Record the render start time for the log.
 		start_render = dates.datetime.now().strftime("%I:%M:%S%p on %m/%d/%Y")
-
+		
 		def render(input_file):
-			if compress == 'true':
-				# Compressionion enabled so use a different ffmpeg command
-				# to compress the input video.
-				fc.FileOperations(input_file, out_dir_path).compress_using_h265_and_norm_aud()
+			"""Take the trimmed/normal input file and compress or normalize it.
+			Args:
+				input_file (pathlib): An input file that's a pathlib path.
+			"""
+			# Confirm the input extension isn't already .mp4.
+			if export_to_mp4 is True and input_file.suffix != new_out_video_ext:
+				# Make a temp output directory because with the way ffmpeg_cmds is setup
+				# you can't output to the same directory.
+				compress_dir = tempfile.TemporaryDirectory()
+				compress_dir_path = paths.Path(compress_dir.name)
+				if compress == True:
+					# Compressionion enabled so use a different ffmpeg command
+					# to compress the input video.
+					fc.FileOperations(input_file, compress_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format)
+				else:
+					# Run the ffmpeg command to normalize the input video audio.
+					# This is done by scanning the input to see how many decibels it can
+					# be raised by before clipping occurs, then raising it by that amount.
+					fc.FileOperations(input_file, compress_dir_path).loudnorm_stereo()
+				output_path = paths.Path.joinpath(compress_dir_path, input_file.name)
+				fc.FileOperations(output_path, out_dir_path).change_ext(new_out_video_ext, codec_copy=True)
 			else:
-				# Run the ffmpeg command to normalize the input video audio.
-				# This is done by scanning the input to see how many decibels it can
-				# be raised by before clipping occurs, then raising it by that amount.
-				fc.FileOperations(input_file, out_dir_path).loudnorm_stereo()
+				if compress == True:
+					# Compressionion enabled so use a different ffmpeg command
+					# to compress the input video.
+					fc.FileOperations(input_file, out_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format)
+				else:
+					# Run the ffmpeg command to normalize the input video audio.
+					# This is done by scanning the input to see how many decibels it can
+					# be raised by before clipping occurs, then raising it by that amount.
+					fc.FileOperations(input_file, out_dir_path).loudnorm_stereo()
 
 		if start_time != "" or end_time != "":
 			# Make a temporary folder where the output of the audio normalization wil be sent
 			# (The output can't be in the same directory as the input so make this temp folder)
 			trim_dir = tempfile.TemporaryDirectory()
 			trim_dir_path = paths.Path(trim_dir.name)
-			fc.FileOperations(renamed_in_path, trim_dir_path).trim(start_time, end_time, codec_copy=bool(codec_copy))
+			fc.FileOperations(renamed_in_path, trim_dir_path).trim(start_time, end_time, codec_copy=codec_copy)
 			out_trim_path = paths.Path.joinpath(trim_dir_path, renamed_in_path.name)
 			render(out_trim_path)
 		else:
 			render(renamed_in_path)
 
 		# Get the path of the output file.
-		out_path = paths.Path.joinpath(out_dir_path, title + '.mp4')
+		out_path = paths.Path.joinpath(out_dir_path, title + output_video_extension)
 		# If the user said to export audio as well then copy the output to a .mp3 file.
-		if export_audio == 'true':
-			fc.FileOperations(out_path, out_dir_path).change_ext('.mp3')
+		if export_audio == True:
+			fc.FileOperations(out_path, out_dir_path).change_ext(out_aud_ext)
 
 		# Record the rendering end time for the log.
 		end_render = dates.datetime.now().strftime("%I:%M:%S%p on %m/%d/%Y" )

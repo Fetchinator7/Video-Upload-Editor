@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { spawn } = require('child_process');
 
-const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
-
 // Confirm the input environment variable isn't undefined.
 router.get('/verify-output-path/:path', (req, res) => {
   const path = req.params.path;
@@ -20,14 +18,16 @@ router.get('/verify-output-path/:path', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+  const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
   const videoPath = req.body.videoPath;
   const title = req.body.title;
   const userName = req.body.userName;
-  const exportSeparateAudio = req.body.exportSeparateAudio;
-  const compress = Boolean(process.env.COMPRESSION) || false;
+  const exportSeparateAudio = String(req.body.exportSeparateAudio);
+  const compress = process.env.COMPRESSION || false;
   const trimStart = req.body.trimStart;
   const trimEnd = req.body.trimEnd;
-  const codecCopy = Boolean(process.env.TRIM_CODEC_COPY) || true;
+  const codecCopy = process.env.TRIM_CODEC_COPY || true;
+  const specifyPixelFormat = process.env.SPECIFY_PIXEL_FORMAT || false;
   const description = req.body.description;
   let pythonErr = false;
   // Run the python file from the command line and pass it these arguments:
@@ -41,7 +41,8 @@ router.post('/', (req, res) => {
       compress,
       trimStart,
       trimEnd,
-      codecCopy
+      codecCopy,
+      specifyPixelFormat
     ]);
   // This is the process standard error. If there's text here send back a status code of
   // 500 along with the error message. And set the pythonErr conditional bool to true so
@@ -55,6 +56,7 @@ router.post('/', (req, res) => {
     // If the python output contains the word "Error, " and if so raise an error.
     const err = data.toString().includes('Error, ');
     if (err) {
+      pythonErr = true;
       res.status(500).send(data.toString());
       return;
     }
@@ -74,7 +76,10 @@ router.post('/', (req, res) => {
       description: description ? description : ''
     };
     // If there wasn't any text in the standard error send back a success response.
-    !pythonErr && res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
+    if (!pythonErr) {
+      pythonErr = true;
+      res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
+    }
   });
 });
 

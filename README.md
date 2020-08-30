@@ -2,9 +2,9 @@
 
 This is a basic interface for automatically rendering then uploading videos to Vimeo. This is geared toward people who do a lot of recordings but little to no editing afterwards such as publishing video conference recordings.
 
-![Game Dropdown](readme-images/preparing.png?raw=true)
+![Selection View](readme-images/preparing.png?raw=true)
 
-![Game Dropdown](readme-images/uploading.png?raw=true)
+![Uploading View](readme-images/uploading.png?raw=true)
 
 ### I know the main question is, "Why shouldn't I just upload to Vimeo directly?" Well, there are a few reasons
 
@@ -80,9 +80,11 @@ This application automatically saves the output video files by the year, month, 
 MAIN_OUTPUT_FOLDER=/Path/To/Main/Output/Folder/
 ```
 
-There are two more parameters for customizing the output: `COMPRESSION` and `TRIM_CODEC_COPY`
+There are three more booleans for customizing the output: `COMPRESSION`, `SPECIFY_PIXEL_FORMAT`, and `TRIM_CODEC_COPY`
 
-`COMPRESSION` (which is disabled by default) will run the output video through the H265 compression filter to help reduce video size while still maintaining quality. However, this was designed thinking it can render overnight so it may take about 3 times the length of the video to finish rendering, but hhe output should only be a about a third of the input size.
+`COMPRESSION` (which is disabled by default) will run the output video through the H265 compression filter to help reduce video size while still maintaining quality. However, this was designed thinking it can render overnight so it may take about twice the length of the input video to finish rendering, but will reduce the output file size significantly.
+
+`SPECIFY_PIXEL_FORMAT` (which is disabled by default) will set the pixel format for compressed videos to "yuv420p" so the output video is actually playable once it's finished rendering. However, this is only necessary for obscure codecs like "Apple ProRes 422 HQ" and it does impact the output coloring so unless you have issues playing the output video this shouldn't need to be specified.
 
 `TRIM_CODEC_COPY` (which is enabled by default) determines if the output video will have null content at the end (if a trim has been specified). Essentially it's much faster to copy the video codec but there will probably be a couple of seconds at the end of the video with no footage or sound. However, when that video is uploaded to Vimeo they render it again so those empty couple of seconds don't appear on Vimeo, only the local file. So if you want the file to have precise trimming then disable this option which will unfortunately be much slower.
 
@@ -96,6 +98,7 @@ CLIENT_SECRET=M9/Oyw...
 MAIN_OUTPUT_FOLDER=/Path/To/Main/Output/Folder/
 
 COMPRESSION=true
+SPECIFY_PIXEL_FORMAT=true
 TRIM_CODEC_COPY=false
 ```
 
