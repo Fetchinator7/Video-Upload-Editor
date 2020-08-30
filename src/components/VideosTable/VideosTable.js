@@ -15,6 +15,74 @@ const useStyles = createMuiTheme(
   VideosTablePresets.theme
 );
 
+// Find all the objects in the videos array that have visibilityDropDownIsOpen === true to get the
+// default radio button value.
+const getOpenVidAttr = (attr, dropDown, arr) => {
+  console.log(attr, dropDown, arr);
+  const val = arr.filter(videoObj => (videoObj[dropDown] === true))
+  if (val.length !== 0) {
+    return val[0][attr];
+  }
+  return '';
+}
+
+const checkValidTimecodeInput = (value, key, newValue) => {
+  // Generic text box that only accepts specified values and allows up to a certain
+  // amount of a specified character (in this case ".")
+  // This particular example is specifically designed for entering numbers with up to 1 period (40.0):
+  const checkQtyCharacter = '.';
+  const qtyOfAllowedCharacter = 1;
+  const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ':', null];
+  let qtyOfCharacter = 0;
+  if (value !== '') {
+    qtyOfCharacter = value.split(checkQtyCharacter).length - 1;
+  }
+  // If the input is the checkForQtyCharacter, but the input box is already at the maximum
+  // capacity for that character prevent the current checkForQtyCharacter from being accepted
+  // by returning the initial value.
+  if (key === checkQtyCharacter && qtyOfCharacter >= qtyOfAllowedCharacter) {
+    console.log(`Error, the input can't have more than ${qtyOfAllowedCharacter} "${checkQtyCharacter}"`);
+    // Prevent the character for the input key from being accepted.
+    return value;
+  } else {
+    // If the keyboard value matches any item in the allowedKeys array enteredAValidKey = true.
+    const enteredAValidKey = allowedKeys.some(allowedKey => key === allowedKey);
+    if (enteredAValidKey === false) {
+      console.log(`Error, the input can't have any non-numeric characters.`);
+      return value;
+    } else {
+      // This character passed all the criteria so return the new value.
+      return newValue;
+    }
+  }
+}
+
+const TimecodeTextField = (autoFocusField, label, inputArr, objKeyword, dispatch) => {
+  console.log(autoFocusField, label, inputArr, objKeyword);
+  return (
+    <TextField
+      focused
+      autoFocus={autoFocusField ? true : undefined}
+      margin="dense"
+      label={label}
+      type="text"
+      fullWidth
+      value={getOpenVidAttr(objKeyword, 'trimDropDownIsOpen', inputArr)}
+      onChange={
+        event => {
+          event.persist();
+          event.preventDefault();
+          const openObjIndex = inputArr.findIndex(vidObj => vidObj.trimDropDownIsOpen)
+          const newTextValue = checkValidTimecodeInput(inputArr[openObjIndex][objKeyword], event.nativeEvent.data, event.target.value);
+          let updateArr = [...inputArr];
+          updateArr[openObjIndex] = { ...inputArr[openObjIndex], [objKeyword]: newTextValue };
+          dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+        }
+      }
+    />
+  )
+}
+
 class Table extends React.Component {
   state = {
     visibilityLevelOpen: false,
@@ -244,15 +312,6 @@ class Table extends React.Component {
       this.props.uploaded.length === this.props.videos.length && this.props.dispatch({ type: 'EXIT_PROCESS' });
     }
 
-    // Find all the objects in the videos array that have visibilityDropDownIsOpen === true to get the
-    // default radio button value.
-    const getOpenVidAttr = (attr, dropDown) => {
-      const val = this.props.videos.filter(videoObj => (videoObj[dropDown] === true))
-      if (val.length !== 0) {
-        return val[0][attr];
-      }
-      return '';
-    }
     return (
       <>
         <MuiThemeProvider theme={useStyles}>
@@ -265,7 +324,7 @@ class Table extends React.Component {
             <DialogTitle id="confirmation-dialog-title">Video Visibility</DialogTitle>
             <DialogContent dividers>
               <RadioGroup
-                value={getOpenVidAttr('visibility', 'visibilityDropDownIsOpen')}
+                value={getOpenVidAttr('visibility', 'visibilityDropDownIsOpen', this.props.videos)}
                 onChange={event => {
                   const updateArr = this.props.videos.map(videoObj => (videoObj.visibilityDropDownIsOpen === true) ? { ...videoObj, visibility: event.target.value } : videoObj);
                   this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
@@ -291,7 +350,7 @@ class Table extends React.Component {
                   label="Password:"
                   type="text"
                   fullWidth
-                  value={getOpenVidAttr('password', 'visibilityDropDownIsOpen')}
+                  value={getOpenVidAttr('password', 'visibilityDropDownIsOpen', this.props.videos)}
                   onChange={
                     // Set maximum number of message characters to 100.
                     event => {
@@ -327,29 +386,14 @@ class Table extends React.Component {
             <DialogTitle id="confirmation-dialog-title">Timecode format = "00:00:00.00" (hours, minutes, seconds, and fractions of a second.)</DialogTitle>
             <DialogContent dividers>
               <>
-                <TextField
-                  focused
-                  autoFocus
-                  margin="dense"
-                  label="Trim Start Timecode:"
-                  type="text"
-                  fullWidth
-                  value={getOpenVidAttr('trimStart', 'trimDropDownIsOpen')}
-                  onChange={
-                    // Set maximum number of message characters to 100.
-                    event => {
-                      const updateArr = this.props.videos.map(videoObj => (videoObj.trimDropDownIsOpen === true) ? { ...videoObj, trimStart: event.target.value } : videoObj);
-                      this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
-                    }
-                  }
-                />
+                {TimecodeTextField(true, 'Trim Start Timecode:', [...this.props.videos], 'trimStart', this.props.dispatch)}
                 <TextField
                   focused
                   margin="dense"
                   label="Trim End Timecode:"
                   type="text"
                   fullWidth
-                  value={getOpenVidAttr('trimEnd', 'trimDropDownIsOpen')}
+                  value={getOpenVidAttr('trimEnd', 'trimDropDownIsOpen', this.props.videos)}
                   onChange={
                     // Set maximum number of message characters to 100.
                     event => {
@@ -371,7 +415,7 @@ class Table extends React.Component {
               color="primary"
             >
               Ok
-                </Button>
+            </Button>
           </Dialog>
         </MuiThemeProvider>
         {!this.props.enableEditing &&
