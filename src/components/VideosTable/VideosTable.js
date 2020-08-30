@@ -42,6 +42,7 @@ class Table extends React.Component {
                   control={
                     <Checkbox
                       color='primary'
+                      style={{ color: '#25f900' }}
                       checked={this.props.videos[tableMeta.rowIndex].exportSeparateAudio}
                       value={this.props.videos[tableMeta.rowIndex].exportSeparateAudio}
                     />
@@ -70,7 +71,10 @@ class Table extends React.Component {
                     this.updateFile(event.target.value, tableMeta, 'title');
                   }}
                   control={
-                    <TextField color='primary' value={this.props.videos[tableMeta.rowIndex].title} />
+                    <TextField
+                      color={this.props.videos[tableMeta.rowIndex].title ? 'primary' : 'secondary'}
+                      value={this.props.videos[tableMeta.rowIndex].title}
+                    />
                   }
                 />
               );
@@ -144,14 +148,15 @@ class Table extends React.Component {
         name: 'Trim',
         options: {
           sort: false,
-          customBodyRender: (value, tableMeta) => {
+          customBodyRenderLite: (dataIndex) => {
             return (
               <FormControlLabel
                 control={
                   <>
                     <Button
+                      style={this.props.videos[dataIndex].trimStart || this.props.videos[dataIndex].trimEnd ? { color: '#25f900' } : undefined}
                       onClick={() => {
-                        this.updateFile(!this.props.videos[tableMeta.rowIndex].trimDropDownIsOpen, tableMeta, 'trimDropDownIsOpen');
+                        this.updateFile(!this.props.videos[dataIndex].trimDropDownIsOpen, { rowIndex: dataIndex }, 'trimDropDownIsOpen');
                         this.setState({ trimDropDownIsOpen: !this.state.trimDropDownIsOpen })
                       }}>
                       Trim
@@ -384,7 +389,7 @@ class Table extends React.Component {
             <br />
             <div className='text'><ErrorIcon style={{ color: '#d31f1f', fontSize: 45 }} />: Error</div>
           </>)
-  }
+        }
       </>
     );
   }

@@ -5,7 +5,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
-import { Button, createMuiTheme, MuiThemeProvider, FormLabel } from '@material-ui/core';
+import { Button, createMuiTheme, MuiThemeProvider, FormLabel, withStyles } from '@material-ui/core';
 import UsersJsonFile from '../../users.json';
 import VideosTable from '../VideosTable/VideosTable';
 import './App.css';
@@ -14,12 +14,35 @@ const useStyles = createMuiTheme(
   SearchTablePresets.theme
 );
 
+const SelectedRadioButton = withStyles({
+  // turns the radio button green
+  root: {
+    color: '#25f900',
+    '&$checked': {
+      color: '#f9a200'
+    }
+  },
+  checked: {}
+})((props) => <Radio color='default' {...props} />);
+
+const EmptyRadioButton = withStyles({
+  // turns the radio button green
+  root: {
+    color: '#f90000'
+    // '&$checked': {
+    //   color: '#e000f9'
+    // }
+  },
+  checked: {}
+})((props) => <Radio color='default' {...props} />);
+
 class HomePage extends Component {
   componentDidMount() {
     this.props.dispatch({ type: 'CONFIRM_VIDEO_CREDENTIALS_EXIST' });
   }
 
   render() {
+    const userSelected = Boolean(this.props.user);
     return (
       <>
         {/* If an environment variable is undefined show warning text
@@ -41,18 +64,18 @@ class HomePage extends Component {
                 })
               }
             >
-              {UsersJsonFile.users.map((users, index) =>
+              {UsersJsonFile.users.map((user, index) =>
                 <FormControlLabel
-                  value={users}
-                  control={<Radio />}
-                  label={users}
+                  value={user}
+                  control={userSelected ? <SelectedRadioButton /> : <EmptyRadioButton />}
+                  label={user}
                   className='text'
-                  key={`user-options-${index}`}
+                  key={`user-radio-buttons-${index}`}
                 />
               )}
               <FormControlLabel
                 value='Other'
-                control={<Radio />}
+                control={userSelected ? <SelectedRadioButton /> : <EmptyRadioButton />}
                 className='text'
                 label='Other'
               />
