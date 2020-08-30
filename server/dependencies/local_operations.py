@@ -16,16 +16,23 @@ if path_to_main_out_save_folder.exists() is False:
 
 
 def main(main_out_save_dir):
+	def set_bool(argv):
+		if argv == 'false':
+			return False
+		elif argv == 'true':
+			return True
+		else:
+			raise NameError(f'''Error, the input args can only be "true" or "false", not '{argv}'.''')
 	# These arguments come in from from the command line that called this process.
 	org_in_vid_path = paths.Path(sys.argv[2])
 	title = sys.argv[3]
 	usr_name = sys.argv[4]
-	export_audio = bool(sys.argv[5])
-	compress = bool(sys.argv[6])
+	export_audio = set_bool(sys.argv[5])
+	compress = set_bool(sys.argv[6])
 	start_time = sys.argv[7]
 	end_time = sys.argv[8]
-	codec_copy = bool(sys.argv[9])
-	add_pixel_format = bool(sys.argv[10])
+	codec_copy = set_bool(sys.argv[9])
+	add_pixel_format = set_bool(sys.argv[10])
 
 	# There's currently no option to change if the output will by .mp4
 	# but I put the boolean here to make it easy to disable.

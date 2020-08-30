@@ -22,12 +22,12 @@ router.post('/', (req, res) => {
   const videoPath = req.body.videoPath;
   const title = req.body.title;
   const userName = req.body.userName;
-  const exportSeparateAudio = req.body.exportSeparateAudio;
-  const compress = Boolean(process.env.COMPRESSION) || false;
+  const exportSeparateAudio = String(req.body.exportSeparateAudio);
+  const compress = process.env.COMPRESSION || false;
   const trimStart = req.body.trimStart;
   const trimEnd = req.body.trimEnd;
-  const codecCopy = Boolean(process.env.TRIM_CODEC_COPY) || true;
-  const specifyPixelFormat = Boolean(process.env.SPECIFY_PIXEL_FORMAT) || false;
+  const codecCopy = process.env.TRIM_CODEC_COPY || true;
+  const specifyPixelFormat = process.env.SPECIFY_PIXEL_FORMAT || false;
   const description = req.body.description;
   let pythonErr = false;
   // Run the python file from the command line and pass it these arguments:
@@ -56,6 +56,7 @@ router.post('/', (req, res) => {
     // If the python output contains the word "Error, " and if so raise an error.
     const err = data.toString().includes('Error, ');
     if (err) {
+      pythonErr = true;
       res.status(500).send(data.toString());
       return;
     }
@@ -75,7 +76,10 @@ router.post('/', (req, res) => {
       description: description ? description : ''
     };
     // If there wasn't any text in the standard error send back a success response.
-    !pythonErr && res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
+    if (!pythonErr) {
+      pythonErr = true;
+      res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
+    }
   });
 });
 
