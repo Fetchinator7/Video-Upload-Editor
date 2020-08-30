@@ -18,7 +18,6 @@ const useStyles = createMuiTheme(
 // Find all the objects in the videos array that have visibilityDropDownIsOpen === true to get the
 // default radio button value.
 const getOpenVidAttr = (attr, dropDown, arr) => {
-  console.log(attr, dropDown, arr);
   const val = arr.filter(videoObj => (videoObj[dropDown] === true))
   if (val.length !== 0) {
     return val[0][attr];
@@ -27,28 +26,49 @@ const getOpenVidAttr = (attr, dropDown, arr) => {
 }
 
 const checkValidTimecodeInput = (value, key, newValue) => {
-  // Generic text box that only accepts specified values and allows up to a certain
-  // amount of a specified character (in this case ".")
-  // This particular example is specifically designed for entering numbers with up to 1 period (40.0):
+  // Confirm the input is in the valid "00:00:00.00" timecode format.
+  // Only allow one period.
   const checkQtyCharacter = '.';
   const qtyOfAllowedCharacter = 1;
-  const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ':', null];
   let qtyOfCharacter = 0;
+  // Allow up to 2 colons.
+  const requireEveryOtherCharacterExceptDecimals = ':';
+  const allowQtyRequireEveryOtherCharacterExceptDecimals = 2;
+  let qtyRequireEveryOtherCharacterExceptDecimals = 0;
+  const punctuationKeys = ['.', ':'];
+  const numbersKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+  const allowedKeys = [...numbersKeys, ...punctuationKeys];
+  // The input doesn't change so return early.
+  if (value === newValue) {
+    return value;
+  }
+  // Count how many checkQtyCharacter(".") and qtyRequireEveryOtherCharacterExceptDecimals(":")
+  // are in the string to determine if any more can be entered.
   if (value !== '') {
     qtyOfCharacter = value.split(checkQtyCharacter).length - 1;
+    qtyRequireEveryOtherCharacterExceptDecimals = value.split(requireEveryOtherCharacterExceptDecimals).length - 1;
   }
-  // If the input is the checkForQtyCharacter, but the input box is already at the maximum
-  // capacity for that character prevent the current checkForQtyCharacter from being accepted
-  // by returning the initial value.
+  // Don't allow more than qtyOfAllowedCharacter(1) checkQtyCharacter(".")
   if (key === checkQtyCharacter && qtyOfCharacter >= qtyOfAllowedCharacter) {
     console.log(`Error, the input can't have more than ${qtyOfAllowedCharacter} "${checkQtyCharacter}"`);
-    // Prevent the character for the input key from being accepted.
+    // Prevent the checkQtyCharacter from being accepted by returning the original value.
     return value;
+    // Don't allow more than allowQtyRequireEveryOtherCharacterExceptDecimals(2) requireEveryOtherCharacterExceptDecimals(":")
+  } else if (key === requireEveryOtherCharacterExceptDecimals && qtyRequireEveryOtherCharacterExceptDecimals >= allowQtyRequireEveryOtherCharacterExceptDecimals) {
+    console.log(`Error, the input can't have more than ${allowQtyRequireEveryOtherCharacterExceptDecimals} "${requireEveryOtherCharacterExceptDecimals}"`);
+    // Prevent the requireEveryOtherCharacterExceptDecimals from being accepted by returning the original value.
+    return value;
+    // If the input is empty and a punctuationKeys ("." or ":") was entered precede it with a 0.
+  } else if (value.length === 0 && punctuationKeys.includes(key)) {
+    return '0' + newValue;
+  } else if (newValue.length === value.length - 1) {
+    // A character was deleted so return the new string.
+    return newValue;
   } else {
     // If the keyboard value matches any item in the allowedKeys array enteredAValidKey = true.
     const enteredAValidKey = allowedKeys.some(allowedKey => key === allowedKey);
     if (enteredAValidKey === false) {
-      console.log(`Error, the input can't have any non-numeric characters.`);
+      console.log(`Error, the input can't have any non-numeric characters (except "." and ":").`);
       return value;
     } else {
       // This character passed all the criteria so return the new value.
@@ -58,7 +78,6 @@ const checkValidTimecodeInput = (value, key, newValue) => {
 }
 
 const TimecodeTextField = (autoFocusField, label, inputArr, objKeyword, dispatch) => {
-  console.log(autoFocusField, label, inputArr, objKeyword);
   return (
     <TextField
       focused
@@ -384,6 +403,7 @@ class Table extends React.Component {
             open={this.state.trimDropDownIsOpen}
           >
             <DialogTitle id="confirmation-dialog-title">Timecode format = "00:00:00.00" (hours, minutes, seconds, and fractions of a second.)</DialogTitle>
+            <DialogTitle>"5" = 5 seconds, "5.3" = 5.3 seconds, "1:05" = 1 minute and 5 seconds, "2:12:00" = 2 hours and 12 minutes.</DialogTitle>
             <DialogContent dividers>
               <>
                 {TimecodeTextField(true, 'Trim Start Timecode:', [...this.props.videos], 'trimStart', this.props.dispatch)}
