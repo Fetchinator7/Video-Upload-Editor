@@ -2,39 +2,17 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import SearchTablePresets from '../VideosTable/VideosTableDefaults';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
-import { Button, createMuiTheme, MuiThemeProvider, FormLabel, withStyles } from '@material-ui/core';
+import { Button, createMuiTheme, MuiThemeProvider, FormLabel } from '@material-ui/core';
 import UsersJsonFile from '../../users.json';
 import VideosTable from '../VideosTable/VideosTable';
+import RadioButton from '../RadioButton';
 import './App.css';
 
 const useStyles = createMuiTheme(
   SearchTablePresets.theme
 );
-
-const SelectedRadioButton = withStyles({
-  // turns the radio button green
-  root: {
-    color: '#25f900',
-    '&$checked': {
-      color: '#f9a200'
-    }
-  },
-  checked: {}
-})((props) => <Radio color='default' {...props} />);
-
-const EmptyRadioButton = withStyles({
-  // turns the radio button green
-  root: {
-    color: '#f90000'
-    // '&$checked': {
-    //   color: '#e000f9'
-    // }
-  },
-  checked: {}
-})((props) => <Radio color='default' {...props} />);
 
 class HomePage extends Component {
   componentDidMount() {
@@ -67,7 +45,7 @@ class HomePage extends Component {
               {UsersJsonFile.users.map((user, index) =>
                 <FormControlLabel
                   value={user}
-                  control={userSelected ? <SelectedRadioButton /> : <EmptyRadioButton />}
+                  control={userSelected ? <RadioButton.selectedRadioButton /> : <RadioButton.emptyRadioButton />}
                   label={user}
                   className='text'
                   key={`user-radio-buttons-${index}`}
@@ -75,7 +53,7 @@ class HomePage extends Component {
               )}
               <FormControlLabel
                 value='Other'
-                control={userSelected ? <SelectedRadioButton /> : <EmptyRadioButton />}
+                control={userSelected ? <RadioButton.selectedRadioButton /> : <RadioButton.emptyRadioButton />}
                 className='text'
                 label='Other'
               />

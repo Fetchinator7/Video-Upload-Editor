@@ -8,7 +8,8 @@ import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ErrorIcon from '@material-ui/icons/Error';
 import upArrow from '../../icons/up-arrow.gif';
 import visibilityOptions from './visibilityOptions.json';
-import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, Radio, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle, Checkbox } from '@material-ui/core';
+import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle, Checkbox } from '@material-ui/core';
+import RadioButton from '../RadioButton';
 import '../App/App.css';
 
 const useStyles = createMuiTheme(
@@ -358,7 +359,7 @@ class Table extends React.Component {
                       this.setState({ showTextField: false })
                     }
                   }
-                  return <FormControlLabel value={option.title} key={option.title} control={<Radio />} label={option.title} />
+                  return <FormControlLabel value={option.title} key={option.title} control={<RadioButton.selectedRadioButton />} label={option.title} />
                 })}
               </RadioGroup>
               {this.state.showTextField &&
