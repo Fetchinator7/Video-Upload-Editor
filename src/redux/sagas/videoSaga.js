@@ -15,8 +15,6 @@ function* selectVideoFiles(action) {
         uri: '',
         password: '',
         exportSeparateAudio: true,
-        visibilityDropDownIsOpen: false,
-        trimDropDownIsOpen: false,
         trimStart: '',
         trimEnd: ''
       }

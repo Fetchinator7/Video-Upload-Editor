@@ -18,8 +18,17 @@ const showPasswordField = 'showPasswordField';
 
 const visibility = 'visibility';
 const password = 'password';
+const trimStart = 'trimStart';
+const trimEnd = 'trimEnd';
+const title = 'title';
+const description = 'description';
+const exportSeparateAudio = 'exportSeparateAudio';
 
 const SET_UPLOAD_FILES = 'SET_UPLOAD_FILES';
+
+const green = '#18bc3c';
+const yellow = '#dde238';
+const red = '#d31f1f';
 
 const useStyles = createMuiTheme(
   VideosTablePresets.theme
@@ -77,49 +86,45 @@ const checkValidTimecodeInput = (value, key, newValue) => {
   }
 }
 
-const TimecodeTextField = (autoFocusField, label, inputArr, objKeyword, dispatch) => {
-  return (
-    <TextField
-      focused
-      autoFocus={autoFocusField ? true : undefined}
-      margin="dense"
-      label={label}
-      type="text"
-      fullWidth
-      // value={getOpenVidAttr(objKeyword, 'trimDropDownIsOpen', inputArr)}
-      onChange={
-        event => {
-          event.persist();
-          event.preventDefault();
-          const openObjIndex = inputArr.findIndex(vidObj => vidObj.trimDropDownIsOpen)
-          const newTextValue = checkValidTimecodeInput(inputArr[openObjIndex][objKeyword], event.nativeEvent.data, event.target.value);
-          let updateArr = [...inputArr];
-          updateArr[openObjIndex] = { ...inputArr[openObjIndex], [objKeyword]: newTextValue };
-          dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
-        }
-      }
-    />
-  )
-}
-
 class Table extends React.Component {
+  // These null local state values will be set to the index of the video in the array they reference.
   state = {
     [visibilityLevelOpenIndex]: null,
     [showPasswordField]: false,
-    [trimDropDownOpenIndex]: null,
-    visibleTableMeta: ''
+    [trimDropDownOpenIndex]: null
   }
 
-  updateFile = (newVal, tableMeta, attr) => {
-    const updateArr = this.props.videos.map((videoObj, index) => tableMeta.rowIndex === index ? { ...videoObj, [attr]: newVal } : videoObj);
-    this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+  // This is the field for entering a trimming timecode range for either the start or stop time.
+  TimecodeTextField = (autoFocusField, label, inputArr, objKeyword, stateIndex) => {
+    return (
+      <TextField
+        focused
+        autoFocus={autoFocusField ? true : false}
+        margin="dense"
+        label={label}
+        type="text"
+        fullWidth
+        // The state default for trimDropDownOpenIndex is null (it's only accessible after a video has been added)
+        // so default to an empty string but otherwise use the index from the local state to determine what value this should have.
+        value={inputArr[this.state[trimDropDownOpenIndex]] ? inputArr[this.state[trimDropDownOpenIndex]][objKeyword] : ''}
+        onChange={
+          event => {
+            event.persist();
+            event.preventDefault();
+            // This filters the input to see if it's valid but either way it returns the string of the next value so always set that.
+            const newTextValue = checkValidTimecodeInput(inputArr[stateIndex][objKeyword], event.nativeEvent.data, event.target.value);
+            this.updateVidObject(stateIndex, objKeyword, newTextValue, false)
+            this.setState({ [trimDropDownOpenIndex]: stateIndex })
+          }
+        }
+      />
+    )
   }
 
+  // If a video object needs to be updated use the index to change the object in the array.
   updateVidObject = (stateIndex, updateVidObjectKey, newVal, nullifyState) => {
-    console.log(stateIndex, updateVidObjectKey, newVal, nullifyState);
     const updateArr = [...this.props.videos];
     updateArr[stateIndex] = { ...this.props.videos[stateIndex], [updateVidObjectKey]: newVal };
-    console.log(updateArr);
     this.props.dispatch({ type: SET_UPLOAD_FILES, payload: updateArr });
     if (nullifyState !== false) {
       this.setState({ [nullifyState]: null })
@@ -135,19 +140,19 @@ class Table extends React.Component {
           name: 'Plus Audio Only',
           options: {
             sort: false,
-            customBodyRender: (value, tableMeta) => {
+            customBodyRenderLite: (dataIndex) => {
               return (
                 <FormControlLabel
                   control={
                     <Checkbox
                       color='primary'
                       style={{ color: '#25f900' }}
-                      checked={videosArr[tableMeta.rowIndex].exportSeparateAudio}
-                      value={videosArr[tableMeta.rowIndex].exportSeparateAudio}
+                      checked={videosArr[dataIndex][exportSeparateAudio]}
+                      value={videosArr[dataIndex][exportSeparateAudio]}
                     />
                   }
-                  onChange={() => {
-                    this.updateFile(!value, tableMeta, 'exportSeparateAudio');
+                  onChange={event => {
+                    this.updateVidObject(dataIndex, exportSeparateAudio, !videosArr[dataIndex][exportSeparateAudio], false)
                   }}
                 />
               );
@@ -163,18 +168,14 @@ class Table extends React.Component {
         {
           name: 'Title',
           options: {
-            customBodyRender: (value, tableMeta) => {
+            customBodyRenderLite: (dataIndex) => {
               return (
-                <FormControlLabel
+                <TextField
+                  color={videosArr[dataIndex][title] ? 'primary' : 'secondary'}
+                  value={videosArr[dataIndex][title]}
                   onChange={event => {
-                    this.updateFile(event.target.value, tableMeta, 'title');
+                    this.updateVidObject(dataIndex, title, event.target.value, false)
                   }}
-                  control={
-                    <TextField
-                      color={videosArr[tableMeta.rowIndex].title ? 'primary' : 'secondary'}
-                      value={videosArr[tableMeta.rowIndex].title}
-                    />
-                  }
                 />
               );
             }
@@ -186,15 +187,14 @@ class Table extends React.Component {
         {
           name: 'Description',
           options: {
-            customBodyRender: (value, tableMeta) => {
+            customBodyRenderLite: (dataIndex) => {
               return (
-                <FormControlLabel
+                <TextField
+                  color='primary'
+                  value={videosArr[dataIndex][description]}
                   onChange={event => {
-                    this.updateFile(event.target.value, tableMeta, 'description');
+                    this.updateVidObject(dataIndex, description, event.target.value, false)
                   }}
-                  control={
-                    <TextField color='primary' value={videosArr[tableMeta.rowIndex].description} />
-                  }
                 />
               );
             }
@@ -209,14 +209,17 @@ class Table extends React.Component {
             sort: false,
             customBodyRenderLite: (dataIndex) => {
               return (
-                <>
-                  <Button
-                    onClick={() => {
-                      this.setState({ [visibilityLevelOpenIndex]: dataIndex })
-                    }}>
-                    {videosArr[dataIndex][visibility]}
-                  </Button>
-                </>
+                <FormControlLabel
+                  control={
+                    <Button
+                      variant='outlined'
+                      onClick={() => {
+                        this.setState({ [visibilityLevelOpenIndex]: dataIndex })
+                      }}>
+                      {videosArr[dataIndex][visibility]}
+                    </Button>
+                  }
+                />
               );
             }
           }
@@ -246,16 +249,14 @@ class Table extends React.Component {
             return (
               <FormControlLabel
                 control={
-                  <>
-                    <Button
-                      style={videosArr[dataIndex].trimStart || videosArr[dataIndex].trimEnd ? { color: '#25f900' } : undefined}
-                      onClick={() => {
-                        this.updateFile(!videosArr[dataIndex].trimDropDownIsOpen, { rowIndex: dataIndex }, 'trimDropDownIsOpen');
-                        this.setState({ trimDropDownIsOpen: !this.state.trimDropDownIsOpen })
-                      }}>
-                      Trim
-                      </Button>
-                  </>
+                  <Button
+                    variant='outlined'
+                    style={videosArr[dataIndex][trimStart] || videosArr[dataIndex][trimEnd] ? { color: '#25f900' } : undefined}
+                    onClick={() => {
+                      this.setState({ [trimDropDownOpenIndex]: dataIndex })
+                    }}>
+                    Trim
+                  </Button>
                 }
               />
             );
@@ -267,7 +268,7 @@ class Table extends React.Component {
           name: 'Cancel',
           options: {
             sort: false,
-            customBodyRender: (value, tableMeta) => {
+            customBodyRenderLite: (dataIndex) => {
               return (
                 <FormControlLabel
                   control={
@@ -278,8 +279,8 @@ class Table extends React.Component {
                   onClick={() => {
                     const videos = [...videosArr];
                     this.props.enableEditing && this.props.dispatch({
-                      type: 'SET_UPLOAD_FILES',
-                      payload: videos.slice(0, tableMeta.rowIndex).concat(videos.slice(tableMeta.rowIndex + 1, videos.length))
+                      type: SET_UPLOAD_FILES,
+                      payload: videos.slice(0, dataIndex).concat(videos.slice(dataIndex + 1, videos.length))
                     });
                   }}
                 />
@@ -337,7 +338,7 @@ class Table extends React.Component {
       });
       this.props.uploaded.length === videosArr.length && this.props.dispatch({ type: 'EXIT_PROCESS' });
     }
-    
+
     return (
       <>
         <MuiThemeProvider theme={useStyles}>
@@ -348,19 +349,20 @@ class Table extends React.Component {
             <DialogTitle id="confirmation-dialog-title">Video Visibility</DialogTitle>
             <DialogContent dividers>
               <RadioGroup
-                value={videosArr[this.state.visibilityLevelOpenIndex] && videosArr[this.state.visibilityLevelOpenIndex][visibility]}
+                value={videosArr[this.state[visibilityLevelOpenIndex]] ? videosArr[this.state[visibilityLevelOpenIndex]][visibility].toUpperCase() : ''}
                 onChange={event => this.updateVidObject(this.state[visibilityLevelOpenIndex], visibility, event.target.value, false)}
               >
                 {visibilityOptions.visibility.map((option) => {
-                  const videoObj = videosArr[this.state.visibilityLevelOpenIndex];
+                  const videoObj = videosArr[this.state[visibilityLevelOpenIndex]];
+                  const title = option.title.toUpperCase();
                   if (videoObj) {
-                    if (videoObj[visibility] === password && this.state[showPasswordField] === false) {
+                    if (videoObj[visibility] === password.toUpperCase() && this.state[showPasswordField] === false) {
                       this.setState({ [showPasswordField]: true })
-                    } else if (videoObj[visibility] !== password && this.state[showPasswordField] === true) {
+                    } else if (videoObj[visibility] !== password.toUpperCase() && this.state[showPasswordField] === true) {
                       this.setState({ [showPasswordField]: false })
                     }
                   }
-                  return <FormControlLabel value={option.title} key={option.title} control={<RadioButton.selectedRadioButton />} label={option.title} />
+                  return <FormControlLabel value={title} key={title} control={<RadioButton.selectedRadioButton />} label={title} />
                 })}
               </RadioGroup>
               {this.state[showPasswordField] &&
@@ -381,7 +383,7 @@ class Table extends React.Component {
             <DialogActions>
               <Button
                 onClick={() => {
-                  const vidVisObj = { ...videosArr[this.state.visibilityLevelOpenIndex] };
+                  const vidVisObj = { ...videosArr[this.state[visibilityLevelOpenIndex]] };
                   // If the visibility is password make sure a password has been entered before closing.
                   if (vidVisObj[visibility] === password && vidVisObj[password].length === 0) {
                     return;
@@ -392,41 +394,25 @@ class Table extends React.Component {
                 color="primary"
               >
                 Ok
-                </Button>
+              </Button>
             </DialogActions>
           </Dialog>
           <Dialog
-            open={this.state.trimDropDownIsOpen}
-            onClose={() => this.findAndUpdateVidObject(videosArr, trimDropDownOpenIndex, false, this.props.dispatch, trimDropDownOpenIndex, this.setState)}
+            open={this.state[trimDropDownOpenIndex] !== null ? true : false}
+            onClose={() => this.setState({ [trimDropDownOpenIndex]: null })}
           >
             <DialogTitle id="confirmation-dialog-title">Timecode format = "00:00:00.00" (hours, minutes, seconds, and fractions of a second.)</DialogTitle>
             <DialogTitle>"5" = 5 seconds, "5.3" = 5.3 seconds, "1:05" = 1 minute and 5 seconds, "2:12:00" = 2 hours and 12 minutes.</DialogTitle>
             <DialogContent dividers>
               <>
-                {TimecodeTextField(true, 'Trim Start Timecode:', [...videosArr], 'trimStart', this.props.dispatch)}
-                <TextField
-                  focused
-                  margin="dense"
-                  label="Trim End Timecode:"
-                  type="text"
-                  fullWidth
-                  // value={getOpenVidAttr('trimEnd', 'trimDropDownIsOpen', videosArr)}
-                  onChange={
-                    // Set maximum number of message characters to 100.
-                    event => {
-                      const updateArr = videosArr.map(videoObj => (videoObj.trimDropDownIsOpen === true) ? { ...videoObj, trimEnd: event.target.value } : videoObj);
-                      this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
-                    }
-                  }
-                />
+                {this.TimecodeTextField(true, 'Trim Start Timecode:', [...videosArr], trimStart, this.state[trimDropDownOpenIndex])}
+                {this.TimecodeTextField(false, 'Trim End Timecode:', [...videosArr], trimEnd, this.state[trimDropDownOpenIndex])}
               </>
             </DialogContent>
             <Button
               onClick={() => {
                 // If the visibility is password make sure a password has been entered before closing.
-                const updateArr = videosArr.map(videoObj => (videoObj.trimDropDownIsOpen === true) ? { ...videoObj, trimDropDownIsOpen: false } : videoObj);
-                this.setState({ trimDropDownIsOpen: !this.state.trimDropDownIsOpen })
-                this.props.dispatch({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+                this.setState({ [trimDropDownOpenIndex]: null })
               }}
               color="primary"
             >
@@ -439,15 +425,15 @@ class Table extends React.Component {
             <br />
             <br />
             <br />
-            <div className='text'><CircularProgress style={{ color: '#18bc3c' }} />: Rendering Locally</div>
+            <div className='text'><CircularProgress style={{ color: green }} />: Rendering Locally</div>
             <br />
             <div className='text'><img alt='Up' src={upArrow} />: Uploading To Vimeo</div>
             <br />
-            <div className='text'><CircularProgress style={{ color: '#dde238' }} />: Transcoding On Vimeo</div>
+            <div className='text'><CircularProgress style={{ color: yellow }} />: Transcoding On Vimeo</div>
             <br />
-            <div className='text'><CheckCircleOutlineIcon style={{ color: '#18bc3c', fontSize: 45 }} />: Successfully Uploaded</div>
+            <div className='text'><CheckCircleOutlineIcon style={{ color: green, fontSize: 45 }} />: Successfully Uploaded</div>
             <br />
-            <div className='text'><ErrorIcon style={{ color: '#d31f1f', fontSize: 45 }} />: Error</div>
+            <div className='text'><ErrorIcon style={{ color: red, fontSize: 45 }} />: Error</div>
           </>)
         }
       </>
