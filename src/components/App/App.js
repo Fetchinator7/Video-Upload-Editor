@@ -5,7 +5,6 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
 import { Button, createMuiTheme, MuiThemeProvider, FormLabel } from '@material-ui/core';
-import UsersJsonFile from '../../users.json';
 import VideosTable from '../VideosTable/VideosTable';
 import RadioButton from '../RadioButton';
 import './App.css';
@@ -42,7 +41,7 @@ class HomePage extends Component {
                 })
               }
             >
-              {UsersJsonFile.users.map((user, index) =>
+              {this.props.users.map((user, index) =>
                 <FormControlLabel
                   value={user}
                   control={userSelected ? <RadioButton.selectedRadioButton /> : <RadioButton.emptyRadioButton />}
@@ -108,6 +107,7 @@ class HomePage extends Component {
 
 const mapStateToProps = state => ({
   user: state.user,
+  users: state.users,
   enableEditing: state.enableEditing,
   loading: state.loading,
   videos: state.uploadFiles,

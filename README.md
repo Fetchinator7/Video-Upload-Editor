@@ -80,6 +80,14 @@ This application automatically saves the output video files by the year, month, 
 MAIN_OUTPUT_FOLDER=/Path/To/Main/Output/Folder/
 ```
 
+### Customizing the users
+
+The user names that appear along side the radio buttons can be customized/added by including `USERS=[]` in the `.env`.
+
+```env
+USERS=["user", "user 1", "user 2", "user 3"]
+```
+
 There are three more booleans for customizing the output: `COMPRESSION`, `SPECIFY_PIXEL_FORMAT`, and `TRIM_CODEC_COPY`
 
 `COMPRESSION` (which is disabled by default) will run the output video through the H265 compression filter to help reduce video size while still maintaining quality. However, this was designed thinking it can render overnight so it may take about twice the length of the input video to finish rendering, but will reduce the output file size significantly.
@@ -97,19 +105,11 @@ CLIENT_SECRET=M9/Oyw...
 
 MAIN_OUTPUT_FOLDER=/Path/To/Main/Output/Folder/
 
+USERS=["user 1"]
+
 COMPRESSION=true
 SPECIFY_PIXEL_FORMAT=true
 TRIM_CODEC_COPY=false
-```
-
-### Customizing the users
-
-The user names that appear along side the radio buttons can be customized/added by including a `users.json` file in the src directory with this structure:
-
-```json
-{
-    "users": ["user 1", "user 2", "user 3"]
-}
 ```
 
 ## Launching it

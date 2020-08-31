@@ -10,6 +10,16 @@ const user = (state = '', action) => {
   }
 };
 
+const users = (state = [], action) => {
+  // Hold the different users that will be options for the radio buttons in an array.
+  switch (action.type) {
+    case 'SET_USERS':
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
 const rendering = (state = [], action) => {
   // An array of ints that show which videos are rendering by their index.
   const stateArr = [...state];
@@ -128,6 +138,7 @@ const errorMessage = (state = '', action) => {
 
 export default combineReducers({
   user,
+  users,
   rendering,
   uploadFiles,
   enableEditing,

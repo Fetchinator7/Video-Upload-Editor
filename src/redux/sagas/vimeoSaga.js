@@ -3,12 +3,22 @@ import { takeEvery, put } from 'redux-saga/effects';
 
 function* confirmVimeoCredentialsExist() {
   try {
-    const getURL = '/vimeo/verify-vimeo-credentials';
     // Start with an empty error string. The error message will be appended if there is one.
     let errorStr = '';
 
-    // Check for the XXX environment variable and if it doesn't exist
-    // append the error text for the new value of the error message.
+    const users = yield axios.get('/video/users');
+    if (users.status === 204) {
+      errorStr += `Heads up! No users have been specified so you'll only have the default "Other" option.
+      See the README for more info on how to add your own users.
+      If you want to dismiss this message but don't want to add users then include "USERS=[]" in the .env`;
+      yield put({ type: 'SET_USERS', payload: [] });
+    } else {
+      yield put({ type: 'SET_USERS', payload: users.data });
+    }
+
+    const getURL = '/vimeo/verify-vimeo-credentials';
+    // Check for the different environment variables and if one doesn't exist
+    // append the error text for that value to the error message.
     const clientID = yield axios.get(`${getURL}/CLIENT_ID`);
     errorStr += clientID.data;
     const clientSecret = yield axios.get(`${getURL}/CLIENT_SECRET`);
