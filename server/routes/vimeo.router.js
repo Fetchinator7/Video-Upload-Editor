@@ -30,14 +30,14 @@ router.get('/transcode-status/:uri', (req, res) => {
   vimeoClient.request(`/videos/${uri}?fields=transcode.status`, function (error, body, statusCode) {
     if (body.transcode) {
       if (body.transcode.status === 'complete') {
-        res.status(statusCode).send('Finished');
+        res.status(200).send('Finished');
       } else if (body.transcode.status === 'in_progress') {
-        res.status(statusCode).send('Transcoding');
+        res.status(102).send('Transcoding');
       } else {
-        res.status(statusCode).send('error', error);
+        res.status(500).send('error', error);
       }
     } else {
-      res.status(statusCode).send(`Error, the requested video with the uri "${uri}" couldn't be found.`);
+      res.status(404).send(`Error, the requested video with the uri "${uri}" couldn't be found.`);
     }
   });
 });
