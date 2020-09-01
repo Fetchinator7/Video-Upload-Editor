@@ -120,13 +120,8 @@ router.get('/file-picker', (req, res) => {
 });
 
 router.get('/exit-process', (req, res) => {
-  // The application success fully uploaded the video(s) so kill all node processes so
-  // all the user has to do to use the application again is to launch the "run" file.
-  try {
-    spawn('kill', [process.ppid]);
-  } catch (error) {
-    console.log(`kill node process "${process.ppid}" error`, error);
-  }
+  // The application success fully uploaded the video(s) so kill this process.
+  process.kill(process.ppid);
 });
 
 module.exports = router;
