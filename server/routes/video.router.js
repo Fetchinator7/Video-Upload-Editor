@@ -40,58 +40,68 @@ router.post('/', (req, res) => {
   const trimEnd = req.body.trimEnd;
   const codecCopy = process.env.TRIM_CODEC_COPY || true;
   const specifyPixelFormat = process.env.SPECIFY_PIXEL_FORMAT || false;
-  const description = req.body.description;
-  let pythonErr = false;
-  // Run the python file from the command line and pass it these arguments:
-  const pyProcess = spawn('python3',
-    ['server/dependencies/local_operations.py',
-      mainOutputFolder,
-      videoPath,
-      title,
-      userName,
-      exportSeparateAudio,
-      compress,
-      trimStart,
-      trimEnd,
-      codecCopy,
-      specifyPixelFormat
-    ]);
-  // This is the process standard error. If there's text here send back a status code of
-  // 500 along with the error message. And set the pythonErr conditional bool to true so
-  // this request won't send back two responses.
-  pyProcess.stderr.on('data', (data) => {
-    console.log(data.toString());
-    pythonErr = true;
-    res.status(500).send({ output: data.toString() });
-  });
-  pyProcess.stdout.on('data', (data) => {
-    // If the python output contains the word "Error, " and if so raise an error.
-    const err = data.toString().includes('Error, ');
-    if (err) {
-      pythonErr = true;
-      res.status(500).send(data.toString());
-      return;
-    }
+  const description = req.body.description || '';
 
-    // The data object is what's sent to the python console which has the messages and the
-    // output path in {}:
-    // {
-    //   the raw output is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application.\n{/...New Title.mp4}\n"
-    //   the path is in curly braces then extracted to be: "/...New Title.mp4"
-    //   without the path is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application."
-    // }
-    const output = data.toString().replace(/{(.*?)}/, '').replace(/{{(.*?)}}/, '').slice(0, -2);
-    const outputVideoPath = data.toString().match(/{(.*?)}/) ? data.toString().match(/{(.*?)}/)[1] : '';
-    const bodyObj = {
-      videoPath: outputVideoPath,
-      title: title,
-      description: description ? description : ''
-    };
-    // If there wasn't any text in the standard error send back a success response.
-    if (!pythonErr) {
-      pythonErr = true;
-      res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
-    }
+  // The python process will change these values as it goes through but define
+  // default values them here due to scoping.
+  let pythonErr = '';
+  let output = '';
+  let outputVideoPath = '';
+  let bodyObj = {};
+
+  // Run the python file from the command line and pass it these arguments:
+  Promise((resolve, reject) => {
+    const pyProcess = spawn('python3',
+      ['server/dependencies/local_operations.py',
+        mainOutputFolder,
+        videoPath,
+        title,
+        userName,
+        exportSeparateAudio,
+        compress,
+        trimStart,
+        trimEnd,
+        codecCopy,
+        specifyPixelFormat
+      ]);
+
+    pyProcess.stdout.setEncoding('utf8');
+    pyProcess.stderr.setEncoding('utf8');
+    pyProcess.stdout.on('data', data => {
+      // With the way it's setup when ffmpeg encounters an error it prints "Error..." so see if the output has "Error..." in it.
+      if (data.toString().includes('Error, ')) {
+        pythonErr = data;
+      } else {
+        // It worked so it returns the command line output:
+        // {
+        //   the raw output is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application.\n{/...New Title.mp4}\n"
+        //   the path is in {} then extracted to be: "/...New Title.mp4"
+        //   without the path is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application."
+        // }
+        // Since extra {} were injected to determine what the output path is remove those {} from the output message.
+        output = data.toString().replace(/{(.*?)}/, '').replace(/{{(.*?)}}/, '').slice(0, -2);
+        outputVideoPath = data.toString().match(/{(.*?)}/) ? data.toString().match(/{(.*?)}/)[1] : '';
+        bodyObj = {
+          videoPath: outputVideoPath,
+          title: title,
+          description: description
+        };
+      }
+    });
+    // python encountered an error.
+    pyProcess.stderr.on('data', data => {
+      pythonErr = data;
+    });
+    pyProcess.on('error', error => reject(error));
+    pyProcess.on('close', exitCode => {
+      resolve(exitCode);
+      if (pythonErr !== '') {
+        // path and bodyObj are used by the next operation so if there was an error don't include.
+        res.status(500).send({ output: pythonErr });
+      } else {
+        res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
+      }
+    });
   });
 });
 
