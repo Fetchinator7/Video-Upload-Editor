@@ -50,7 +50,7 @@ router.post('/', (req, res) => {
   let bodyObj = {};
 
   // Run the python file from the command line and pass it these arguments:
-  Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     const pyProcess = spawn('python3',
       ['server/dependencies/local_operations.py',
         mainOutputFolder,
