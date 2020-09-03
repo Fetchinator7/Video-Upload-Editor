@@ -30,14 +30,14 @@ router.get('/transcode-status/:uri', (req, res) => {
   vimeoClient.request(`/videos/${uri}?fields=transcode.status`, function (error, body, statusCode) {
     if (body.transcode) {
       if (body.transcode.status === 'complete') {
-        res.status(200).send('Finished');
+        res.status(statusCode).send('Finished');
       } else if (body.transcode.status === 'in_progress') {
-        res.status(102).send('Transcoding');
+        res.status(statusCode).send('Transcoding');
       } else {
-        res.status(500).send('error', error);
+        res.status(statusCode).send('error', error);
       }
     } else {
-      res.status(404).send(`Error, the requested video with the uri "${uri}" couldn't be found.`);
+      res.status(statusCode).send(`Error, the requested video with the uri "${uri}" couldn't be found.`);
     }
   });
 });
@@ -57,7 +57,7 @@ router.post('/', (req, res) => {
     function (uri) {
       console.log('Your video URI is: ' + uri.substr(8, uri.length));
       // Remove the "/videos/" at the beginning.
-      res.send(uri.substr(8, uri.length));
+      res.status(200).send(uri.substr(8, uri.length));
     },
     function (bytesUploaded, bytesTotal) {
       // Show an uploaded percentage in the console.
@@ -107,7 +107,7 @@ router.patch('/', (req, res) => {
   }, function (error, body, statusCode) {
     const responseStr = `Updated video visibility level to: "${view}".`;
     if (error) {
-      res.status(statusCode).send('Error:', error);
+      res.status(statusCode).send(`Error, ${error}`);
     } else if (view === 'password') {
       res.status(statusCode).send(`${responseStr} The new password is: "${password}"`);
     } else {
