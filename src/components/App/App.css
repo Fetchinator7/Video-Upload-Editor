@@ -10,3 +10,11 @@ img {
 .text {
   color: rgb(240, 240, 240)
 }
+
+.success {
+  color: rgb(28, 218, 11)
+}
+
+.error {
+  color: rgb(238, 8, 8)
+}

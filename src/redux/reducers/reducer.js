@@ -1,5 +1,8 @@
 import { combineReducers } from 'redux';
 
+const VIDEO_ERROR_MESSAGE = 'VIDEO_ERROR_MESSAGE';
+const OUTPUT_MESSAGE = 'OUTPUT_MESSAGE';
+
 const user = (state = '', action) => {
   // The string of which user is uploading.
   switch (action.type) {
@@ -100,7 +103,7 @@ const uploadFiles = (state = [], action) => {
         return state;
       } else if (action.payload.length) {
         return action.payload;
-      // The user removed all of the file they had selected to upload.
+        // The user removed all of the file they had selected to upload.
       } else if (action.payload.length === 0) {
         return [];
       } else {
@@ -126,6 +129,36 @@ const enableEditing = (state = true, action) => {
   }
 };
 
+const outputMessage = (state = {}, action) => {
+  // This holds a text field for all of the successful output from python.
+  // This will assign the key to the index of which video has the error and a value of the error text.
+  let returnMessage = { ...state };
+  if (action.payload) {
+    returnMessage = { ...state, [String(action.index)]: action.payload };
+  }
+  switch (action.type) {
+    case OUTPUT_MESSAGE:
+      return returnMessage;
+    default:
+      return state;
+  }
+};
+
+const videoErrorMessage = (state = { 0: '' }, action) => {
+  // This holds a text field for all of the error output from python.
+  // This will assign the key to the index of which video has the error and a value of the error text.
+  let returnMessage = { ...state };
+  if (action.payload) {
+    returnMessage = { ...state, [String(action.index)]: action.payload };
+  }
+  switch (action.type) {
+    case VIDEO_ERROR_MESSAGE:
+      return returnMessage;
+    default:
+      return state;
+  }
+};
+
 const errorMessage = (state = '', action) => {
   // A string to displays an error message if at least one of the environment variables is undefined.
   switch (action.type) {
@@ -146,5 +179,7 @@ export default combineReducers({
   uploadError,
   uploading,
   uploaded,
+  outputMessage,
+  videoErrorMessage,
   errorMessage
 });
