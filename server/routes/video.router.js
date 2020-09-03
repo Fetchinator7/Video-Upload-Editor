@@ -97,7 +97,7 @@ router.post('/', (req, res) => {
       resolve(exitCode);
       if (pythonErr !== '') {
         // path and bodyObj are used by the next operation so if there was an error don't include.
-        res.status(500).send({ output: pythonErr });
+        res.status(500).send(pythonErr);
       } else {
         res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
       }
@@ -121,7 +121,14 @@ router.get('/file-picker', (req, res) => {
 
 router.get('/exit-process', (req, res) => {
   // The application success fully uploaded the video(s) so kill this process.
-  process.kill(process.ppid);
+  try {
+    spawn('killall', ['node']);
+    res.sendStatus(200);
+  } catch (error) {
+    console.log('killall error', error);
+    res.sendStatus(500);
+  }
+  // process.kill(process.ppid);
 });
 
 module.exports = router;

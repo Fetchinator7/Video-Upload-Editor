@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "npm run server & react-scripts start",
-    "server": "nodemon --watch server server/start.js",
+    "server": "node server/start.js",
     "build": "react-scripts build",
     "test": "jest --detectOpenHandles --forceExit",
     "eject": "react-scripts eject"
