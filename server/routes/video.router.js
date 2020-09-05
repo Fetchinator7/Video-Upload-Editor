@@ -36,10 +36,12 @@ router.post('/', (req, res) => {
   const userName = req.body.userName;
   const exportSeparateAudio = String(req.body.exportSeparateAudio);
   const compress = process.env.COMPRESSION || false;
-  const trimStart = req.body.trimStart;
-  const trimEnd = req.body.trimEnd;
+  const trimStart = req.body.trimStart || '';
+  const trimEnd = req.body.trimEnd || '';
   const codecCopy = process.env.TRIM_CODEC_COPY || true;
   const specifyPixelFormat = process.env.SPECIFY_PIXEL_FORMAT || false;
+  const compressionSpeedPreset = process.env.COMPRESSION_SPEED_PRESET || 'fast';
+  const outputExtension = process.env.OUTPUT_EXTENSION || '.mp4';
   const description = req.body.description || '';
 
   // The python process will change these values as it goes through but define
@@ -62,7 +64,9 @@ router.post('/', (req, res) => {
         trimStart,
         trimEnd,
         codecCopy,
-        specifyPixelFormat
+        specifyPixelFormat,
+        compressionSpeedPreset,
+        outputExtension
       ]);
 
     pyProcess.stdout.setEncoding('utf8');

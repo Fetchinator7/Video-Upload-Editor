@@ -33,16 +33,11 @@ def main(main_out_save_dir):
 	end_time = sys.argv[8]
 	codec_copy = set_bool(sys.argv[9])
 	add_pixel_format = set_bool(sys.argv[10])
+	compression_speed_preset = sys.argv[11]
+	output_extension = sys.argv[12]
 
-	# There's currently no option to change if the output will by .mp4
-	# but I put the boolean here to make it easy to disable.
-	export_to_mp4 = True
-	new_out_video_ext = '.mp4'
+	# If export_audio is true this will be the extension used for that.
 	out_aud_ext = '.mp3'
-	if export_to_mp4 == True:
-		output_video_extension = new_out_video_ext
-	else:
-		output_video_extension = org_in_vid_path.suffix
 
 	# Rename the input file to be the input title.
 	renamed_in_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
@@ -69,7 +64,7 @@ def main(main_out_save_dir):
 		if compress == True:
 			# Compressionion enabled so use a different ffmpeg command
 			# to compress the input video.
-			fc.FileOperations(renamed_in_path, loudnorm_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format, custom_db='30 dB')
+			fc.FileOperations(renamed_in_path, loudnorm_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format, speed_preset=compression_speed_preset)
 		else:
 			# Run the ffmpeg command to normalize the input video audio.
 			# This is done by scanning the input to see how many decibels it can
@@ -82,19 +77,26 @@ def main(main_out_save_dir):
 		# you can't output to the same directory.
 		trim_dir = tempfile.TemporaryDirectory()
 		trim_dir_path = paths.Path(trim_dir.name)
-		if start_time != "0" or end_time != "0":
+		if start_time != "" or end_time != "":
 			fc.FileOperations(loudnorm_output_path, trim_dir_path).trim(start_time, end_time, codec_copy=codec_copy)
 		else:
 			syst.Paths().move_to_new_dir(loudnorm_output_path, trim_dir_path)
 		out_trim_path = paths.Path.joinpath(trim_dir_path, loudnorm_output_path.name)
 
-		if export_to_mp4 is True and out_trim_path.suffix != new_out_video_ext:
-			fc.FileOperations(out_trim_path, out_dir_path).change_ext(new_out_video_ext, codec_copy=True)
+		# The input video extension doesn't match the desired output extension.
+		if out_trim_path.suffix != output_extension:
+			if compress is True:
+				# If the video was compressed then it's encoded so the codec can be copied.
+				fc.FileOperations(out_trim_path, out_dir_path).change_ext(output_extension, codec_copy=True)
+			else:
+				# If the input video wasn't compressed then we don't know what
+				# the input codec is so play it safe and don't copy the codec.
+				fc.FileOperations(out_trim_path, out_dir_path).change_ext(output_extension, codec_copy=False)
 		else:
 			syst.Paths().move_to_new_dir(out_trim_path, out_dir_path)
 
 		# Get the path of the output file.
-		out_path = paths.Path.joinpath(out_dir_path, title + output_video_extension)
+		out_path = paths.Path.joinpath(out_dir_path, title + output_extension)
 		# If the user said to export audio as well then copy the output to a .mp3 file.
 		if export_audio == True:
 			fc.FileOperations(out_path, out_dir_path).change_ext(out_aud_ext)
@@ -110,7 +112,7 @@ def fin_log(usr, title, renamed_in_path, start, end, out_vid, out_dir_path):
 	"""Create log file."""
 
 	# Path to log file and create it.
-	session_txt_path = paths.Path().joinpath(out_dir_path, title + '-log').with_suffix('.txt')
+	session_txt_path = paths.Path.joinpath(out_dir_path, title + '-log').with_suffix('.txt')
 	paths.Path.touch(session_txt_path)
 
 	# Write info about session to .txt file in the save location.

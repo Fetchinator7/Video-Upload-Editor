@@ -92,9 +92,13 @@ There are three more booleans for customizing the output: `COMPRESSION`, `SPECIF
 
 `COMPRESSION` (which is disabled by default) will run the output video through the H265 compression filter to help reduce video size while still maintaining quality. However, this was designed thinking it can render overnight so it may take about twice the length of the input video to finish rendering, but will reduce the output file size significantly.
 
+`COMPRESSION_SPEED_PRESET` (which is the string "fast" by default) dictates how quickly the video compression will be done. For example; if you want a higher quality video and have the computer resources you could set it to "slow," or if you have a sluggish computer you could set it to "superfast." See [H.265 Compression](https://trac.ffmpeg.org/wiki/Encode/H.265) "Choose a preset" for details.
+
 `SPECIFY_PIXEL_FORMAT` (which is disabled by default) will set the pixel format for compressed videos to "yuv420p" so the output video is actually playable once it's finished rendering. However, this is only necessary for obscure codecs like "Apple ProRes 422 HQ" and it does impact the output coloring so unless you have issues playing the output video this shouldn't need to be specified.
 
 `TRIM_CODEC_COPY` (which is enabled by default) determines if the output video will have null content at the end (if a trim has been specified). Essentially it's much faster to copy the video codec but there will probably be a couple of seconds at the end of the video with no footage or sound. However, when that video is uploaded to Vimeo they render it again so those empty couple of seconds don't appear on Vimeo, only the local file. So if you want the file to have precise trimming then disable this option which will unfortunately be much slower.
+
+`OUTPUT_EXTENSION` (which is ".mp4" by default) will be the extension of the output video. If the video already has this extension then nothing will be changed, but it the input video doesn't have this extension the output video will be converted so it uses that extension.
 
 ### All in all the final `.env` file could look something like this
 
@@ -108,8 +112,10 @@ MAIN_OUTPUT_FOLDER=/Path/To/Main/Output/Folder/
 USERS=["user 1"]
 
 COMPRESSION=true
+COMPRESSION_SPEED_PRESET=slow
 SPECIFY_PIXEL_FORMAT=true
 TRIM_CODEC_COPY=false
+OUTPUT_EXTENSION=.mov
 ```
 
 ## Launching it
