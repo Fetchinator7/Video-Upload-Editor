@@ -42,7 +42,6 @@ function* uploadVideoFiles(action) {
     yield put({ type: 'SET_RENDERING', payload: action.index });
     const renderResponse = yield call(axiosPost, { url: '/video', payload: action.payload });
     yield put({ type: 'CLEAR_RENDERING', payload: action.index });
-    console.log(renderResponse);
     yield put({ type: OUTPUT_MESSAGE, payload: renderResponse.data[output], index: action.index });
 
     yield put({ type: 'SET_UPLOADING', payload: action.index });
