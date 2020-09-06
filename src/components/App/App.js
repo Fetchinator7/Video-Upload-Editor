@@ -99,9 +99,6 @@ class HomePage extends Component {
             Upload Video(s)
           </Button>
           <VideosTable />
-          {/* If there's an object with the index of a video display the value. */}
-          <div className='success'>{this.props.videos.map((video, index) => this.props.outputMessage[index] && `Index ${index}: ${this.props.outputMessage[index]}`)}</div>
-          <div className='error'>{this.props.videos.map((video, index) => this.props.videoErrorMessage[index] && `Index ${index}: ${this.props.videoErrorMessage[index]}`)}</div>
         </MuiThemeProvider>
       </>
     );

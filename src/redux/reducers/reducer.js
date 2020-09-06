@@ -144,7 +144,7 @@ const outputMessage = (state = {}, action) => {
   }
 };
 
-const videoErrorMessage = (state = { 0: '' }, action) => {
+const videoErrorMessage = (state = {}, action) => {
   // This holds a text field for all of the error output from python.
   // This will assign the key to the index of which video has the error and a value of the error text.
   let returnMessage = { ...state };

@@ -8,7 +8,7 @@ import ErrorIcon from '@material-ui/icons/Error';
 import CancelIcon from '@material-ui/icons/Cancel';
 import upArrow from '../../icons/up-arrow.gif';
 import visibilityOptions from './visibilityOptions.json';
-import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle, Checkbox } from '@material-ui/core';
+import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle, Checkbox, TableRow, TableCell } from '@material-ui/core';
 import RadioButton from '../RadioButton';
 import '../App/App.css';
 import './VideosTable.css';
@@ -16,6 +16,7 @@ import './VideosTable.css';
 const visibilityLevelOpenIndex = 'visibilityLevelOpenIndex';
 const trimDropDownOpenIndex = 'trimDropDownOpenIndex';
 const showPasswordField = 'showPasswordField';
+const rowsExpanded = 'rowsExpanded';
 
 const visibility = 'visibility';
 const password = 'password';
@@ -92,7 +93,8 @@ class Table extends React.Component {
   state = {
     [visibilityLevelOpenIndex]: null,
     [showPasswordField]: false,
-    [trimDropDownOpenIndex]: null
+    [trimDropDownOpenIndex]: null,
+    [rowsExpanded]: []
   }
 
   // This is the field for entering a trimming timecode range for either the start or stop time.
@@ -329,7 +331,35 @@ class Table extends React.Component {
       );
     });
 
+    let options = VideosTablePresets.options;
+
     if (this.props.enableEditing === false) {
+      options = {
+        ...options,
+        isRowExpandable: () => true,
+        filter: true,
+        filterType: 'dropdown',
+        responsive: 'standard',
+        expandableRows: true,
+        expandableRowsHeader: false,
+        expandableRowsOnClick: false,
+        rowsExpanded: this.state[rowsExpanded],
+        renderExpandableRow: (rowData, rowMeta) => {
+          const colSpan = rowData.length + 0;
+          return (
+            <TableRow>
+              <TableCell colSpan={colSpan}>
+                <div className='parent'>
+                  <div className='terminal success'>{this.props.outputMessage[rowMeta.rowIndex] ? this.props.outputMessage[rowMeta.rowIndex] : 'No successful output produced yet.'}</div>
+                  <div className='terminal error'>{this.props.videoErrorMessage[rowMeta.rowIndex] ? this.props.videoErrorMessage[rowMeta.rowIndex] : 'No errors encountered.'}</div>
+                </div>
+              </TableCell>
+            </TableRow>
+          );
+        },
+        onRowExpansionChange: (allRowsArray, allExpandedArray) => this.setState({ [rowsExpanded]: allExpandedArray.map(rowObj => rowObj.index) })
+      };
+
       data = data.map((vidObj, index) => {
         // Remove the export audio indicator at the beginning of the array and replace it
         // with the upload status indicator.
@@ -350,30 +380,41 @@ class Table extends React.Component {
       this.props.uploaded.length === videosArr.length && this.props.dispatch({ type: 'EXIT_PROCESS' });
     }
 
+    const theme = createMuiTheme({
+      overrides: {
+        MUIDataTableSelectCell: {
+          expandDisabled: {
+            // Soft hide the button.
+            visibility: 'hidden'
+          },
+        },
+      },
+    });
+
     return (
       <>
         <MuiThemeProvider theme={useStyles}>
-          <MUIDataTable title='Videos To Upload' data={data} columns={columns} options={VideosTablePresets.options} />
+          <MUIDataTable title='Video(s) To Upload' data={data} columns={columns} options={options} theme={theme}/>
           <Dialog
             open={this.state[visibilityLevelOpenIndex] === null ? false : true}
           >
             <DialogTitle id="confirmation-dialog-title">Video Visibility</DialogTitle>
             <DialogContent dividers>
               <RadioGroup
-                value={videosArr[this.state[visibilityLevelOpenIndex]] ? videosArr[this.state[visibilityLevelOpenIndex]][visibility].toUpperCase() : ''}
+                value={videosArr[this.state[visibilityLevelOpenIndex]] ? videosArr[this.state[visibilityLevelOpenIndex]][visibility] : ''}
                 onChange={event => this.updateVidObject(this.state[visibilityLevelOpenIndex], visibility, event.target.value, false)}
               >
                 {visibilityOptions.visibility.map((option) => {
                   const videoObj = videosArr[this.state[visibilityLevelOpenIndex]];
                   const title = option.title.toUpperCase();
                   if (videoObj) {
-                    if (videoObj[visibility] === password.toUpperCase() && this.state[showPasswordField] === false) {
+                    if (videoObj[visibility] === password && this.state[showPasswordField] === false) {
                       this.setState({ [showPasswordField]: true })
-                    } else if (videoObj[visibility] !== password.toUpperCase() && this.state[showPasswordField] === true) {
+                    } else if (videoObj[visibility] !== password && this.state[showPasswordField] === true) {
                       this.setState({ [showPasswordField]: false })
                     }
                   }
-                  return <FormControlLabel value={title} key={title} control={<RadioButton.selectedRadioButton />} label={title} />
+                  return <FormControlLabel value={option.title} key={option.title} control={<RadioButton.selectedRadioButton />} label={title} />
                 })}
               </RadioGroup>
               {this.state[showPasswordField] &&
@@ -459,7 +500,9 @@ const mapStateToProps = state => ({
   uploaded: state.uploaded,
   transCoding: state.transCoding,
   uploadError: state.uploadError,
-  enableEditing: state.enableEditing
+  enableEditing: state.enableEditing,
+  outputMessage: state.outputMessage,
+  videoErrorMessage: state.videoErrorMessage,
 });
 
 export default connect(mapStateToProps)(Table);
