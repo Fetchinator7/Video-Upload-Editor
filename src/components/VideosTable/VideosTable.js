@@ -142,7 +142,6 @@ class Table extends React.Component {
         {
           name: 'Plus Audio Only',
           options: {
-            sort: false,
             customBodyRenderLite: (dataIndex) => {
               return (
                 <FormControlLabel
@@ -154,7 +153,7 @@ class Table extends React.Component {
                       value={videosArr[dataIndex][exportSeparateAudio]}
                     />
                   }
-                  onChange={event => {
+                  onChange={() => {
                     this.updateVidObject(dataIndex, exportSeparateAudio, !videosArr[dataIndex][exportSeparateAudio], false)
                   }}
                 />
@@ -164,7 +163,8 @@ class Table extends React.Component {
         } : {
           name: 'Status',
           options: {
-            sort: false
+            sort: false,
+            filter: false,
           }
         },
       this.props.enableEditing ?
@@ -209,7 +209,6 @@ class Table extends React.Component {
         {
           name: 'Visibility',
           options: {
-            sort: false,
             customBodyRenderLite: (dataIndex) => {
               return (
                 <FormControlLabel
@@ -229,7 +228,6 @@ class Table extends React.Component {
         } : {
           name: 'Visibility',
           options: {
-            sort: false,
             customBodyRender: (value) => {
               return (
                 value.toUpperCase()
@@ -239,9 +237,6 @@ class Table extends React.Component {
         },
       {
         name: 'File Path',
-        options: {
-          sort: false,
-        }
       },
       this.props.enableEditing ?
         {
@@ -269,6 +264,7 @@ class Table extends React.Component {
           name: 'Trim',
           options: {
             sort: false,
+            filter: false,
             customBodyRenderLite: (dataIndex) => {
               return (
                 <div className={videosArr[dataIndex][trimStart] || videosArr[dataIndex][trimEnd] ? 'trim' : undefined}>TRIM</div>
@@ -304,6 +300,7 @@ class Table extends React.Component {
           name: 'Link',
           options: {
             sort: false,
+            filter: false,
             customBodyRender: (value, tableMeta) => {
               const uri = videosArr[tableMeta.rowIndex].uri
               return (
@@ -345,7 +342,7 @@ class Table extends React.Component {
         expandableRowsOnClick: false,
         rowsExpanded: this.state[rowsExpanded],
         renderExpandableRow: (rowData, rowMeta) => {
-          const colSpan = rowData.length + 0;
+          const colSpan = rowData.length + 1;
           return (
             <TableRow>
               <TableCell colSpan={colSpan}>
