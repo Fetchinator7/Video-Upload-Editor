@@ -56,15 +56,26 @@ def main(main_out_save_dir):
 
 		# Record the render start time for the log.
 		start_render = dates.datetime.now().strftime("%I:%M:%S%p on %m/%d/%Y")
-		
-		# Make a temp output directory because with the way ffmpeg_cmds is setup
-		# you can't output to the same directory.
-		loudnorm_dir = tempfile.TemporaryDirectory()
-		loudnorm_dir_path = paths.Path(loudnorm_dir.name)
+
+		# If debug mode is True then the different directory generated for compressing/normalizing,
+		# trimming and chanign the extension will remain alongside the output instead of being hidden
+		# temporary directories. This way it's easier to tell which step of the process is failing.
+		# NOTE: This isn't changed anywhere, this is just here so it's easy for a programmer to debug.
+		in_debug_mode = True
+
+		if in_debug_mode is True:
+			# Make a visible output directory along side the output directory for debugging.
+			loudnorm_dir_path = paths.Path.joinpath(out_dir_path.with_name(title + '-loudnorm'))
+			loudnorm_dir_path.mkdir()
+		else:
+			# Make a temp output directory because with the way ffmpeg_cmds is setup
+			# you can't output to the same directory.
+			loudnorm_dir = tempfile.TemporaryDirectory()
+			loudnorm_dir_path = paths.Path(loudnorm_dir.name)
 		if compress == True:
 			# Compressionion enabled so use a different ffmpeg command
 			# to compress the input video.
-			fc.FileOperations(renamed_in_path, loudnorm_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format, speed_preset=compression_speed_preset)
+			fc.FileOperations(renamed_in_path, loudnorm_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format, speed_preset=compression_speed_preset, maintain_metadata=False)
 		else:
 			# Run the ffmpeg command to normalize the input video audio.
 			# This is done by scanning the input to see how many decibels it can
@@ -73,10 +84,16 @@ def main(main_out_save_dir):
 		loudnorm_output_path = paths.Path.joinpath(loudnorm_dir_path, renamed_in_path.name)
 
 		# * The trim is after the compression because the trim doesn't always work for the uncompressed input video codec.
-		# Make a temp output directory because with the way ffmpeg_cmds is setup
-		# you can't output to the same directory.
-		trim_dir = tempfile.TemporaryDirectory()
-		trim_dir_path = paths.Path(trim_dir.name)
+		if in_debug_mode is True:
+			# Make a visible output directory along side the output directory for debugging.
+			trim_dir_path = paths.Path.joinpath(out_dir_path.with_name(title + '-trim'))
+			trim_dir_path.mkdir()
+		else:
+			# Make a temp output directory because with the way ffmpeg_cmds is setup
+			# you can't output to the same directory.
+			trim_dir = tempfile.TemporaryDirectory()
+			trim_dir_path = paths.Path(trim_dir.name)
+
 		if start_time != "" or end_time != "":
 			fc.FileOperations(loudnorm_output_path, trim_dir_path).trim(start_time, end_time, codec_copy=codec_copy)
 		else:
