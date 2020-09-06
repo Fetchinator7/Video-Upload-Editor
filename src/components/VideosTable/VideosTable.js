@@ -3,14 +3,15 @@ import { connect } from 'react-redux';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import VideosTablePresets from './VideosTableDefaults';
 import MUIDataTable from 'mui-datatables';
-import DeleteIcon from '@material-ui/icons/Delete';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ErrorIcon from '@material-ui/icons/Error';
+import CancelIcon from '@material-ui/icons/Cancel';
 import upArrow from '../../icons/up-arrow.gif';
 import visibilityOptions from './visibilityOptions.json';
 import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle, Checkbox } from '@material-ui/core';
 import RadioButton from '../RadioButton';
 import '../App/App.css';
+import './VideosTable.css';
 
 const visibilityLevelOpenIndex = 'visibilityLevelOpenIndex';
 const trimDropDownOpenIndex = 'trimDropDownOpenIndex';
@@ -240,29 +241,39 @@ class Table extends React.Component {
           sort: false,
         }
       },
-      this.props.enableEditing &&
-      {
-        name: 'Trim',
-        options: {
-          sort: false,
-          customBodyRenderLite: (dataIndex) => {
-            return (
-              <FormControlLabel
-                control={
-                  <Button
-                    variant='outlined'
-                    style={videosArr[dataIndex][trimStart] || videosArr[dataIndex][trimEnd] ? { color: '#25f900' } : undefined}
-                    onClick={() => {
-                      this.setState({ [trimDropDownOpenIndex]: dataIndex })
-                    }}>
-                    Trim
+      this.props.enableEditing ?
+        {
+          name: 'Trim',
+          options: {
+            sort: false,
+            customBodyRenderLite: (dataIndex) => {
+              return (
+                <FormControlLabel
+                  control={
+                    <Button
+                      variant='outlined'
+                      style={videosArr[dataIndex][trimStart] || videosArr[dataIndex][trimEnd] ? { color: '#25f900' } : undefined}
+                      onClick={() => {
+                        this.setState({ [trimDropDownOpenIndex]: dataIndex })
+                      }}>
+                      Trim
                   </Button>
-                }
-              />
-            );
+                  }
+                />
+              );
+            }
           }
-        }
-      },
+        } : {
+          name: 'Trim',
+          options: {
+            sort: false,
+            customBodyRenderLite: (dataIndex) => {
+              return (
+                <div className={videosArr[dataIndex][trimStart] || videosArr[dataIndex][trimEnd] ? 'trim' : undefined}>TRIM</div>
+              );
+            }
+          }
+        },
       this.props.enableEditing ?
         {
           name: 'Cancel',
@@ -272,8 +283,8 @@ class Table extends React.Component {
               return (
                 <FormControlLabel
                   control={
-                    <Button variant='contained' disabled={!this.props.enableEditing}>
-                      <DeleteIcon color='secondary' />
+                    <Button variant='outlined' disabled={!this.props.enableEditing}>
+                      <CancelIcon color='secondary' />
                     </Button>
                   }
                   onClick={() => {
