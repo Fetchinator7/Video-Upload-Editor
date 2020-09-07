@@ -12,6 +12,16 @@ const OUTPUT_MESSAGE = 'OUTPUT_MESSAGE';
 const VIDEO_ERROR_MESSAGE = 'VIDEO_ERROR_MESSAGE';
 
 function* selectVideoFiles(action) {
+  const globalState = yield select();
+  let exportSeparateAudio;
+  // If the global state for showing the checkboxes for separate audio is true default to
+  // the boxes being selected/exportSeparateAudio = true, but it it's false no checkboxes will
+  // be shown meaning there's no way for the user to change it so default to false.
+  if (globalState.audioOnlyOption) {
+    exportSeparateAudio = true;
+  } else {
+    exportSeparateAudio = false;
+  }
   try {
     const response = yield axios.get('/video/file-picker', action.payload);
     yield put({
@@ -23,7 +33,7 @@ function* selectVideoFiles(action) {
         visibility: 'anybody',
         uri: '',
         password: '',
-        exportSeparateAudio: true,
+        exportSeparateAudio: exportSeparateAudio,
         trimStart: '',
         trimEnd: ''
       }
