@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import SearchTablePresets from '../VideosTable/VideosTableDefaults';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControl from '@material-ui/core/FormControl';
 import { Button, createMuiTheme, MuiThemeProvider, FormLabel } from '@material-ui/core';
-import UsersJsonFile from '../../users.json';
 import VideosTable from '../VideosTable/VideosTable';
+import RadioButton from '../RadioButton';
 import './App.css';
 
 const useStyles = createMuiTheme(
@@ -20,6 +19,7 @@ class HomePage extends Component {
   }
 
   render() {
+    const userSelected = Boolean(this.props.user);
     return (
       <>
         {/* If an environment variable is undefined show warning text
@@ -41,18 +41,18 @@ class HomePage extends Component {
                 })
               }
             >
-              {UsersJsonFile.users.map((users, index) =>
+              {this.props.users.map((user, index) =>
                 <FormControlLabel
-                  value={users}
-                  control={<Radio />}
-                  label={users}
+                  value={user}
+                  control={userSelected ? <RadioButton.selectedRadioButton /> : <RadioButton.emptyRadioButton />}
+                  label={user}
                   className='text'
-                  key={`user-options-${index}`}
+                  key={`user-radio-buttons-${index}`}
                 />
               )}
               <FormControlLabel
                 value='Other'
-                control={<Radio />}
+                control={userSelected ? <RadioButton.selectedRadioButton /> : <RadioButton.emptyRadioButton />}
                 className='text'
                 label='Other'
               />
@@ -107,9 +107,12 @@ class HomePage extends Component {
 
 const mapStateToProps = state => ({
   user: state.user,
+  users: state.users,
   enableEditing: state.enableEditing,
   loading: state.loading,
   videos: state.uploadFiles,
+  outputMessage: state.outputMessage,
+  videoErrorMessage: state.videoErrorMessage,
   errorMessage: state.errorMessage
 });
 

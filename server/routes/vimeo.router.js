@@ -57,7 +57,7 @@ router.post('/', (req, res) => {
     function (uri) {
       console.log('Your video URI is: ' + uri.substr(8, uri.length));
       // Remove the "/videos/" at the beginning.
-      res.send(uri.substr(8, uri.length));
+      res.status(200).send(uri.substr(8, uri.length));
     },
     function (bytesUploaded, bytesTotal) {
       // Show an uploaded percentage in the console.
@@ -107,7 +107,7 @@ router.patch('/', (req, res) => {
   }, function (error, body, statusCode) {
     const responseStr = `Updated video visibility level to: "${view}".`;
     if (error) {
-      res.status(statusCode).send('Error:', error);
+      res.status(statusCode).send(`Error, ${error}`);
     } else if (view === 'password') {
       res.status(statusCode).send(`${responseStr} The new password is: "${password}"`);
     } else {

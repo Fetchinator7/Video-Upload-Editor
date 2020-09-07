@@ -3,14 +3,39 @@ const router = express.Router();
 const { spawn } = require('child_process');
 
 // Confirm the input environment variable isn't undefined.
-router.get('/verify-output-path/:path', (req, res) => {
-  const path = req.params.path;
+router.get('/users', (req, res) => {
+  const users = 'USERS';
+  try {
+    if (process.env[users] === undefined) {
+      res.sendStatus(204);
+    } else {
+      res.status(200).send(process.env[users]);
+    }
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
+router.get('/verify-output-path', (req, res) => {
+  const path = 'MAIN_OUTPUT_FOLDER';
   try {
     if (process.env[path] === undefined) {
-      console.log('req.body', path);
       res.status(200).send(`Heads up! The main output path ${path} is undefined so this will application will fail to run until that's been specified.`);
     } else {
       res.status(200).send('');
+    }
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
+router.get('/check-separate-audio-only', (req, res) => {
+  const keyword = 'SEPARATE_AUDIO_ONLY_FILE_OPTION';
+  try {
+    if (process.env[keyword] === 'true') {
+      res.status(200).send(true);
+    } else {
+      res.status(200).send(false);
     }
   } catch {
     res.sendStatus(500);
@@ -24,62 +49,78 @@ router.post('/', (req, res) => {
   const userName = req.body.userName;
   const exportSeparateAudio = String(req.body.exportSeparateAudio);
   const compress = process.env.COMPRESSION || false;
-  const trimStart = req.body.trimStart;
-  const trimEnd = req.body.trimEnd;
+  const trimStart = req.body.trimStart || '';
+  const trimEnd = req.body.trimEnd || '';
   const codecCopy = process.env.TRIM_CODEC_COPY || true;
   const specifyPixelFormat = process.env.SPECIFY_PIXEL_FORMAT || false;
-  const description = req.body.description;
-  let pythonErr = false;
-  // Run the python file from the command line and pass it these arguments:
-  const pyProcess = spawn('python3',
-    ['server/dependencies/local_operations.py',
-      mainOutputFolder,
-      videoPath,
-      title,
-      userName,
-      exportSeparateAudio,
-      compress,
-      trimStart,
-      trimEnd,
-      codecCopy,
-      specifyPixelFormat
-    ]);
-  // This is the process standard error. If there's text here send back a status code of
-  // 500 along with the error message. And set the pythonErr conditional bool to true so
-  // this request won't send back two responses.
-  pyProcess.stderr.on('data', (data) => {
-    console.log(data.toString());
-    pythonErr = true;
-    res.status(500).send({ output: data.toString() });
-  });
-  pyProcess.stdout.on('data', (data) => {
-    // If the python output contains the word "Error, " and if so raise an error.
-    const err = data.toString().includes('Error, ');
-    if (err) {
-      pythonErr = true;
-      res.status(500).send(data.toString());
-      return;
-    }
+  const compressionSpeedPreset = process.env.COMPRESSION_SPEED_PRESET || 'fast';
+  const outputExtension = process.env.OUTPUT_EXTENSION || '.mp4';
+  const renameInputFile = process.env.RENAME_INPUT_VIDEO || true;
+  const description = req.body.description || '';
 
-    // The data object is what's sent to the python console which has the messages and the
-    // output path in {}:
-    // {
-    //   the raw output is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application.\n{/...New Title.mp4}\n"
-    //   the path is in curly braces then extracted to be: "/...New Title.mp4"
-    //   without the path is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application."
-    // }
-    const output = data.toString().replace(/{(.*?)}/, '').replace(/{{(.*?)}}/, '').slice(0, -2);
-    const outputVideoPath = data.toString().match(/{(.*?)}/) ? data.toString().match(/{(.*?)}/)[1] : '';
-    const bodyObj = {
-      videoPath: outputVideoPath,
-      title: title,
-      description: description ? description : ''
-    };
-    // If there wasn't any text in the standard error send back a success response.
-    if (!pythonErr) {
-      pythonErr = true;
-      res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
-    }
+  // The python process will change these values as it goes through but define
+  // default values them here due to scoping.
+  let pythonErr = '';
+  let output = '';
+  let outputVideoPath = '';
+  let bodyObj = {};
+
+  // Run the python file from the command line and pass it these arguments:
+  const promise = new Promise((resolve, reject) => {
+    const pyProcess = spawn('python3',
+      ['server/dependencies/local_operations.py',
+        mainOutputFolder,
+        videoPath,
+        title,
+        userName,
+        exportSeparateAudio,
+        compress,
+        trimStart,
+        trimEnd,
+        codecCopy,
+        specifyPixelFormat,
+        compressionSpeedPreset,
+        outputExtension,
+        renameInputFile
+      ]);
+
+    pyProcess.stdout.setEncoding('utf8');
+    pyProcess.stderr.setEncoding('utf8');
+    pyProcess.stdout.on('data', data => {
+      // With the way it's setup when ffmpeg encounters an error it prints "Error..." so see if the output has "Error..." in it.
+      if (data.toString().includes('Error, ')) {
+        pythonErr = data;
+      } else {
+        // It worked so it returns the command line output:
+        // {
+        //   the raw output is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application.\n{/...New Title.mp4}\n"
+        //   the path is in {} then extracted to be: "/...New Title.mp4"
+        //   without the path is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application."
+        // }
+        // Since extra {} were injected to determine what the output path is remove those {} from the output message.
+        output = data.toString().replace(/{(.*?)}/, '').replace(/{{(.*?)}}/, '').slice(0, -2);
+        outputVideoPath = data.toString().match(/{(.*?)}/) ? data.toString().match(/{(.*?)}/)[1] : '';
+        bodyObj = {
+          videoPath: outputVideoPath,
+          title: title,
+          description: description
+        };
+      }
+    });
+    // python encountered an error.
+    pyProcess.stderr.on('data', data => {
+      pythonErr = data;
+    });
+    pyProcess.on('error', error => reject(error));
+    pyProcess.on('close', exitCode => {
+      resolve(exitCode);
+      if (pythonErr !== '') {
+        // path and bodyObj are used by the next operation so if there was an error don't include.
+        res.status(500).send(pythonErr);
+      } else {
+        res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
+      }
+    });
   });
 });
 
@@ -98,13 +139,15 @@ router.get('/file-picker', (req, res) => {
 });
 
 router.get('/exit-process', (req, res) => {
-  // The application success fully uploaded the video(s) so kill all node processes so
-  // all the user has to do to use the application again is to launch the "run" file.
+  // The application success fully uploaded the video(s) so kill this process.
   try {
     spawn('killall', ['node']);
+    res.sendStatus(200);
   } catch (error) {
     console.log('killall error', error);
+    res.sendStatus(500);
   }
+  // process.kill(process.ppid);
 });
 
 module.exports = router;

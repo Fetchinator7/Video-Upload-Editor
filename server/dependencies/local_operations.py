@@ -8,6 +8,7 @@ sys.path.append(str(paths.Path.joinpath(paths.Path(__file__).parent, 'System-Com
 import ffmpeg_cmds as fc
 import system as syst
 
+
 # The path to the main output directory.
 # This is where folders for the current month and year will be generated.
 path_to_main_out_save_folder = paths.Path(sys.argv[1])
@@ -33,20 +34,19 @@ def main(main_out_save_dir):
 	end_time = sys.argv[8]
 	codec_copy = set_bool(sys.argv[9])
 	add_pixel_format = set_bool(sys.argv[10])
+	compression_speed_preset = sys.argv[11]
+	output_extension = sys.argv[12]
+	rename_input_file = set_bool(sys.argv[13])
 
-	# There's currently no option to change if the output will by .mp4
-	# but I put the boolean here to make it easy to disable.
-	export_to_mp4 = True
-	new_out_video_ext = '.mp4'
+	# If export_audio is true this will be the extension used for that.
 	out_aud_ext = '.mp3'
-	if export_to_mp4 == True:
-		output_video_extension = new_out_video_ext
-	else:
-		output_video_extension = org_in_vid_path.suffix
 
 	# Rename the input file to be the input title.
-	renamed_in_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
-	org_in_vid_path.rename(renamed_in_path)
+	if rename_input_file is True:
+		input_video_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
+		org_in_vid_path.rename(input_video_path)
+	else:
+		input_video_path = org_in_vid_path
 
 	# Create a folder for the current year and month (they may already exist)
 	# and create a folder with the name of the video title.
@@ -61,53 +61,64 @@ def main(main_out_save_dir):
 
 		# Record the render start time for the log.
 		start_render = dates.datetime.now().strftime("%I:%M:%S%p on %m/%d/%Y")
-		
-		def render(input_file):
-			"""Take the trimmed/normal input file and compress or normalize it.
-			Args:
-				input_file (pathlib): An input file that's a pathlib path.
-			"""
-			# Confirm the input extension isn't already .mp4.
-			if export_to_mp4 is True and input_file.suffix != new_out_video_ext:
-				# Make a temp output directory because with the way ffmpeg_cmds is setup
-				# you can't output to the same directory.
-				compress_dir = tempfile.TemporaryDirectory()
-				compress_dir_path = paths.Path(compress_dir.name)
-				if compress == True:
-					# Compressionion enabled so use a different ffmpeg command
-					# to compress the input video.
-					fc.FileOperations(input_file, compress_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format)
-				else:
-					# Run the ffmpeg command to normalize the input video audio.
-					# This is done by scanning the input to see how many decibels it can
-					# be raised by before clipping occurs, then raising it by that amount.
-					fc.FileOperations(input_file, compress_dir_path).loudnorm_stereo()
-				output_path = paths.Path.joinpath(compress_dir_path, input_file.name)
-				fc.FileOperations(output_path, out_dir_path).change_ext(new_out_video_ext, codec_copy=True)
-			else:
-				if compress == True:
-					# Compressionion enabled so use a different ffmpeg command
-					# to compress the input video.
-					fc.FileOperations(input_file, out_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format)
-				else:
-					# Run the ffmpeg command to normalize the input video audio.
-					# This is done by scanning the input to see how many decibels it can
-					# be raised by before clipping occurs, then raising it by that amount.
-					fc.FileOperations(input_file, out_dir_path).loudnorm_stereo()
 
-		if start_time != "" or end_time != "":
-			# Make a temporary folder where the output of the audio normalization wil be sent
-			# (The output can't be in the same directory as the input so make this temp folder)
+		# If debug mode is True then the different directory generated for compressing/normalizing,
+		# trimming and chanign the extension will remain alongside the output instead of being hidden
+		# temporary directories. This way it's easier to tell which step of the process is failing.
+		# NOTE: This isn't changed anywhere, this is just here so it's easy for a programmer to debug.
+		in_debug_mode = False
+
+		if in_debug_mode is True:
+			# Make a visible output directory along side the output directory for debugging.
+			loudnorm_dir_path = paths.Path.joinpath(out_dir_path.with_name(title + '-loudnorm'))
+			loudnorm_dir_path.mkdir()
+		else:
+			# Make a temp output directory because with the way ffmpeg_cmds is setup
+			# you can't output to the same directory.
+			loudnorm_dir = tempfile.TemporaryDirectory()
+			loudnorm_dir_path = paths.Path(loudnorm_dir.name)
+		if compress == True:
+			# Compressionion enabled so use a different ffmpeg command
+			# to compress the input video.
+			fc.FileOperations(input_video_path, loudnorm_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format, speed_preset=compression_speed_preset, maintain_metadata=False)
+		else:
+			# Run the ffmpeg command to normalize the input video audio.
+			# This is done by scanning the input to see how many decibels it can
+			# be raised by before clipping occurs, then raising it by that amount.
+			fc.FileOperations(input_video_path, loudnorm_dir_path).loudnorm_stereo()
+		loudnorm_output_path = paths.Path.joinpath(loudnorm_dir_path, input_video_path.name)
+
+		# * The trim is after the compression because the trim doesn't always work for the uncompressed input video codec.
+		if in_debug_mode is True:
+			# Make a visible output directory along side the output directory for debugging.
+			trim_dir_path = paths.Path.joinpath(out_dir_path.with_name(title + '-trim'))
+			trim_dir_path.mkdir()
+		else:
+			# Make a temp output directory because with the way ffmpeg_cmds is setup
+			# you can't output to the same directory.
 			trim_dir = tempfile.TemporaryDirectory()
 			trim_dir_path = paths.Path(trim_dir.name)
-			fc.FileOperations(renamed_in_path, trim_dir_path).trim(start_time, end_time, codec_copy=codec_copy)
-			out_trim_path = paths.Path.joinpath(trim_dir_path, renamed_in_path.name)
-			render(out_trim_path)
+
+		if start_time != "" or end_time != "":
+			fc.FileOperations(loudnorm_output_path, trim_dir_path).trim(start_time, end_time, codec_copy=codec_copy)
 		else:
-			render(renamed_in_path)
+			syst.Paths().move_to_new_dir(loudnorm_output_path, trim_dir_path)
+		out_trim_path = paths.Path.joinpath(trim_dir_path, loudnorm_output_path.name)
+
+		# The input video extension doesn't match the desired output extension.
+		if out_trim_path.suffix != output_extension:
+			if compress is True:
+				# If the video was compressed then it's encoded so the codec can be copied.
+				fc.FileOperations(out_trim_path, out_dir_path).change_ext(output_extension, codec_copy=True)
+			else:
+				# If the input video wasn't compressed then we don't know what
+				# the input codec is so play it safe and don't copy the codec.
+				fc.FileOperations(out_trim_path, out_dir_path).change_ext(output_extension, codec_copy=False)
+		else:
+			syst.Paths().move_to_new_dir(out_trim_path, out_dir_path)
 
 		# Get the path of the output file.
-		out_path = paths.Path.joinpath(out_dir_path, title + output_video_extension)
+		out_path = paths.Path.joinpath(out_dir_path, title + output_extension)
 		# If the user said to export audio as well then copy the output to a .mp3 file.
 		if export_audio == True:
 			fc.FileOperations(out_path, out_dir_path).change_ext(out_aud_ext)
@@ -115,21 +126,24 @@ def main(main_out_save_dir):
 		# Record the rendering end time for the log.
 		end_render = dates.datetime.now().strftime("%I:%M:%S%p on %m/%d/%Y" )
 		# Run function that makes a text file with some relevant information.
-		fin_log(usr_name, title, renamed_in_path, start_render, end_render, out_path, out_dir_path)
+		fin_log(usr_name, title, input_video_path, rename_input_file, start_render, end_render, out_path, out_dir_path)
 		print("{" + str(out_path) + "}")
 
 
-def fin_log(usr, title, renamed_in_path, start, end, out_vid, out_dir_path):
+def fin_log(usr, title, in_path, in_path_was_renamed, start, end, out_vid, out_dir_path):
 	"""Create log file."""
 
 	# Path to log file and create it.
-	session_txt_path = paths.Path().joinpath(out_dir_path, title + '-log').with_suffix('.txt')
+	session_txt_path = paths.Path.joinpath(out_dir_path, title + '-log').with_suffix('.txt')
 	paths.Path.touch(session_txt_path)
 
 	# Write info about session to .txt file in the save location.
 	session_info = [f'User: {usr}', f'Title: {title}', f'Started rendering at {start}',
-					f'Finished rendering at {end}', f'Output video: {str(out_vid)}',
-					f'Renamed source file: {str(renamed_in_path)}']
+					f'Finished rendering at {end}', f'Output video: {str(out_vid)}']
+	if in_path_was_renamed is True:
+		session_info.append(f'Renamed source file: {str(in_path)}')
+	else:
+		session_info.append(f'Source file: {str(in_path)}')
 	session_write = '\n'.join(session_info)
 	session_txt_path.write_text(session_write)
 

@@ -1,6 +1,15 @@
 import axios from 'axios';
 import moment from 'moment';
-import { put, takeEvery, delay, select } from 'redux-saga/effects';
+import { put, takeEvery, delay, select, call } from 'redux-saga/effects';
+
+const view = 'view';
+const visibility = 'visibility';
+const password = 'password';
+const output = 'output';
+const uriKey = 'uri';
+const SET_UPLOAD_FILES = 'SET_UPLOAD_FILES';
+const OUTPUT_MESSAGE = 'OUTPUT_MESSAGE';
+const VIDEO_ERROR_MESSAGE = 'VIDEO_ERROR_MESSAGE';
 
 function* selectVideoFiles(action) {
   try {
@@ -15,8 +24,6 @@ function* selectVideoFiles(action) {
         uri: '',
         password: '',
         exportSeparateAudio: true,
-        visibilityDropDownIsOpen: false,
-        trimDropDownIsOpen: false,
         trimStart: '',
         trimEnd: ''
       }
@@ -26,27 +33,35 @@ function* selectVideoFiles(action) {
   }
 }
 
+const axiosPost = (argObj) => {
+  return axios.post(argObj.url, argObj.payload);
+};
+
 function* uploadVideoFiles(action) {
   try {
     yield put({ type: 'SET_RENDERING', payload: action.index });
-    const renderResponse = yield axios.post('/video', action.payload);
+    const renderResponse = yield call(axiosPost, { url: '/video', payload: action.payload });
     yield put({ type: 'CLEAR_RENDERING', payload: action.index });
+    yield put({ type: OUTPUT_MESSAGE, payload: renderResponse.data[output], index: action.index });
 
     yield put({ type: 'SET_UPLOADING', payload: action.index });
     const uploadResponse = yield axios.post('/vimeo', renderResponse.data.bodyObj);
+    yield put({ type: OUTPUT_MESSAGE, payload: uploadResponse.data[output], index: action.index });
 
-    const uri = uploadResponse.data;
+    const uriRes = uploadResponse.data;
     yield put({ type: 'CLEAR_UPLOADING', payload: action.index });
 
     const globalState = yield select();
-    const updateArr = globalState.uploadFiles.map((videoObj, index) => action.index === index ? { ...videoObj, uri: uri } : videoObj);
-    yield put({ type: 'SET_UPLOAD_FILES', payload: updateArr });
+    const updateArr = [...globalState.uploadFiles];
+    updateArr[action.index] = { ...globalState.uploadFiles[action.index], [uriKey]: uriRes };
+    yield put({ type: SET_UPLOAD_FILES, payload: updateArr });
 
-    yield put({ type: 'UPDATE_VIDEO_VISIBILITY', payload: { uri: uri, view: action.visibility, password: action.password } });
+    yield put({ type: 'UPDATE_VIDEO_VISIBILITY', payload: { [uriKey]: uriRes, [view]: action[visibility], [password]: action[password] } });
     yield put({ type: 'SET_TRANSCODING', payload: action.index });
     let transCoding = true;
     while (transCoding === true) {
-      const transCodingResponse = yield axios.get(`/vimeo/transcode-status/${uri}`);
+      const transCodingResponse = yield axios.get(`/vimeo/transcode-status/${uriRes}`);
+      yield put({ type: OUTPUT_MESSAGE, payload: transCodingResponse.data[output], index: action.index });
       yield delay(5000);
       if (transCodingResponse.data === 'Finished') {
         transCoding = false;
@@ -56,7 +71,9 @@ function* uploadVideoFiles(action) {
     yield put({ type: 'SET_UPLOADED', payload: action.index });
   } catch (error) {
     console.log('Error uploading video', error);
+    console.log('error.response.data', error.response.data);
     yield put({ type: 'SET_UPLOAD_ERROR', payload: action.index });
+    yield put({ type: VIDEO_ERROR_MESSAGE, payload: error.response ? error.response.data : error, index: action.index });
   } finally {
     yield put({ type: 'CLEAR_LOADING', payload: action.index });
     yield put({ type: 'CLEAR_TRANSCODING', payload: action.index });
