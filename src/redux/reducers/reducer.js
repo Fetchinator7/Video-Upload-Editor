@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 
+const ENABLE_AUDIO_ONLY_OPTION = 'ENABLE_AUDIO_ONLY_OPTION';
 const VIDEO_ERROR_MESSAGE = 'VIDEO_ERROR_MESSAGE';
 const OUTPUT_MESSAGE = 'OUTPUT_MESSAGE';
 
@@ -18,6 +19,17 @@ const users = (state = [], action) => {
   switch (action.type) {
     case 'SET_USERS':
       return action.payload;
+    default:
+      return state;
+  }
+};
+
+const audioOnlyOption = (state = false, action) => {
+  // A boolean that uses conditional rendering to either show or hide things based on it the
+  // user started the upload process.
+  switch (action.type) {
+    case ENABLE_AUDIO_ONLY_OPTION:
+      return true;
     default:
       return state;
   }
@@ -172,6 +184,7 @@ const errorMessage = (state = '', action) => {
 export default combineReducers({
   user,
   users,
+  audioOnlyOption,
   rendering,
   uploadFiles,
   enableEditing,

@@ -139,6 +139,7 @@ class Table extends React.Component {
     // Get the base formatted data then add the "comments" column to the end.
     const columns = [
       this.props.enableEditing ?
+        this.props.audioOnlyOption &&
         {
           name: 'Plus Audio Only',
           options: {
@@ -391,7 +392,7 @@ class Table extends React.Component {
     return (
       <>
         <MuiThemeProvider theme={useStyles}>
-          <MUIDataTable title='Video(s) To Upload' data={data} columns={columns} options={options} theme={theme}/>
+          <MUIDataTable title='Video(s) To Upload' data={data} columns={columns} options={options} theme={theme} />
           <Dialog
             open={this.state[visibilityLevelOpenIndex] === null ? false : true}
           >
@@ -492,6 +493,7 @@ class Table extends React.Component {
 
 const mapStateToProps = state => ({
   videos: state.uploadFiles,
+  audioOnlyOption: state.audioOnlyOption,
   rendering: state.rendering,
   uploading: state.uploading,
   uploaded: state.uploaded,

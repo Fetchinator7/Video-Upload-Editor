@@ -16,13 +16,26 @@ router.get('/users', (req, res) => {
   }
 });
 
-router.get('/verify-output-path/:path', (req, res) => {
-  const path = req.params.path;
+router.get('/verify-output-path', (req, res) => {
+  const path = 'MAIN_OUTPUT_FOLDER';
   try {
     if (process.env[path] === undefined) {
       res.status(200).send(`Heads up! The main output path ${path} is undefined so this will application will fail to run until that's been specified.`);
     } else {
       res.status(200).send('');
+    }
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
+router.get('/check-separate-audio-only', (req, res) => {
+  const keyword = 'SEPARATE_AUDIO_ONLY_FILE_OPTION';
+  try {
+    if (process.env[keyword] === 'true') {
+      res.status(200).send(true);
+    } else {
+      res.status(200).send(false);
     }
   } catch {
     res.sendStatus(500);

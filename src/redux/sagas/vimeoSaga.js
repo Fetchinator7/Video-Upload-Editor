@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { takeEvery, put } from 'redux-saga/effects';
 
+const ENABLE_AUDIO_ONLY_OPTION = 'ENABLE_AUDIO_ONLY_OPTION';
+
 function* confirmVimeoCredentialsExist() {
   try {
     // Start with an empty error string. The error message will be appended if there is one.
@@ -25,8 +27,12 @@ function* confirmVimeoCredentialsExist() {
     errorStr += clientSecret.data;
     const accessToken = yield axios.get(`${getURL}/ACCESS_TOKEN`);
     errorStr += accessToken.data;
-    const outputPath = yield axios.get('/video/verify-output-path/MAIN_OUTPUT_FOLDER');
+    const outputPath = yield axios.get('/video/verify-output-path');
     errorStr += outputPath.data;
+    const separateAudioOnly = yield axios.get('/video/check-separate-audio-only');
+    if (separateAudioOnly.data === true) {
+      yield put({ type: ENABLE_AUDIO_ONLY_OPTION });
+    }
 
     // Set the global state error message to the combined error message string.
     // If there's no text (because there was no error) nothing will change visibly.
