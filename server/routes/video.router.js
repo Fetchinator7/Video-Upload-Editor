@@ -55,6 +55,7 @@ router.post('/', (req, res) => {
   const specifyPixelFormat = process.env.SPECIFY_PIXEL_FORMAT || false;
   const compressionSpeedPreset = process.env.COMPRESSION_SPEED_PRESET || 'fast';
   const outputExtension = process.env.OUTPUT_EXTENSION || '.mp4';
+  const renameInputFile = process.env.RENAME_INPUT_VIDEO || true;
   const description = req.body.description || '';
 
   // The python process will change these values as it goes through but define
@@ -79,7 +80,8 @@ router.post('/', (req, res) => {
         codecCopy,
         specifyPixelFormat,
         compressionSpeedPreset,
-        outputExtension
+        outputExtension,
+        renameInputFile
       ]);
 
     pyProcess.stdout.setEncoding('utf8');

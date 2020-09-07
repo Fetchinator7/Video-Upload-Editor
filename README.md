@@ -109,6 +109,8 @@ USERS=["user", "user 1", "user 2", "user 3"]
 
 `OUTPUT_EXTENSION` (which is ".mp4" by default) will be the extension of the output video. If the video already has this extension then nothing will be changed, but if the input video doesn't have this extension the output video will be converted so it uses that extension.
 
+`RENAME_INPUT_VIDEO` (which is enabled by default) dictates if input video files will be renamed to the output video title or keep the same title. It's enabled by default because more often than not source files aren't named according to their content and just follow an automatic naming convention. However, you may not want to rename the source file, such as for specifying two different trimming ranges for the same input file to export two files for two separate Vimeo videos.
+
 `SEPARATE_AUDIO_ONLY_FILE_OPTION` (which is disabled by default) shows a checkbox with each video to toggle rendering an additional separate audio-only file with the audio of the output video.
 
 ### All in all the final `.env` file could look something like this
@@ -127,6 +129,7 @@ COMPRESSION_SPEED_PRESET=slow
 SPECIFY_PIXEL_FORMAT=true
 TRIM_CODEC_COPY=false
 OUTPUT_EXTENSION=.mov
+RENAME_INPUT_VIDEO=false
 SEPARATE_AUDIO_ONLY_FILE_OPTION=true
 ```
 

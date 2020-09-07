@@ -8,6 +8,7 @@ sys.path.append(str(paths.Path.joinpath(paths.Path(__file__).parent, 'System-Com
 import ffmpeg_cmds as fc
 import system as syst
 
+
 # The path to the main output directory.
 # This is where folders for the current month and year will be generated.
 path_to_main_out_save_folder = paths.Path(sys.argv[1])
@@ -35,13 +36,17 @@ def main(main_out_save_dir):
 	add_pixel_format = set_bool(sys.argv[10])
 	compression_speed_preset = sys.argv[11]
 	output_extension = sys.argv[12]
+	rename_input_file = set_bool(sys.argv[13])
 
 	# If export_audio is true this will be the extension used for that.
 	out_aud_ext = '.mp3'
 
 	# Rename the input file to be the input title.
-	renamed_in_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
-	org_in_vid_path.rename(renamed_in_path)
+	if rename_input_file is True:
+		input_video_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
+		org_in_vid_path.rename(input_video_path)
+	else:
+		input_video_path = org_in_vid_path
 
 	# Create a folder for the current year and month (they may already exist)
 	# and create a folder with the name of the video title.
@@ -61,7 +66,7 @@ def main(main_out_save_dir):
 		# trimming and chanign the extension will remain alongside the output instead of being hidden
 		# temporary directories. This way it's easier to tell which step of the process is failing.
 		# NOTE: This isn't changed anywhere, this is just here so it's easy for a programmer to debug.
-		in_debug_mode = True
+		in_debug_mode = False
 
 		if in_debug_mode is True:
 			# Make a visible output directory along side the output directory for debugging.
@@ -75,13 +80,13 @@ def main(main_out_save_dir):
 		if compress == True:
 			# Compressionion enabled so use a different ffmpeg command
 			# to compress the input video.
-			fc.FileOperations(renamed_in_path, loudnorm_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format, speed_preset=compression_speed_preset, maintain_metadata=False)
+			fc.FileOperations(input_video_path, loudnorm_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format, speed_preset=compression_speed_preset, maintain_metadata=False)
 		else:
 			# Run the ffmpeg command to normalize the input video audio.
 			# This is done by scanning the input to see how many decibels it can
 			# be raised by before clipping occurs, then raising it by that amount.
-			fc.FileOperations(renamed_in_path, loudnorm_dir_path).loudnorm_stereo()
-		loudnorm_output_path = paths.Path.joinpath(loudnorm_dir_path, renamed_in_path.name)
+			fc.FileOperations(input_video_path, loudnorm_dir_path).loudnorm_stereo()
+		loudnorm_output_path = paths.Path.joinpath(loudnorm_dir_path, input_video_path.name)
 
 		# * The trim is after the compression because the trim doesn't always work for the uncompressed input video codec.
 		if in_debug_mode is True:
@@ -121,11 +126,11 @@ def main(main_out_save_dir):
 		# Record the rendering end time for the log.
 		end_render = dates.datetime.now().strftime("%I:%M:%S%p on %m/%d/%Y" )
 		# Run function that makes a text file with some relevant information.
-		fin_log(usr_name, title, renamed_in_path, start_render, end_render, out_path, out_dir_path)
+		fin_log(usr_name, title, input_video_path, rename_input_file, start_render, end_render, out_path, out_dir_path)
 		print("{" + str(out_path) + "}")
 
 
-def fin_log(usr, title, renamed_in_path, start, end, out_vid, out_dir_path):
+def fin_log(usr, title, in_path, in_path_was_renamed, start, end, out_vid, out_dir_path):
 	"""Create log file."""
 
 	# Path to log file and create it.
@@ -134,8 +139,11 @@ def fin_log(usr, title, renamed_in_path, start, end, out_vid, out_dir_path):
 
 	# Write info about session to .txt file in the save location.
 	session_info = [f'User: {usr}', f'Title: {title}', f'Started rendering at {start}',
-					f'Finished rendering at {end}', f'Output video: {str(out_vid)}',
-					f'Renamed source file: {str(renamed_in_path)}']
+					f'Finished rendering at {end}', f'Output video: {str(out_vid)}']
+	if in_path_was_renamed is True:
+		session_info.append(f'Renamed source file: {str(in_path)}')
+	else:
+		session_info.append(f'Source file: {str(in_path)}')
 	session_write = '\n'.join(session_info)
 	session_txt_path.write_text(session_write)
 
