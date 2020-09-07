@@ -2,7 +2,15 @@
 
 This is a basic interface for automatically rendering then uploading videos to Vimeo. This is geared toward people who do a lot of recordings but little to no editing afterwards such as publishing video conference recordings.
 
+### The first selection screen
+
 ![Selection View](readme-images/preparing.png?raw=true)
+
+### After clicking upload and the videos started rendering
+
+![Rendering View](readme-images/rendering.png?raw=true)
+
+### The rendering finished so it's uploading to Vimeo
 
 ![Uploading View](readme-images/uploading.png?raw=true)
 
