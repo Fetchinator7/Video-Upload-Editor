@@ -55,7 +55,7 @@ This'll download the .msi which will do the installation and paths for you.
 
 ### Both
 
-If you don't have git you can download this project as a zip file, unzip it, and move it to the folder on the computer where you'd like to store this project. Once that's done, open a terminal window, enter `cd`, drag-and-drop the folder icon on top of the terminal window, and press enter. Then run `npm install`
+If you don't have git you can download this project as a zip file, unzip it, and move it to the folder on the computer where you'd like to store this project. Once that's done, open a terminal window, enter `cd`, drag-and-drop the folder icon on top of the terminal window, and press enter. Then run `npm install`.
 
 ## Setup
 
@@ -67,7 +67,7 @@ Are you back now? Great, let's move on!
 Now that our app has upload access go to `Authentication` and `Generate an access token` by selecting `Authenticated (you)`. Give it access to `Public, Private, Create, Edit, Upload, and Video Files` then copy the `Token`.
 
 Next we need to create a new `.env` file in the root directory of the project (no parent folders).
-See [create a file on mac] or [create a file on windows] with these parameters:
+To make a `.env` on mac it's `touch .env` and on windows it's `type nul > .env`. Next open it with a text editor (`open .env` for mac or `.env` for windows) and enter these parameters:
 
 ```env
 ACCESS_TOKEN=
