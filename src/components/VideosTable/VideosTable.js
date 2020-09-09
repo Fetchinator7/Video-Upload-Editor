@@ -179,13 +179,13 @@ class Table extends React.Component {
         {
           name: 'Title',
           options: {
-            customBodyRenderLite: (dataIndex) => {
+            // NOTE: This needs to be a "customBodyRender" because otherwise when you delete
+            // a character in the text field the curser jumps to the end.
+            customBodyRender: (value, tableMeta) => {
               return (
-                <TextField
-                  color={videosArr[dataIndex][title] ? 'primary' : 'secondary'}
-                  value={videosArr[dataIndex][title]}
+                <FormControlLabel
                   onChange={event => {
-                    this.updateVidObject(dataIndex, title, event.target.value, false)
+                    this.updateVidObject(tableMeta.rowIndex, title, event.target.value, false)
                     // If the title has any characters from the invalid characters array display the warning message.
                     if (this.props[invalidCharactersArrayPlatformSpecific].some(invalidChar => String(event.target.value).includes(invalidChar))) {
                       this.props.dispatch({
@@ -197,6 +197,12 @@ class Table extends React.Component {
                       this.props.dispatch({ type: HIDE_INVALID_CHARACTER_WARNING });
                     }
                   }}
+                  control={
+                    <TextField
+                      color={videosArr[tableMeta.rowIndex][title] ? 'primary' : 'secondary'}
+                      value={videosArr[tableMeta.rowIndex][title]}
+                    />
+                  }
                 />
               );
             }
@@ -208,14 +214,20 @@ class Table extends React.Component {
         {
           name: 'Description',
           options: {
-            customBodyRenderLite: (dataIndex) => {
+            // NOTE: This needs to be a "customBodyRender" because otherwise when you delete
+            // a character in the text field the curser jumps to the end.
+            customBodyRender: (value, tableMeta) => {
               return (
-                <TextField
-                  color='primary'
-                  value={videosArr[dataIndex][description]}
+                <FormControlLabel
                   onChange={event => {
-                    this.updateVidObject(dataIndex, description, event.target.value, false)
+                    this.updateVidObject(tableMeta.rowIndex, description, event.target.value, false)
                   }}
+                  control={
+                    <TextField
+                      color='primary'
+                      value={videosArr[tableMeta.rowIndex][description]}
+                    />
+                  }
                 />
               );
             }
@@ -305,7 +317,7 @@ class Table extends React.Component {
                   }
                   onClick={() => {
                     const videos = [...videosArr];
-                    this.props.enableEditing && this.props.dispatch({
+                    this.props.dispatch({
                       type: SET_UPLOAD_FILES,
                       payload: videos.slice(0, dataIndex).concat(videos.slice(dataIndex + 1, videos.length))
                     });
