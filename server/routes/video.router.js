@@ -163,18 +163,28 @@ router.get('/file-picker', (req, res) => {
     res.status(500).send({ output: data.toString() });
   });
   pyProcess.stdout.on('data', (data) => {
-    !pythonErr && res.status(200).send(String(data.toString().slice(0, -1)));
+    !pythonErr && res.status(200).send(String(data.toString()));
   });
 });
 
 router.get('/exit-process', (req, res) => {
   // The application success fully uploaded the video(s) so kill this process.
-  try {
-    spawn('killall', ['node']);
-    res.sendStatus(200);
-  } catch (error) {
-    console.log('killall error', error);
-    res.sendStatus(500);
+  if (os.platform() === 'darwin') {
+    try {
+      spawn('killall', ['node']);
+      res.sendStatus(200);
+    } catch (error) {
+      console.log('killall error', error);
+      res.sendStatus(500);
+    }
+  } else if (os.platform() === 'win32') {
+    try {
+      spawn('taskkill', ['/IM', 'node.exe', '/F']);
+      res.sendStatus(200);
+    } catch (error) {
+      console.log('taskkill error', error);
+      res.sendStatus(500);
+    }
   }
   // process.kill(process.ppid);
 });
