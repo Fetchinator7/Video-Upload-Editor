@@ -155,15 +155,41 @@ router.post('/', (req, res) => {
 
 router.get('/file-picker', (req, res) => {
   // Launch the python file to open the file picker which prints the selected file to the stdout.
-  let pythonErr = false;
-  const pyProcess = spawn('python3', ['server/dependencies/file_picker.py']);
-  pyProcess.stderr.on('data', (data) => {
-    console.log(data.toString());
-    pythonErr = true;
-    res.status(500).send({ output: data.toString() });
-  });
-  pyProcess.stdout.on('data', (data) => {
-    !pythonErr && res.status(200).send(String(data.toString()));
+
+  // The python process will change these values as it goes through but define
+  // default values them here due to scoping.
+  let pythonErr = '';
+  let output = '';
+
+  const promise = new Promise((resolve, reject) => {
+    const pyProcess = spawn('python3', ['server/dependencies/file_picker.py']);
+    pyProcess.stdout.setEncoding('utf8');
+    pyProcess.stderr.setEncoding('utf8');
+    pyProcess.stdout.on('data', data => {
+      output = data.toString();
+      console.log('output', output);
+    }
+    );
+    // python encountered an error.
+    pyProcess.stderr.on('data', data => {
+      pythonErr = data;
+    });
+    pyProcess.on('error', error => reject(error));
+    pyProcess.on('close', exitCode => {
+      resolve(exitCode);
+      if (pythonErr !== '') {
+        // path and bodyObj are used by the next operation so if there was an error don't include.
+        res.status(500).send({ output: pythonErr });
+      } else {
+        // If the user clicks the "cancel" button for the file picker it returns "."
+        // so instead return an empty string to avoid a video being add with an invalid path.
+        if (output === '.') {
+          res.status(200).send('');
+        } else {
+          res.status(200).send(output);
+        }
+      }
+    });
   });
 });
 
