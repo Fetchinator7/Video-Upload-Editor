@@ -3,6 +3,12 @@ import { combineReducers } from 'redux';
 const ENABLE_AUDIO_ONLY_OPTION = 'ENABLE_AUDIO_ONLY_OPTION';
 const VIDEO_ERROR_MESSAGE = 'VIDEO_ERROR_MESSAGE';
 const OUTPUT_MESSAGE = 'OUTPUT_MESSAGE';
+const SET_INVALID_FILENAME_REPLACEMENT_CHARACTER = 'SET_INVALID_FILENAME_REPLACEMENT_CHARACTER';
+const SET_INVALID_CHARACTER_ARRAY = 'SET_INVALID_CHARACTER_ARRAY';
+const DISPLAY_INVALID_CHARACTER_WARNING = 'DISPLAY_INVALID_CHARACTER_WARNING';
+const HIDE_INVALID_CHARACTER_WARNING = 'HIDE_INVALID_CHARACTER_WARNING';
+const invalidCharArr = 'invalidCharArr';
+const replaceInvalidCharacterWithKey = 'replaceInvalidCharacterWithKey';
 
 const user = (state = '', action) => {
   // The string of which user is uploading.
@@ -181,6 +187,40 @@ const errorMessage = (state = '', action) => {
   }
 };
 
+const invalidCharactersArrayPlatformSpecific = (state = [], action) => {
+  // This is the array that holds the invalid characters base on the current operating system.
+  switch (action.type) {
+    case SET_INVALID_CHARACTER_ARRAY:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+const displayInvalidFilenameCharacterWarning = (state = false, action) => {
+  // This warning will appear on the bottom left if the user entered invalid filename
+  // characters for the video title.
+  switch (action.type) {
+    case DISPLAY_INVALID_CHARACTER_WARNING:
+      return `Heads up! Filenames can't contain ${action[invalidCharArr].map(char => `"${char}"`)} so the video title will stay the same, but those invalid filename characters will be replaced with "${action[replaceInvalidCharacterWithKey]}" for the output filename and/or input filename.`;
+    case HIDE_INVALID_CHARACTER_WARNING:
+      return '';
+    default:
+      return state;
+  }
+};
+
+const characterToReplaceInvalidFilenameCharactersWith = (state = '', action) => {
+  // This is the character to replace invalid filename characters with. By default it's "-",
+  // but the user can change that by setting REPLACE_INVALID_FILENAME_CHARACTERS_WITH in the .env
+  switch (action.type) {
+    case SET_INVALID_FILENAME_REPLACEMENT_CHARACTER:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   user,
   users,
@@ -194,5 +234,8 @@ export default combineReducers({
   uploaded,
   outputMessage,
   videoErrorMessage,
-  errorMessage
+  errorMessage,
+  invalidCharactersArrayPlatformSpecific,
+  displayInvalidFilenameCharacterWarning,
+  characterToReplaceInvalidFilenameCharactersWith
 });

@@ -1,6 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const { spawn } = require('child_process');
+const os = require('os');
+
+let invalidCharactersArrayPlatformSpecific = [];
+if (os.platform() === 'darwin' || os.platform() === 'linux') {
+  invalidCharactersArrayPlatformSpecific = ['/'];
+} else if (os.platform() === 'win32') {
+  invalidCharactersArrayPlatformSpecific = ['\\', '/', ':', '*', '?', '"', '<', '>', '|'];
+}
+
+// Confirm the input environment variable isn't undefined.
+router.get('/invalid-filename-character-array', (req, res) => {
+  res.status(200).send(invalidCharactersArrayPlatformSpecific);
+});
 
 // Confirm the input environment variable isn't undefined.
 router.get('/users', (req, res) => {
@@ -42,6 +55,19 @@ router.get('/check-separate-audio-only', (req, res) => {
   }
 });
 
+router.get('/invalid-filename-replacement-character', (req, res) => {
+  const keyword = 'REPLACE_INVALID_FILENAME_CHARACTERS_WITH';
+  try {
+    if (process.env[keyword]) {
+      res.status(200).send(String(process.env[keyword]));
+    } else {
+      res.status(200).send('-');
+    }
+  } catch {
+    res.sendStatus(500);
+  }
+});
+
 router.post('/', (req, res) => {
   const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
   const videoPath = req.body.videoPath;
@@ -56,6 +82,7 @@ router.post('/', (req, res) => {
   const compressionSpeedPreset = process.env.COMPRESSION_SPEED_PRESET || 'fast';
   const outputExtension = process.env.OUTPUT_EXTENSION || '.mp4';
   const renameInputFile = process.env.RENAME_INPUT_VIDEO || true;
+  const characterToReplaceInvalidFilenameCharactersWith = req.body.characterToReplaceInvalidFilenameCharactersWith;
   const description = req.body.description || '';
 
   // The python process will change these values as it goes through but define
@@ -81,7 +108,9 @@ router.post('/', (req, res) => {
         specifyPixelFormat,
         compressionSpeedPreset,
         outputExtension,
-        renameInputFile
+        renameInputFile,
+        invalidCharactersArrayPlatformSpecific.join(''),
+        characterToReplaceInvalidFilenameCharactersWith
       ]);
 
     pyProcess.stdout.setEncoding('utf8');

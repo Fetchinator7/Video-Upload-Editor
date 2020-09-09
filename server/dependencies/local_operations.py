@@ -37,13 +37,20 @@ def main(main_out_save_dir):
 	compression_speed_preset = sys.argv[11]
 	output_extension = sys.argv[12]
 	rename_input_file = set_bool(sys.argv[13])
+	invalid_characters_str = sys.argv[14]
+	replace_invalid_filename_characters_with_this = sys.argv[15]
 
 	# If export_audio is true this will be the extension used for that.
 	out_aud_ext = '.mp3'
 
+	sanitized_title = title
+	for invalidChar in invalid_characters_str:
+		if invalidChar in title:
+			sanitized_title = sanitized_title.replace(invalidChar, replace_invalid_filename_characters_with_this)
+
 	# Rename the input file to be the input title.
 	if rename_input_file is True:
-		input_video_path = org_in_vid_path.with_name(title).with_suffix(org_in_vid_path.suffix)
+		input_video_path = org_in_vid_path.with_name(sanitized_title).with_suffix(org_in_vid_path.suffix)
 		org_in_vid_path.rename(input_video_path)
 	else:
 		input_video_path = org_in_vid_path
@@ -51,11 +58,11 @@ def main(main_out_save_dir):
 	# Create a folder for the current year and month (they may already exist)
 	# and create a folder with the name of the video title.
 	cur_month_dur = syst.Paths().create_cur_year_month_dir(path_to_main_out_save_folder)
-	out_dir_path = syst.Paths().create_dir(cur_month_dur, title)
+	out_dir_path = syst.Paths().create_dir(cur_month_dur, sanitized_title)
 
 	if out_dir_path is False:
 		# The output folder already exists so return an error.
-		raise FileExistsError(f'Error, the output folder "{title}" already exists.')
+		raise FileExistsError(f'Error, the output folder "{sanitized_title}" already exists.')
 	else:
 		print('Encoding...\n')
 
@@ -66,11 +73,11 @@ def main(main_out_save_dir):
 		# trimming and chanign the extension will remain alongside the output instead of being hidden
 		# temporary directories. This way it's easier to tell which step of the process is failing.
 		# NOTE: This isn't changed anywhere, this is just here so it's easy for a programmer to debug.
-		in_debug_mode = False
+		in_debug_mode = True
 
 		if in_debug_mode is True:
 			# Make a visible output directory along side the output directory for debugging.
-			loudnorm_dir_path = paths.Path.joinpath(out_dir_path.with_name(title + '-loudnorm'))
+			loudnorm_dir_path = paths.Path.joinpath(out_dir_path.with_name(sanitized_title + '-loudnorm'))
 			loudnorm_dir_path.mkdir()
 		else:
 			# Make a temp output directory because with the way ffmpeg_cmds is setup
@@ -91,7 +98,7 @@ def main(main_out_save_dir):
 		# * The trim is after the compression because the trim doesn't always work for the uncompressed input video codec.
 		if in_debug_mode is True:
 			# Make a visible output directory along side the output directory for debugging.
-			trim_dir_path = paths.Path.joinpath(out_dir_path.with_name(title + '-trim'))
+			trim_dir_path = paths.Path.joinpath(out_dir_path.with_name(sanitized_title + '-trim'))
 			trim_dir_path.mkdir()
 		else:
 			# Make a temp output directory because with the way ffmpeg_cmds is setup
@@ -118,7 +125,7 @@ def main(main_out_save_dir):
 			syst.Paths().move_to_new_dir(out_trim_path, out_dir_path)
 
 		# Get the path of the output file.
-		out_path = paths.Path.joinpath(out_dir_path, title + output_extension)
+		out_path = paths.Path.joinpath(out_dir_path, sanitized_title + output_extension)
 		# If the user said to export audio as well then copy the output to a .mp3 file.
 		if export_audio == True:
 			fc.FileOperations(out_path, out_dir_path).change_ext(out_aud_ext)
@@ -126,15 +133,15 @@ def main(main_out_save_dir):
 		# Record the rendering end time for the log.
 		end_render = dates.datetime.now().strftime("%I:%M:%S%p on %m/%d/%Y" )
 		# Run function that makes a text file with some relevant information.
-		fin_log(usr_name, title, input_video_path, rename_input_file, start_render, end_render, out_path, out_dir_path)
+		fin_log(usr_name, title, sanitized_title, input_video_path, rename_input_file, start_render, end_render, out_path, out_dir_path)
 		print("{" + str(out_path) + "}")
 
 
-def fin_log(usr, title, in_path, in_path_was_renamed, start, end, out_vid, out_dir_path):
+def fin_log(usr, title, sanitized_title, in_path, in_path_was_renamed, start, end, out_vid, out_dir_path):
 	"""Create log file."""
 
 	# Path to log file and create it.
-	session_txt_path = paths.Path.joinpath(out_dir_path, title + '-log').with_suffix('.txt')
+	session_txt_path = paths.Path.joinpath(out_dir_path, sanitized_title + '-log').with_suffix('.txt')
 	paths.Path.touch(session_txt_path)
 
 	# Write info about session to .txt file in the save location.

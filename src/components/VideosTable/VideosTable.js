@@ -27,6 +27,13 @@ const description = 'description';
 const exportSeparateAudio = 'exportSeparateAudio';
 
 const SET_UPLOAD_FILES = 'SET_UPLOAD_FILES';
+const DISPLAY_INVALID_CHARACTER_WARNING = 'DISPLAY_INVALID_CHARACTER_WARNING';
+const HIDE_INVALID_CHARACTER_WARNING = 'HIDE_INVALID_CHARACTER_WARNING';
+
+const invalidCharArrKey = 'invalidCharArr';
+const replaceInvalidCharacterWithKey = 'replaceInvalidCharacterWithKey';
+const characterToReplaceInvalidFilenameCharactersWith = 'characterToReplaceInvalidFilenameCharactersWith';
+const invalidCharactersArrayPlatformSpecific = 'invalidCharactersArrayPlatformSpecific';
 
 const green = '#18bc3c';
 const yellow = '#dde238';
@@ -179,6 +186,16 @@ class Table extends React.Component {
                   value={videosArr[dataIndex][title]}
                   onChange={event => {
                     this.updateVidObject(dataIndex, title, event.target.value, false)
+                    // If the title has any characters from the invalid characters array display the warning message.
+                    if (this.props[invalidCharactersArrayPlatformSpecific].some(invalidChar => String(event.target.value).includes(invalidChar))) {
+                      this.props.dispatch({
+                        type: DISPLAY_INVALID_CHARACTER_WARNING,
+                        [invalidCharArrKey]: this.props[invalidCharactersArrayPlatformSpecific],
+                        [replaceInvalidCharacterWithKey]: this.props[characterToReplaceInvalidFilenameCharactersWith]
+                      });
+                    } else {
+                      this.props.dispatch({ type: HIDE_INVALID_CHARACTER_WARNING });
+                    }
                   }}
                 />
               );
@@ -494,6 +511,8 @@ class Table extends React.Component {
 const mapStateToProps = state => ({
   videos: state.uploadFiles,
   audioOnlyOption: state.audioOnlyOption,
+  [characterToReplaceInvalidFilenameCharactersWith]: state[characterToReplaceInvalidFilenameCharactersWith],
+  [invalidCharactersArrayPlatformSpecific]: state[invalidCharactersArrayPlatformSpecific],
   rendering: state.rendering,
   uploading: state.uploading,
   uploaded: state.uploaded,

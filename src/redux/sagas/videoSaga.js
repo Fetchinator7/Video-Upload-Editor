@@ -10,6 +10,7 @@ const uriKey = 'uri';
 const SET_UPLOAD_FILES = 'SET_UPLOAD_FILES';
 const OUTPUT_MESSAGE = 'OUTPUT_MESSAGE';
 const VIDEO_ERROR_MESSAGE = 'VIDEO_ERROR_MESSAGE';
+const HIDE_INVALID_CHARACTER_WARNING = 'HIDE_INVALID_CHARACTER_WARNING';
 
 function* selectVideoFiles(action) {
   const globalState = yield select();
@@ -49,6 +50,7 @@ const axiosPost = (argObj) => {
 
 function* uploadVideoFiles(action) {
   try {
+    yield put({ type: HIDE_INVALID_CHARACTER_WARNING });
     yield put({ type: 'SET_RENDERING', payload: action.index });
     const renderResponse = yield call(axiosPost, { url: '/video', payload: action.payload });
     yield put({ type: 'CLEAR_RENDERING', payload: action.index });

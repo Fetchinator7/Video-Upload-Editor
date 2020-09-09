@@ -9,6 +9,9 @@ import VideosTable from '../VideosTable/VideosTable';
 import RadioButton from '../RadioButton';
 import './App.css';
 
+const characterToReplaceInvalidFilenameCharactersWith = 'characterToReplaceInvalidFilenameCharactersWith';
+const displayInvalidFilenameCharacterWarning = 'displayInvalidFilenameCharacterWarning';
+
 const useStyles = createMuiTheme(
   SearchTablePresets.theme
 );
@@ -85,7 +88,8 @@ class HomePage extends Component {
                     userName: this.props.user,
                     exportSeparateAudio: videoObj.exportSeparateAudio,
                     trimStart: videoObj.trimStart,
-                    trimEnd: videoObj.trimEnd
+                    trimEnd: videoObj.trimEnd,
+                    [characterToReplaceInvalidFilenameCharactersWith]: this.props[characterToReplaceInvalidFilenameCharactersWith]
                   },
                   visibility: videoObj.visibility,
                   index: index,
@@ -99,6 +103,7 @@ class HomePage extends Component {
             Upload Video(s)
           </Button>
           <VideosTable />
+          <div id={this.props[displayInvalidFilenameCharacterWarning] ? 'invalidCharacterWarning' : undefined}>{this.props[displayInvalidFilenameCharacterWarning]}</div>
         </MuiThemeProvider>
       </>
     );
@@ -113,7 +118,9 @@ const mapStateToProps = state => ({
   videos: state.uploadFiles,
   outputMessage: state.outputMessage,
   videoErrorMessage: state.videoErrorMessage,
-  errorMessage: state.errorMessage
+  errorMessage: state.errorMessage,
+  [characterToReplaceInvalidFilenameCharactersWith]: state[characterToReplaceInvalidFilenameCharactersWith],
+  [displayInvalidFilenameCharacterWarning]: state[displayInvalidFilenameCharacterWarning]
 });
 
 export default connect(mapStateToProps)(HomePage);
