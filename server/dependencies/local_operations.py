@@ -3,8 +3,8 @@ import datetime as dates
 import tempfile
 import sys
 # Append these submodules to the system path so they can be imported.
-sys.path.append(str(paths.Path.joinpath(paths.Path(__file__).parent, 'FFmpeg-Commands')))
-sys.path.append(str(paths.Path.joinpath(paths.Path(__file__).parent, 'System-Commands')))
+sys.path.append(str(paths.Path().joinpath(paths.Path(__file__).parent, 'FFmpeg-Commands')))
+sys.path.append(str(paths.Path().joinpath(paths.Path(__file__).parent, 'System-Commands')))
 import ffmpeg_cmds as fc
 import system as syst
 
@@ -77,7 +77,7 @@ def main(main_out_save_dir):
 
 		if in_debug_mode is True:
 			# Make a visible output directory along side the output directory for debugging.
-			loudnorm_dir_path = paths.Path.joinpath(out_dir_path.with_name(sanitized_title + '-loudnorm'))
+			loudnorm_dir_path = paths.Path().joinpath(out_dir_path.with_name(sanitized_title + '-loudnorm'))
 			loudnorm_dir_path.mkdir()
 		else:
 			# Make a temp output directory because with the way ffmpeg_cmds is setup
@@ -93,12 +93,12 @@ def main(main_out_save_dir):
 			# This is done by scanning the input to see how many decibels it can
 			# be raised by before clipping occurs, then raising it by that amount.
 			fc.FileOperations(input_video_path, loudnorm_dir_path).loudnorm_stereo()
-		loudnorm_output_path = paths.Path.joinpath(loudnorm_dir_path, input_video_path.name)
+		loudnorm_output_path = paths.Path().joinpath(loudnorm_dir_path, input_video_path.name)
 
 		# * The trim is after the compression because the trim doesn't always work for the uncompressed input video codec.
 		if in_debug_mode is True:
 			# Make a visible output directory along side the output directory for debugging.
-			trim_dir_path = paths.Path.joinpath(out_dir_path.with_name(sanitized_title + '-trim'))
+			trim_dir_path = paths.Path().joinpath(out_dir_path.with_name(sanitized_title + '-trim'))
 			trim_dir_path.mkdir()
 		else:
 			# Make a temp output directory because with the way ffmpeg_cmds is setup
@@ -110,7 +110,7 @@ def main(main_out_save_dir):
 			fc.FileOperations(loudnorm_output_path, trim_dir_path).trim(start_time, end_time, codec_copy=codec_copy)
 		else:
 			syst.Paths().move_to_new_dir(loudnorm_output_path, trim_dir_path)
-		out_trim_path = paths.Path.joinpath(trim_dir_path, loudnorm_output_path.name)
+		out_trim_path = paths.Path().joinpath(trim_dir_path, loudnorm_output_path.name)
 
 		# The input video extension doesn't match the desired output extension.
 		if out_trim_path.suffix != output_extension:
@@ -125,7 +125,7 @@ def main(main_out_save_dir):
 			syst.Paths().move_to_new_dir(out_trim_path, out_dir_path)
 
 		# Get the path of the output file.
-		out_path = paths.Path.joinpath(out_dir_path, sanitized_title + output_extension)
+		out_path = paths.Path().joinpath(out_dir_path, sanitized_title + output_extension)
 		# If the user said to export audio as well then copy the output to a .mp3 file.
 		if export_audio == True:
 			fc.FileOperations(out_path, out_dir_path).change_ext(out_aud_ext)
@@ -141,7 +141,7 @@ def fin_log(usr, title, sanitized_title, in_path, in_path_was_renamed, start, en
 	"""Create log file."""
 
 	# Path to log file and create it.
-	session_txt_path = paths.Path.joinpath(out_dir_path, sanitized_title + '-log').with_suffix('.txt')
+	session_txt_path = paths.Path().joinpath(out_dir_path, sanitized_title + '-log').with_suffix('.txt')
 	paths.Path.touch(session_txt_path)
 
 	# Write info about session to .txt file in the save location.
