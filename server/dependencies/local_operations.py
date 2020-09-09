@@ -73,7 +73,7 @@ def main(main_out_save_dir):
 		# trimming and chanign the extension will remain alongside the output instead of being hidden
 		# temporary directories. This way it's easier to tell which step of the process is failing.
 		# NOTE: This isn't changed anywhere, this is just here so it's easy for a programmer to debug.
-		in_debug_mode = True
+		in_debug_mode = False
 
 		if in_debug_mode is True:
 			# Make a visible output directory along side the output directory for debugging.
@@ -94,6 +94,13 @@ def main(main_out_save_dir):
 			# be raised by before clipping occurs, then raising it by that amount.
 			fc.FileOperations(input_video_path, loudnorm_dir_path).loudnorm_stereo()
 		loudnorm_output_path = paths.Path().joinpath(loudnorm_dir_path, input_video_path.name)
+		# The input file wasn't renamed so rename the output of this first ideo render.
+		if org_in_vid_path.stem != sanitized_title:
+			loudnorm_potentially_renamed_output_file = loudnorm_output_path.with_name(sanitized_title).with_suffix(org_in_vid_path.suffix)
+			loudnorm_output_path.rename(loudnorm_potentially_renamed_output_file)
+		else:
+			# The input file was already renamed so just assign this to the output path.
+			loudnorm_potentially_renamed_output_file = loudnorm_output_path
 
 		# * The trim is after the compression because the trim doesn't always work for the uncompressed input video codec.
 		if in_debug_mode is True:
@@ -107,10 +114,10 @@ def main(main_out_save_dir):
 			trim_dir_path = paths.Path(trim_dir.name)
 
 		if start_time != "" or end_time != "":
-			fc.FileOperations(loudnorm_output_path, trim_dir_path).trim(start_time, end_time, codec_copy=codec_copy)
+			fc.FileOperations(loudnorm_potentially_renamed_output_file, trim_dir_path).trim(start_time, end_time, codec_copy=codec_copy)
 		else:
-			syst.Paths().move_to_new_dir(loudnorm_output_path, trim_dir_path)
-		out_trim_path = paths.Path().joinpath(trim_dir_path, loudnorm_output_path.name)
+			syst.Paths().move_to_new_dir(loudnorm_potentially_renamed_output_file, trim_dir_path)
+		out_trim_path = paths.Path().joinpath(trim_dir_path, loudnorm_potentially_renamed_output_file.name)
 
 		# The input video extension doesn't match the desired output extension.
 		if out_trim_path.suffix != output_extension:
