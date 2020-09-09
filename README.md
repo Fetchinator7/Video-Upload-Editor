@@ -58,7 +58,6 @@ brew install ffmpeg
 
 ### Both
 
-
 Open a terminal window, type `cd ` (with a space afterward), drag-and-drop the folder on your computer where you want to store this project on top of the terminal window, and press enter.
 Since you have `git` now (it is a dependency) clone the project by entering `git clone https://github.com/Fetchinator7/Video-Upload-Editor.git`. Next import the submodules by entering `git submodule update --init --recursive`, and finally enter `npm install`.
 
@@ -90,6 +89,9 @@ CLIENT_SECRET=M9/Oyw...
 
 This application automatically saves the output video files by the year, month, and title of the video so next add `MAIN_OUTPUT_FOLDER=` to the `.env` then the path to the main folder where the videos should be saved after the `MAIN_OUTPUT_FOLDER=`. (To copy a path on Mac right-click the folder, hold down the option key, then `Copy "<folder>" as Pathname` or on Windows copy the path from the top of the file explorer.) It should look something like this on Mac:
 `MAIN_OUTPUT_FOLDER=/Path/To/Main/Output/Folder` or this on Windows: `MAIN_OUTPUT_FOLDER=C:\Path\To\Main\Output\Folder`
+
+### Tip
+On Mac if you want to automatically close the terminal windows when this finishes open the `Terminal` application and go to `Preferences` > `Profiles` > `Shell` > `When the shell exits` and choose `Close if the shell exited cleanly`,
 
 ### Customizing the users
 
@@ -139,4 +141,4 @@ SEPARATE_AUDIO_ONLY_FILE_OPTION=true
 
 ## Launching it
 
-To run the application, double-click/open the `run.sh` file. You can also add an alias to that file on the dock or desktop to speed up the start process. The application window should open automatically in the computer's default web browser, but it may take a few seconds. If it doesn't open automatically, open it by manually going to [localhost:3000](http://localhost:3000/).
+To run the application on Mac double-click/open the `run.sh` file, but on Windows you need to open the `run_scripts` folder and double-click/open `run_server.sh` and `run_start.sh`. You can also add an alias to that file on the dock or desktop to speed up the start process. The application window should open automatically in the computer's default web browser, but it may take a few seconds. If it doesn't open automatically, open it by manually going to [localhost:3000](http://localhost:3000/).

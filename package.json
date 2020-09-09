@@ -23,7 +23,7 @@
     "vimeo": "^2.1.1"
   },
   "scripts": {
-    "start": "npm run server & react-scripts start",
+    "start": "react-scripts start",
     "server": "node server/start.js",
     "build": "react-scripts build",
     "test": "jest --detectOpenHandles --forceExit",
