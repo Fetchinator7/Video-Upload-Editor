@@ -48,15 +48,6 @@ function* confirmVimeoCredentialsExist() {
   }
 }
 
-function* uploadVideo(action) {
-  // Upload the input video to Vimeo.
-  try {
-    yield axios.post('/vimeo/', action.payload);
-  } catch (error) {
-    console.log('Error uploading to Vimeo', error);
-  }
-}
-
 function* updateVideoVisibility(action) {
   // Update the visibility for a video based of the uri.
   try {
@@ -68,7 +59,6 @@ function* updateVideoVisibility(action) {
 
 function* vimeoSaga() {
   yield takeEvery('CONFIRM_VIDEO_CREDENTIALS_EXIST', confirmVimeoCredentialsExist);
-  yield takeEvery('UPLOAD_VIDEO_TO_VIMEO', uploadVideo);
   yield takeEvery('UPDATE_VIDEO_VISIBILITY', updateVideoVisibility);
 }
 
