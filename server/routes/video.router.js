@@ -59,9 +59,9 @@ router.get('/invalid-filename-replacement-character', (req, res) => {
   const keyword = 'REPLACE_INVALID_FILENAME_CHARACTERS_WITH';
   try {
     if (process.env[keyword]) {
-      res.status(200).send(String(process.env[keyword]));
+      res.status(200).send(process.env[keyword]);
     } else {
-      res.status(200).send('-');
+      res.status(200).send('');
     }
   } catch {
     res.sendStatus(500);

@@ -107,7 +107,7 @@ USERS=["user", "user 1", "user 2", "user 3"]
 
 `SPECIFY_PIXEL_FORMAT` (which is disabled by default) will set the pixel format for compressed videos to "yuv420p" so the output video is actually playable once it's finished rendering. However, this is only necessary for obscure codecs like "Apple ProRes 422 HQ" and it does impact the output coloring, so unless you have issues playing the output video this shouldn't need to be specified.
 
-`REPLACE_INVALID_FILENAME_CHARACTERS_WITH` (which is the string "-" by default) replaces invalid filename characters. By default the output filename is the title entered for that video, but if there are invalid filename characters such as `/` in the title replace those invalid charters with ths for the filename (but the title for Vimeo stays the same).
+`REPLACE_INVALID_FILENAME_CHARACTERS_WITH` (which removes it by default) is what replaces invalid filename characters. By default the output filename is the title entered for that video, but if there are invalid filename characters such as `/` in the title replace those invalid charters with this character for the filename (but the title for Vimeo stays the same).
 
 `TRIM_CODEC_COPY` (which is enabled by default) determines whether the output video will have null content at the end (if a trim has been specified). Essentially, it's much faster to copy the video codec but there will probably be a couple of seconds at the end of the video with no footage or sound. However, when that video is uploaded to Vimeo they render it again so those empty couple of seconds don't appear on Vimeo, only the local file. So if you want the file to have precise trimming then disable this option which will unfortunately be much slower.
 

@@ -211,7 +211,7 @@ const displayInvalidFilenameCharacterWarning = (state = false, action) => {
 };
 
 const characterToReplaceInvalidFilenameCharactersWith = (state = '', action) => {
-  // This is the character to replace invalid filename characters with. By default it's "-",
+  // This is the character to replace invalid filename characters with. By default it removes the character,
   // but the user can change that by setting REPLACE_INVALID_FILENAME_CHARACTERS_WITH in the .env
   switch (action.type) {
     case SET_INVALID_FILENAME_REPLACEMENT_CHARACTER:
