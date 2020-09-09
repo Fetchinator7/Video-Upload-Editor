@@ -199,7 +199,9 @@ class Table extends React.Component {
                   }}
                   control={
                     <TextField
-                      color={videosArr[tableMeta.rowIndex][title] ? 'primary' : 'secondary'}
+                      // If the title is empty or the last character is a space show red since
+                      // that's an invalid title.
+                      color={videosArr[tableMeta.rowIndex][title] === '' || String(videosArr[tableMeta.rowIndex][title]).slice(-1) === ' ' ? 'secondary' : 'primary'}
                       value={videosArr[tableMeta.rowIndex][title]}
                     />
                   }

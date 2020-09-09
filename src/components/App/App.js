@@ -11,11 +11,19 @@ import './App.css';
 
 const characterToReplaceInvalidFilenameCharactersWith = 'characterToReplaceInvalidFilenameCharactersWith';
 const displayInvalidFilenameCharacterWarning = 'displayInvalidFilenameCharacterWarning';
+const title = 'title';
 
 const useStyles = createMuiTheme(
   SearchTablePresets.theme
 );
 
+const isDisabled = (user, videos, enableEditing) => {
+  if (user === '' || videos.length === 0 || videos.some(videoObj => videoObj[title] === '') || videos.some(videoObj => String(videoObj[title]).slice(-1) === ' ' || !enableEditing)) {
+    return true;
+  } else {
+    return false;
+  }
+}
 class HomePage extends Component {
   componentDidMount() {
     this.props.dispatch({ type: 'CONFIRM_VIDEO_CREDENTIALS_EXIST' });
@@ -75,7 +83,7 @@ class HomePage extends Component {
             color='primary'
             // Confirm that a user has been selected, there's at least one video to upload,
             // and each video has a title (not an empty string).
-            disabled={(!this.props.user || this.props.videos.length === 0 || this.props.videos.some(videoObj => videoObj.title === '') || !this.props.enableEditing)}
+            disabled={isDisabled(this.props.user, this.props.videos, this.props.enableEditing)}
             onClick={() => {
               this.props.dispatch({ type: 'DISABLE_EDITING' });
               this.props.videos.map((videoObj, index) => {
