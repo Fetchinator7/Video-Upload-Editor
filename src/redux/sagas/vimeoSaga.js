@@ -2,6 +2,8 @@ import axios from 'axios';
 import { takeEvery, put } from 'redux-saga/effects';
 
 const ENABLE_AUDIO_ONLY_OPTION = 'ENABLE_AUDIO_ONLY_OPTION';
+const SET_INVALID_CHARACTER_ARRAY = 'SET_INVALID_CHARACTER_ARRAY';
+const SET_INVALID_FILENAME_REPLACEMENT_CHARACTER = 'SET_INVALID_FILENAME_REPLACEMENT_CHARACTER';
 
 function* confirmVimeoCredentialsExist() {
   try {
@@ -33,21 +35,16 @@ function* confirmVimeoCredentialsExist() {
     if (separateAudioOnly.data === true) {
       yield put({ type: ENABLE_AUDIO_ONLY_OPTION });
     }
+    const replaceInvalidFilenameCharactersWith = yield axios.get('/video/invalid-filename-replacement-character');
+    yield put({ type: SET_INVALID_FILENAME_REPLACEMENT_CHARACTER, payload: replaceInvalidFilenameCharactersWith.data });
+    const invalidFilenameCharacterArray = yield axios.get('/video/invalid-filename-character-array');
+    yield put({ type: SET_INVALID_CHARACTER_ARRAY, payload: invalidFilenameCharacterArray.data });
 
     // Set the global state error message to the combined error message string.
     // If there's no text (because there was no error) nothing will change visibly.
     yield put({ type: 'SET_MISSING_ENV_ERROR_MESSAGE', payload: errorStr });
   } catch (error) {
     console.log('Error getting the env variables', error);
-  }
-}
-
-function* uploadVideo(action) {
-  // Upload the input video to Vimeo.
-  try {
-    yield axios.post('/vimeo/', action.payload);
-  } catch (error) {
-    console.log('Error uploading to Vimeo', error);
   }
 }
 
@@ -62,7 +59,6 @@ function* updateVideoVisibility(action) {
 
 function* vimeoSaga() {
   yield takeEvery('CONFIRM_VIDEO_CREDENTIALS_EXIST', confirmVimeoCredentialsExist);
-  yield takeEvery('UPLOAD_VIDEO_TO_VIMEO', uploadVideo);
   yield takeEvery('UPDATE_VIDEO_VISIBILITY', updateVideoVisibility);
 }
 

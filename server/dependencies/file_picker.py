@@ -1,5 +1,6 @@
 from tkinter.filedialog import askopenfilename
 from tkinter import Tk
+import pathlib as paths
 
 # Make the root gui element.
 root = Tk()
@@ -12,4 +13,4 @@ root.withdraw()
 # Show an "Open" dialog box and return the path to the selected file.
 filename = askopenfilename(filetypes=[("Video files", ".mp4 .mov .mkv")])
 # Print the file path which will be read by the server.
-print(filename)
+print(str(paths.Path(filename)), end='')

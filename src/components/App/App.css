@@ -18,3 +18,18 @@ img {
 .error {
   color: rgb(238, 8, 8)
 }
+
+/* Generic message in the bottom left */
+#invalidCharacterWarning {
+ /* Set to invisible by default. */
+ /* display: none; */
+ color: rgb(240, 240, 240);
+ background-color: rgb(202, 18, 18);
+ padding: 10px;
+ border-radius: 20px;
+ position: fixed;
+ right: 50%;
+ bottom: 20px;
+ left: 20px;
+ /* right: 15px; */
+}

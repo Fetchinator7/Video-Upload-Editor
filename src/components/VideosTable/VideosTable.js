@@ -27,6 +27,13 @@ const description = 'description';
 const exportSeparateAudio = 'exportSeparateAudio';
 
 const SET_UPLOAD_FILES = 'SET_UPLOAD_FILES';
+const DISPLAY_INVALID_CHARACTER_WARNING = 'DISPLAY_INVALID_CHARACTER_WARNING';
+const HIDE_INVALID_CHARACTER_WARNING = 'HIDE_INVALID_CHARACTER_WARNING';
+
+const invalidCharArrKey = 'invalidCharArr';
+const replaceInvalidCharacterWithKey = 'replaceInvalidCharacterWithKey';
+const characterToReplaceInvalidFilenameCharactersWith = 'characterToReplaceInvalidFilenameCharactersWith';
+const invalidCharactersArrayPlatformSpecific = 'invalidCharactersArrayPlatformSpecific';
 
 const green = '#18bc3c';
 const yellow = '#dde238';
@@ -172,14 +179,32 @@ class Table extends React.Component {
         {
           name: 'Title',
           options: {
-            customBodyRenderLite: (dataIndex) => {
+            // NOTE: This needs to be a "customBodyRender" because otherwise when you delete
+            // a character in the text field the curser jumps to the end.
+            customBodyRender: (value, tableMeta) => {
               return (
-                <TextField
-                  color={videosArr[dataIndex][title] ? 'primary' : 'secondary'}
-                  value={videosArr[dataIndex][title]}
+                <FormControlLabel
                   onChange={event => {
-                    this.updateVidObject(dataIndex, title, event.target.value, false)
+                    this.updateVidObject(tableMeta.rowIndex, title, event.target.value, false)
+                    // If the title has any characters from the invalid characters array display the warning message.
+                    if (this.props[invalidCharactersArrayPlatformSpecific].some(invalidChar => String(event.target.value).includes(invalidChar))) {
+                      this.props.dispatch({
+                        type: DISPLAY_INVALID_CHARACTER_WARNING,
+                        [invalidCharArrKey]: this.props[invalidCharactersArrayPlatformSpecific],
+                        [replaceInvalidCharacterWithKey]: this.props[characterToReplaceInvalidFilenameCharactersWith]
+                      });
+                    } else {
+                      this.props.dispatch({ type: HIDE_INVALID_CHARACTER_WARNING });
+                    }
                   }}
+                  control={
+                    <TextField
+                      // If the title is empty or the last character is a space show red since
+                      // that's an invalid title.
+                      color={videosArr[tableMeta.rowIndex][title] === '' || String(videosArr[tableMeta.rowIndex][title]).slice(-1) === ' ' ? 'secondary' : 'primary'}
+                      value={videosArr[tableMeta.rowIndex][title]}
+                    />
+                  }
                 />
               );
             }
@@ -191,14 +216,20 @@ class Table extends React.Component {
         {
           name: 'Description',
           options: {
-            customBodyRenderLite: (dataIndex) => {
+            // NOTE: This needs to be a "customBodyRender" because otherwise when you delete
+            // a character in the text field the curser jumps to the end.
+            customBodyRender: (value, tableMeta) => {
               return (
-                <TextField
-                  color='primary'
-                  value={videosArr[dataIndex][description]}
+                <FormControlLabel
                   onChange={event => {
-                    this.updateVidObject(dataIndex, description, event.target.value, false)
+                    this.updateVidObject(tableMeta.rowIndex, description, event.target.value, false)
                   }}
+                  control={
+                    <TextField
+                      color='primary'
+                      value={videosArr[tableMeta.rowIndex][description]}
+                    />
+                  }
                 />
               );
             }
@@ -288,7 +319,7 @@ class Table extends React.Component {
                   }
                   onClick={() => {
                     const videos = [...videosArr];
-                    this.props.enableEditing && this.props.dispatch({
+                    this.props.dispatch({
                       type: SET_UPLOAD_FILES,
                       payload: videos.slice(0, dataIndex).concat(videos.slice(dataIndex + 1, videos.length))
                     });
@@ -494,6 +525,8 @@ class Table extends React.Component {
 const mapStateToProps = state => ({
   videos: state.uploadFiles,
   audioOnlyOption: state.audioOnlyOption,
+  [characterToReplaceInvalidFilenameCharactersWith]: state[characterToReplaceInvalidFilenameCharactersWith],
+  [invalidCharactersArrayPlatformSpecific]: state[invalidCharactersArrayPlatformSpecific],
   rendering: state.rendering,
   uploading: state.uploading,
   uploaded: state.uploaded,
