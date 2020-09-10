@@ -167,7 +167,6 @@ router.get('/file-picker', (req, res) => {
     pyProcess.stderr.setEncoding('utf8');
     pyProcess.stdout.on('data', data => {
       output = data.toString();
-      console.log('output', output);
     }
     );
     // python encountered an error.
