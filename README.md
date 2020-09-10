@@ -39,10 +39,10 @@ This is a basic interface for automatically rendering, then uploading videos to 
 All the dependencies can be installed using the [Homebrew](https://brew.sh/) package manager.
 
 ```shell
-choco install git
-choco install nodejs
-choco install python
-choco install ffmpeg
+brew install git
+brew install node
+brew install python3
+brew install ffmpeg
 ```
 
 ### Windows
@@ -50,10 +50,10 @@ choco install ffmpeg
 All the dependencies can be installed using the [Chocolatey](https://chocolatey.org/install) package manager.
 
 ```shell
-brew install git
-brew install node
-brew install python3
-brew install ffmpeg
+choco install git
+choco install nodejs
+choco install python
+choco install ffmpeg
 ```
 
 ### Both
