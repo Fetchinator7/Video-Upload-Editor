@@ -7,6 +7,7 @@ import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ErrorIcon from '@material-ui/icons/Error';
 import CancelIcon from '@material-ui/icons/Cancel';
 import upArrow from '../../icons/up-arrow.gif';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import visibilityOptions from './visibilityOptions.json';
 import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle, Checkbox, TableRow, TableCell } from '@material-ui/core';
 import RadioButton from '../RadioButton';
@@ -342,7 +343,9 @@ class Table extends React.Component {
                       color='primary'
                       variant='contained'
                       href={`https://vimeo.com/${uri}`}
+                      target='_blank'
                       disabled={!Boolean(uri)}
+                      endIcon={<OpenInNewIcon />}
                     >
                       Open
                     </Button>
