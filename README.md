@@ -32,6 +32,9 @@ This is a basic interface for automatically rendering, then uploading videos to 
 
    - Don't like manually organizing by date? Once you specify a parent folder all the videos will automatically be put inside that folder for the current year and month.
 
+## NOTE
+By default a video's title is today's date followed by a space to add your own title afterward, but the title can't end in a space (because of Windows 10 compatibility) so the default title has to be modified for it to be valid.
+
 ## Installation
 
 ### Mac
