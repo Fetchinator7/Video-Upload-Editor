@@ -7,6 +7,10 @@ const SET_INVALID_FILENAME_REPLACEMENT_CHARACTER = 'SET_INVALID_FILENAME_REPLACE
 const SET_INVALID_CHARACTER_ARRAY = 'SET_INVALID_CHARACTER_ARRAY';
 const DISPLAY_INVALID_CHARACTER_WARNING = 'DISPLAY_INVALID_CHARACTER_WARNING';
 const HIDE_INVALID_CHARACTER_WARNING = 'HIDE_INVALID_CHARACTER_WARNING';
+const SET_TRANSCODING = 'SET_TRANSCODING';
+const CLEAR_TRANSCODING = 'CLEAR_TRANSCODING';
+const SET_UPLOADED = 'SET_UPLOADED';
+const CLEAR_UPLOADED = 'CLEAR_UPLOADED';
 const invalidCharArr = 'invalidCharArr';
 const replaceInvalidCharacterWithKey = 'replaceInvalidCharacterWithKey';
 
@@ -86,13 +90,15 @@ const transCoding = (state = [], action) => {
   }
 };
 
-const uploaded = (state = [], action) => {
-  // An array of ints that show which videos have uploaded by their index.
-  const stateArr = [...state];
+const uploaded = (state = {}, action) => {
+  let returnMessage = { ...state };
   switch (action.type) {
-    case 'SET_UPLOADED':
-      stateArr.push(action.payload);
-      return stateArr;
+    case SET_UPLOADED:
+      returnMessage = { ...state, [String(action.index)]: action.payload };
+      return returnMessage;
+    case CLEAR_UPLOADED:
+      delete state[action.index];
+      return returnMessage;
     default:
       return state;
   }

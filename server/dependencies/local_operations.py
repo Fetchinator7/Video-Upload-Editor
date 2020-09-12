@@ -44,9 +44,9 @@ def main(main_out_save_dir):
 	out_aud_ext = '.mp3'
 
 	sanitized_title = title
-	for invalidChar in invalid_characters_str:
-		if invalidChar in title:
-			sanitized_title = sanitized_title.replace(invalidChar, replace_invalid_filename_characters_with_this)
+	for character in invalid_characters_str:
+		if character in title:
+			sanitized_title = sanitized_title.replace(character, replace_invalid_filename_characters_with_this)
 
 	# Rename the input file to be the input title.
 	if rename_input_file is True:
@@ -85,7 +85,7 @@ def main(main_out_save_dir):
 			loudnorm_dir = tempfile.TemporaryDirectory()
 			loudnorm_dir_path = paths.Path(loudnorm_dir.name)
 		if compress == True:
-			# Compressionion enabled so use a different ffmpeg command
+			# Compressionion is enabled so use a different ffmpeg command
 			# to compress the input video.
 			fc.FileOperations(input_video_path, loudnorm_dir_path).compress_using_h265_and_norm_aud(insert_pixel_format=add_pixel_format, speed_preset=compression_speed_preset, maintain_metadata=False)
 		else:
@@ -94,7 +94,7 @@ def main(main_out_save_dir):
 			# be raised by before clipping occurs, then raising it by that amount.
 			fc.FileOperations(input_video_path, loudnorm_dir_path).loudnorm_stereo()
 		loudnorm_output_path = paths.Path().joinpath(loudnorm_dir_path, input_video_path.name)
-		# The input file wasn't renamed so rename the output of this first ideo render.
+		# The input file wasn't renamed so rename the output of this first video render.
 		if org_in_vid_path.stem != sanitized_title:
 			loudnorm_potentially_renamed_output_file = loudnorm_output_path.with_name(sanitized_title).with_suffix(org_in_vid_path.suffix)
 			loudnorm_output_path.rename(loudnorm_potentially_renamed_output_file)

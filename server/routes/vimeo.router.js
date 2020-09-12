@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const io = require('socket.io');
 
 // Import the api info from the .env file.
 const clientID = process.env.CLIENT_ID;
@@ -13,6 +14,10 @@ const vimeoClient = new Vimeo(clientID, clientSecret, accessToken);
 // Confirm the input environment variable isn't undefined.
 router.get('/verify-vimeo-credentials/:credential', (req, res) => {
   const credential = req.params.credential;
+  // socket.attach('http://localhost:5000');
+  io.emit('upload.progress');
+  // console.log(socket);
+  // socket.emit('test', { 'upload.': 'cool' });
   try {
     if (process.env[credential] === undefined) {
       res.status(200).send(`Heads up! ${credential} is undefined so you can still select videos but you won't be able to upload them until that's been entered. `);

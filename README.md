@@ -91,11 +91,11 @@ This application automatically saves the output video files by the year, month, 
 `MAIN_OUTPUT_FOLDER=/Path/To/Main/Output/Folder` or this on Windows: `MAIN_OUTPUT_FOLDER=C:\Path\To\Main\Output\Folder`
 
 ### Tip
-On Mac if you want to automatically close the terminal windows when this finishes open the `Terminal` application and go to `Preferences` > `Profiles` > `Shell` > `When the shell exits` and choose `Close if the shell exited cleanly`,
+On Mac if you want to automatically close the terminal windows when this finishes open the `Terminal` application and go to `Preferences` > `Profiles` > `Shell` > `When the shell exits` and choose `Close if the shell exited cleanly`.
 
 ### Customizing the users
 
-The user names that appear alongside the radio buttons can be customized/added by including a `USERS=[]` array in the `.env` with each name inside quotes and separate the names with commas:
+The user names that appear alongside the radio buttons can be customized/added by including a `USERS=[]` array in the `.env` with each name inside quotes and separated by commas:
 
 ```env
 USERS=["user", "user 1", "user 2", "user 3"]
@@ -133,6 +133,7 @@ USERS=["user 1"]
 COMPRESSION=true
 COMPRESSION_SPEED_PRESET=slow
 SPECIFY_PIXEL_FORMAT=true
+REPLACE_INVALID_FILENAME_CHARACTERS_WITH=-
 TRIM_CODEC_COPY=false
 OUTPUT_EXTENSION=.mov
 RENAME_INPUT_VIDEO=false

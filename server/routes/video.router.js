@@ -181,7 +181,7 @@ router.get('/file-picker', (req, res) => {
         res.status(500).send({ output: pythonErr });
       } else {
         // If the user clicks the "cancel" button for the file picker it returns "."
-        // so instead return an empty string to avoid a video being add with an invalid path.
+        // so instead return an empty string to avoid a video being added with an invalid path.
         if (output === '.') {
           res.status(200).send('');
         } else {

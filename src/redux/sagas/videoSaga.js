@@ -1,6 +1,8 @@
 import axios from 'axios';
 import moment from 'moment';
-import { put, takeEvery, delay, select, call } from 'redux-saga/effects';
+import { eventChannel } from 'redux-saga';
+import io from 'socket.io-client';
+import { put, takeEvery, delay, select, call, take } from 'redux-saga/effects';
 
 const view = 'view';
 const visibility = 'visibility';
@@ -52,6 +54,7 @@ function* uploadVideoFiles(action) {
   try {
     yield put({ type: HIDE_INVALID_CHARACTER_WARNING });
     yield put({ type: 'SET_RENDERING', payload: action.index });
+    yield put({ type: 'OPEN_SOCKET' });
     const renderResponse = yield call(axiosPost, { url: '/video', payload: action.payload });
     yield put({ type: 'CLEAR_RENDERING', payload: action.index });
     yield put({ type: OUTPUT_MESSAGE, payload: renderResponse.data[output], index: action.index });
