@@ -6,8 +6,8 @@ import MUIDataTable from 'mui-datatables';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ErrorIcon from '@material-ui/icons/Error';
 import CancelIcon from '@material-ui/icons/Cancel';
-import upArrow from '../../icons/up-arrow.gif';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import HelpIcon from '@material-ui/icons/Help';
 import visibilityOptions from './visibilityOptions.json';
 import { MuiThemeProvider, createMuiTheme, TextField, Button, CircularProgress, RadioGroup, DialogActions, DialogContent, Dialog, DialogTitle, Checkbox, TableRow, TableCell } from '@material-ui/core';
 import RadioButton from '../RadioButton';
@@ -18,6 +18,7 @@ const visibilityLevelOpenIndex = 'visibilityLevelOpenIndex';
 const trimDropDownOpenIndex = 'trimDropDownOpenIndex';
 const showPasswordField = 'showPasswordField';
 const rowsExpanded = 'rowsExpanded';
+const uploadProgressExample = 'uploadProgressExample';
 
 const visibility = 'visibility';
 const password = 'password';
@@ -38,7 +39,9 @@ const invalidCharactersArrayPlatformSpecific = 'invalidCharactersArrayPlatformSp
 
 const green = '#18bc3c';
 const yellow = '#dde238';
+const orange = '#f76111';
 const red = '#d31f1f';
+const white = '#ffffff';
 
 const useStyles = createMuiTheme(
   VideosTablePresets.theme
@@ -102,7 +105,15 @@ class Table extends React.Component {
     [visibilityLevelOpenIndex]: null,
     [showPasswordField]: false,
     [trimDropDownOpenIndex]: null,
-    [rowsExpanded]: []
+    [rowsExpanded]: [],
+    [uploadProgressExample]: 0
+  }
+
+  componentDidMount() {
+    // Set a timer for the "Uploading To Vimeo" icon so it isn't static.
+    setInterval(() => {
+      this.setState({ [uploadProgressExample]: this.state[uploadProgressExample] >= 100 ? 0 : this.state[uploadProgressExample] + 10 } );
+    }, 1000);
   }
 
   // This is the field for entering a trimming timecode range for either the start or stop time.
@@ -398,15 +409,21 @@ class Table extends React.Component {
         const vidData = [...data[index]];
         vidData.shift();
         if (this.props.uploadError.includes(index)) {
-          return [<ErrorIcon style={{ color: '#d31f1f', fontSize: 40 }} />, ...vidData];
+          return [<ErrorIcon style={{ color: red, fontSize: 45 }} />, ...vidData];
         } else if (this.props.rendering.includes(index)) {
-          return [<CircularProgress style={{ color: '#18bc3c' }} key={`loading-${index}`} />, ...vidData];
-        } else if (this.props.uploading.includes(index)) {
-          return [<img alt='Up' src={upArrow} />, ...vidData];
+          return [<CircularProgress style={{ color: green }} key={`loading-${index}`} />, ...vidData];
+          // This comes in as an object so see if it has the key for the current index,
+          // if it dos then the value will be the upload percentage.
+        } else if (Object.keys(this.props.uploading).includes(String(index))) {
+          return [<CircularProgress style={{ color: orange }} variant='static' key={`uploading-${index}`} value={Object(this.props.uploading)[String(index)]} />, ...vidData];
         } else if (this.props.transCoding.includes(index)) {
-          return [<CircularProgress style={{ color: '#dde238' }} />, ...vidData];
+          return [<CircularProgress style={{ color: yellow }} />, ...vidData];
+        } else if (this.props.uploaded.includes(index)) {
+          return [<CheckCircleOutlineIcon style={{ color: green, fontSize: 45 }} />, ...vidData];
         } else {
-          return [<CheckCircleOutlineIcon style={{ color: '#18bc3c', fontSize: 40 }} />, ...vidData];
+          // One of these is supposed to match but it didn't (like if it's between steps)
+          // so show a question mark.
+          return [<HelpIcon style={{ color: white, fontSize: 45 }} />, ...vidData];
         }
       });
       this.props.uploaded.length === videosArr.length && this.props.dispatch({ type: 'EXIT_PROCESS' });
@@ -511,13 +528,15 @@ class Table extends React.Component {
             <br />
             <div className='text'><CircularProgress style={{ color: green }} />: Rendering Locally</div>
             <br />
-            <div className='text'><img alt='Up' src={upArrow} />: Uploading To Vimeo</div>
+            <div className='text'><CircularProgress style={{ color: orange }} variant='static' value={this.state[uploadProgressExample]} />: Uploading To Vimeo</div>
             <br />
             <div className='text'><CircularProgress style={{ color: yellow }} />: Transcoding On Vimeo</div>
             <br />
             <div className='text'><CheckCircleOutlineIcon style={{ color: green, fontSize: 45 }} />: Successfully Uploaded</div>
             <br />
             <div className='text'><ErrorIcon style={{ color: red, fontSize: 45 }} />: Error</div>
+            <br />
+            <div className='text'><HelpIcon style={{ color: white, fontSize: 45 }} />:Status Unknown (it's probably between steps)</div>
           </>)
         }
       </>

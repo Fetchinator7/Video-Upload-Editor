@@ -9,8 +9,8 @@ const DISPLAY_INVALID_CHARACTER_WARNING = 'DISPLAY_INVALID_CHARACTER_WARNING';
 const HIDE_INVALID_CHARACTER_WARNING = 'HIDE_INVALID_CHARACTER_WARNING';
 const SET_TRANSCODING = 'SET_TRANSCODING';
 const CLEAR_TRANSCODING = 'CLEAR_TRANSCODING';
-const SET_UPLOADED = 'SET_UPLOADED';
-const CLEAR_UPLOADED = 'CLEAR_UPLOADED';
+const SET_UPLOADING = 'SET_UPLOADING';
+const REMOVE_UPLOADING = 'REMOVE_UPLOADING';
 const invalidCharArr = 'invalidCharArr';
 const replaceInvalidCharacterWithKey = 'replaceInvalidCharacterWithKey';
 
@@ -60,16 +60,15 @@ const rendering = (state = [], action) => {
   }
 };
 
-const uploading = (state = [], action) => {
-  // An array of ints that show which videos are uploading by their index.
-  const stateArr = [...state];
+const uploading = (state = {}, action) => {
+  let returnMessage = { ...state };
   switch (action.type) {
-    case 'SET_UPLOADING':
-      stateArr.push(action.payload);
-      return stateArr;
-    case 'CLEAR_UPLOADING':
-      stateArr.splice(stateArr.indexOf(action.payload), 1);
-      return stateArr;
+    case SET_UPLOADING:
+      returnMessage = { ...state, ...action.payload };
+      return returnMessage;
+    case REMOVE_UPLOADING:
+      delete returnMessage[String(action.payload)];
+      return returnMessage;
     default:
       return state;
   }
@@ -79,10 +78,10 @@ const transCoding = (state = [], action) => {
   // An array of ints that show which videos are transcoding by their index.
   const stateArr = [...state];
   switch (action.type) {
-    case 'SET_TRANSCODING':
+    case SET_TRANSCODING:
       stateArr.push(action.payload);
       return stateArr;
-    case 'CLEAR_TRANSCODING':
+    case CLEAR_TRANSCODING:
       stateArr.splice(stateArr.indexOf(action.payload), 1);
       return stateArr;
     default:
@@ -90,15 +89,13 @@ const transCoding = (state = [], action) => {
   }
 };
 
-const uploaded = (state = {}, action) => {
-  let returnMessage = { ...state };
+const uploaded = (state = [], action) => {
+  // An array of ints that show which videos have uploaded by their index.
+  const stateArr = [...state];
   switch (action.type) {
-    case SET_UPLOADED:
-      returnMessage = { ...state, [String(action.index)]: action.payload };
-      return returnMessage;
-    case CLEAR_UPLOADED:
-      delete state[action.index];
-      return returnMessage;
+    case 'SET_UPLOADED':
+      stateArr.push(action.payload);
+      return stateArr;
     default:
       return state;
   }

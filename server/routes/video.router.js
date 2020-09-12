@@ -193,7 +193,10 @@ router.get('/file-picker', (req, res) => {
 });
 
 router.get('/exit-process', (req, res) => {
-  // The application success fully uploaded the video(s) so kill this process.
+  // The application success fully uploaded the video(s) so kill the node processes and
+  // stop the sockets.
+  req.io.sockets.removeListener('upload.progress', () => {});
+  req.io.sockets.removeListener('upload.finish', () => {});
   if (os.platform() === 'darwin') {
     try {
       spawn('killall', ['node']);

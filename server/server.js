@@ -1,22 +1,28 @@
 require('dotenv').config();
-// Boilerplate.
 const express = require('express');
 const bodyParser = require('body-parser');
 
-// Add the routers I created.
+const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+// Serve static files
+app.use(express.static('build'));
+
+const PORT = process.env.PORT || 5000;
+const io = require('socket.io').listen(app.listen(PORT));
+
 const videoRouter = require('./routes/video.router');
 const vimeoRouter = require('./routes/vimeo.router');
 
-function setApp() {
-  const app = express()
-    .use(bodyParser.json())
-    .use(bodyParser.urlencoded({ extended: true }))
-    /* Routes */
-    .use('/video', videoRouter)
-    .use('/vimeo', vimeoRouter)
-    // Serve static files
-    .use(express.static('build'));
-  return app;
-}
+// Make socket.io accessible to our routers from the req.
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 
-module.exports = setApp;
+app.use('/video', videoRouter);
+app.use('/vimeo', vimeoRouter);
+
+console.log('listening on port', PORT);
+
+module.exports = app;

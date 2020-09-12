@@ -29,7 +29,6 @@ const isDisabled = (user, videos, enableEditing) => {
 class HomePage extends Component {
   componentDidMount() {
     this.props.dispatch({ type: 'CONFIRM_VIDEO_CREDENTIALS_EXIST' });
-    this.props.dispatch({ type: 'OPEN_SOCKET' });
   }
 
   render() {
@@ -73,16 +72,6 @@ class HomePage extends Component {
             </RadioGroup>
           </FormControl>
           <br />
-          <Button
-            variant='contained'
-            color='primary'
-            onClick={() => {
-              socket.emit('hey', { 0: 42.8 });
-              socket.emit('upload.progress', { 0: 22.8 });
-            }}
-          >
-            Connect
-          </Button>
           <Button
             variant='contained'
             color='primary'
