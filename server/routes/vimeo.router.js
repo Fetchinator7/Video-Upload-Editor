@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const io = require('socket.io');
 
 // Import the api info from the .env file.
 const clientID = process.env.CLIENT_ID;

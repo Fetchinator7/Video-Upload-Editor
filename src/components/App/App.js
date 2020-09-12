@@ -7,9 +7,7 @@ import FormControl from '@material-ui/core/FormControl';
 import { Button, createMuiTheme, MuiThemeProvider, FormLabel } from '@material-ui/core';
 import VideosTable from '../VideosTable/VideosTable';
 import RadioButton from '../RadioButton';
-import io from 'socket.io-client';
 import './App.css';
-const socket = io();
 
 const characterToReplaceInvalidFilenameCharactersWith = 'characterToReplaceInvalidFilenameCharactersWith';
 const displayInvalidFilenameCharacterWarning = 'displayInvalidFilenameCharacterWarning';
