@@ -205,7 +205,7 @@ const displayInvalidFilenameCharacterWarning = (state = false, action) => {
   // characters for the video title.
   switch (action.type) {
     case DISPLAY_INVALID_CHARACTER_WARNING:
-      return `Heads up! Filenames can't contain ${action[invalidCharArr].map(char => `"${char}"`)} so the video title will stay the same, but those invalid filename characters will be replaced with "${action[replaceInvalidCharacterWithKey]}" for the output filename and/or input filename.`;
+      return `Heads up! Filenames can't contain ${action[invalidCharArr].map(char => `"${char}"`)}. The video title will stay the same, but those invalid filename characters will be ${!action[replaceInvalidCharacterWithKey] ? 'removed' : `replaced with "${action[replaceInvalidCharacterWithKey]}"`} for the output filename and/or input filename.`;
     case HIDE_INVALID_CHARACTER_WARNING:
       return '';
     default:
