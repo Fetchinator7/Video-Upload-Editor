@@ -10,7 +10,7 @@ This is a basic interface for automatically rendering, then uploading videos to 
 
 ![Rendering View](readme-images/rendering.png?raw=true)
 
-### The rendering finished so it's uploading to Vimeo
+### The first video finished uploading and the second video is almost finished uploading to Vimeo
 
 ![Uploading View](readme-images/uploading.png?raw=true)
 
