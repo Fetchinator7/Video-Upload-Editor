@@ -181,7 +181,7 @@ router.get('/file-picker', (req, res) => {
         res.status(500).send({ output: pythonErr });
       } else {
         // If the user clicks the "cancel" button for the file picker it returns "."
-        // so instead return an empty string to avoid a video being add with an invalid path.
+        // so instead return an empty string to avoid a video being added with an invalid path.
         if (output === '.') {
           res.status(200).send('');
         } else {
@@ -193,7 +193,10 @@ router.get('/file-picker', (req, res) => {
 });
 
 router.get('/exit-process', (req, res) => {
-  // The application success fully uploaded the video(s) so kill this process.
+  // The application success fully uploaded the video(s) so kill the node processes and
+  // stop the sockets.
+  req.io.sockets.removeListener('upload.progress', () => {});
+  req.io.sockets.removeListener('upload.finish', () => {});
   if (os.platform() === 'darwin') {
     try {
       spawn('killall', ['node']);

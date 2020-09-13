@@ -52,16 +52,17 @@ function* uploadVideoFiles(action) {
   try {
     yield put({ type: HIDE_INVALID_CHARACTER_WARNING });
     yield put({ type: 'SET_RENDERING', payload: action.index });
+    yield put({ type: 'OPEN_SOCKET' });
     const renderResponse = yield call(axiosPost, { url: '/video', payload: action.payload });
     yield put({ type: 'CLEAR_RENDERING', payload: action.index });
     yield put({ type: OUTPUT_MESSAGE, payload: renderResponse.data[output], index: action.index });
 
     yield put({ type: 'SET_UPLOADING', payload: action.index });
-    const uploadResponse = yield axios.post('/vimeo', renderResponse.data.bodyObj);
+    const uploadResponse = yield axios.post('/vimeo', { uploadVideoIndex: action.index, ...renderResponse.data.bodyObj });
     yield put({ type: OUTPUT_MESSAGE, payload: uploadResponse.data[output], index: action.index });
 
     const uriRes = uploadResponse.data;
-    yield put({ type: 'CLEAR_UPLOADING', payload: action.index });
+    yield put({ type: 'REMOVE_UPLOADING', payload: action.index });
 
     const globalState = yield select();
     const updateArr = [...globalState.uploadFiles];
@@ -90,7 +91,7 @@ function* uploadVideoFiles(action) {
     yield put({ type: 'CLEAR_LOADING', payload: action.index });
     yield put({ type: 'CLEAR_TRANSCODING', payload: action.index });
     yield put({ type: 'CLEAR_RENDERING', payload: action.index });
-    yield put({ type: 'CLEAR_UPLOADING', payload: action.index });
+    yield put({ type: 'REMOVE_UPLOADING', payload: action.index });
   }
 }
 

@@ -44,10 +44,13 @@ router.get('/transcode-status/:uri', (req, res) => {
 
 router.post('/', (req, res) => {
   // Post the given video to Vimeo.
+  const uploadVideoIndex = req.body.uploadVideoIndex;
   const videoPath = req.body.videoPath;
   const title = req.body.title;
   const description = req.body.description;
   console.log('Uploading...');
+  // Set the starting value to 0 (percent).
+  req.io.sockets.emit('upload.progress', { [uploadVideoIndex]: 0 });
   vimeoClient.upload(
     videoPath,
     {
@@ -55,16 +58,17 @@ router.post('/', (req, res) => {
       description: description
     },
     function (uri) {
-      console.log('Your video URI is: ' + uri.substr(8, uri.length));
+      req.io.sockets.emit('upload.finish', uploadVideoIndex);
       // Remove the "/videos/" at the beginning.
       res.status(200).send(uri.substr(8, uri.length));
     },
     function (bytesUploaded, bytesTotal) {
-      // Show an uploaded percentage in the console.
       const uploadPercentage = (bytesUploaded / bytesTotal * 100).toFixed(2);
-      console.log(uploadPercentage + '%');
+      // Send the uploaded percentage to a socket which the client is listening to.
+      req.io.sockets.emit('upload.progress', { [uploadVideoIndex]: uploadPercentage });
     },
     function (error) {
+      req.io.sockets.emit('upload.finish', uploadVideoIndex);
       res.status(500).send('Failed because: ' + error);
     }
   );
