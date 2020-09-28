@@ -62,7 +62,7 @@ choco install ffmpeg
 ### Both
 
 Open a terminal window, type `cd ` (with a space afterward), drag-and-drop the folder on your computer where you want to store this project on top of the terminal window, and press enter.
-Since you have `git` now (it is a dependency) clone the project by entering `git clone https://github.com/Fetchinator7/Video-Upload-Editor.git`. Next import the submodules by entering `git submodule update --init --recursive`, and finally enter `npm install`.
+Since you have `git` now (it's one of the dependencies) clone the project by entering `git clone https://github.com/Fetchinator7/Video-Upload-Editor.git`. Next cd into the project folder by entering `cd ` again, use the **tab** button to autocomplete the folder path, import the submodules by entering `git submodule update --init --recursive`, and finally enter `npm install`.
 
 ## Setup
 
@@ -73,7 +73,7 @@ The step that requires approval is the `Request Upload Access` so click on that 
 Are you back now? Great, let's move on!
 Now that our app has upload access go to `Authentication` and `Generate an access token` by selecting `Authenticated (you)`. Give it access to `Public, Private, Create, Edit, Upload, and Video Files` then copy the `Token`.
 
-Next we need to create a new `.env` file in the root directory of the project (no parent folders) and the terminal from the **Setup** step will already be in the correct folder.
+Next we need to create a new `.env` file in the root directory of the project (no parent folders), but unless you changed it the terminal window from the **Installation** step will already be in the correct folder.
 To make a `.env` on Mac it's `touch .env` and on Windows it's `type nul > .env`. Next open it with a text editor (`open .env` for Mac or `.env` for Windows) and enter these parameters:
 
 ```env
@@ -145,4 +145,4 @@ SEPARATE_AUDIO_ONLY_FILE_OPTION=true
 
 ## Launching it
 
-To run the application on Mac double-click/open the `run.sh` file, but on Windows you need to open the `run_scripts` folder and double-click/open `run_server.sh` and `run_start.sh`. You can also add an alias to that file on the dock or desktop to speed up the start process. The application window should open automatically in the computer's default web browser, but it may take a few seconds. If it doesn't open automatically, open it by manually going to [localhost:3000](http://localhost:3000/).
+To run the application on Mac double-click/open the `run.sh` file, but on Windows you need to open the `run_scripts` folder and double-click/open `run_server.sh` and `run_start.sh`. You can also add an alias to that file on the dock or desktop to speed up the start process. The application window should open automatically in the computer's default web browser, but it may take a few seconds. If it doesn't open automatically, open it manually by going to [localhost:3000](http://localhost:3000/).
