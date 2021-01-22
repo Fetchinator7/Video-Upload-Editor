@@ -3,13 +3,57 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
+    // Run the scripts from the package.json file.
     "configurations": [
         {
-            "type": "chrome",
+            // Launch the special chrome debugger (chrome debugger extension must be installed)
+            "name": "Launch Chrome",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:3000",
+            "type": "pwa-chrome",
             "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Run Client",
+            "request": "launch",
+            // Equivalent "npm start" command.
+            "command": "npm run start",
+            "type": "node-terminal"
+        },
+        {
+            "name": "Run Server",
+            "request": "launch",
+            // Equivalent "npm run server" command.
+            "command": "npm run debug-server",
+            "type": "node-terminal"
+        }
+    ],
+    "compounds": [
+        {
+            // To debug the client we first have to run it from the terminal,
+            // then launch the special chrome debugger.
+            "name": "Debug Client",
+            "configurations": [
+                "Run Client",
+                "Launch Chrome"
+            ]
+        },
+        {
+            // This is just here for the sake of clarity on how to debug only the server.
+            "name": "Debug Server",
+            "configurations": [
+                "Run Server"
+            ]
+        },
+        {
+            // To debug the client we first have to run it from the terminal,
+            // then launch the special chrome debugger.
+            // To debug the server will simply run it from the terminal.
+            "name": "Both, Allons-y",
+            "configurations": [
+                "Run Server",
+                "Run Client",
+                "Launch Chrome"
+            ]
         }
     ]
 }

@@ -27,6 +27,7 @@
   "scripts": {
     "start": "react-scripts start",
     "server": "node server/server.js",
+    "debug-server": "nodemon --watch server server/server.js",
     "build": "react-scripts build",
     "test": "jest --detectOpenHandles --forceExit",
     "eject": "react-scripts eject"
@@ -45,5 +46,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^7.18.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.22.0"
   }
 }

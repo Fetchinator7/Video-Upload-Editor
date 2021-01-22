@@ -2,7 +2,7 @@
 
 This is a basic interface for automatically rendering, then uploading videos to Vimeo. This is geared toward people who do a lot of recording but little to no editing afterward, such as publishing video conference recordings.
 
-### The first selection screen
+## The first selection screen
 
 ![Selection View](readme-images/preparing.png?raw=true)
 
@@ -14,7 +14,7 @@ This is a basic interface for automatically rendering, then uploading videos to 
 
 ![Uploading View](readme-images/uploading.png?raw=true)
 
-### I know the main question is, "Why shouldn't I just upload to Vimeo directly?" Well, there are a few reasons:
+### I know the main question is, "Why shouldn't I just upload to Vimeo directly?" Well, there are a few reasons
 
 1. This interface is designed to work with teams that have varying permission levels
 
@@ -33,6 +33,7 @@ This is a basic interface for automatically rendering, then uploading videos to 
    - Don't like manually organizing by date? Once you specify a parent folder all the videos will automatically be put inside that folder for the current year and month.
 
 ## NOTE
+
 By default a video's title is today's date followed by a space to add your own title afterward, but the title can't end in a space (because of Windows 10 compatibility) so the default title has to be modified for it to be valid.
 
 ## Installation
@@ -61,8 +62,8 @@ choco install ffmpeg
 
 ### Both
 
-Open a terminal window, type `cd ` (with a space afterward), drag-and-drop the folder on your computer where you want to store this project on top of the terminal window, and press enter.
-Since you have `git` now (it's one of the dependencies) clone the project by entering `git clone https://github.com/Fetchinator7/Video-Upload-Editor.git`. Next cd into the project folder by entering `cd ` again, use the **tab** button to autocomplete the folder path, import the submodules by entering `git submodule update --init --recursive`, and finally enter `npm install`.
+Open a terminal window, type `cd` (with a space afterward), drag-and-drop the folder on your computer where you want to store this project on top of the terminal window, and press enter.
+Since you have `git` now (it's one of the dependencies) clone the project by entering `git clone https://github.com/Fetchinator7/Video-Upload-Editor.git`. Next cd into the project folder by entering `cd` again, use the **tab** button to autocomplete the folder path, import the submodules by entering `git submodule update --init --recursive`, and finally enter `npm install`.
 
 ## Setup
 
@@ -94,6 +95,7 @@ This application automatically saves the output video files by the year, month, 
 `MAIN_OUTPUT_FOLDER=/Path/To/Main/Output/Folder` or this on Windows: `MAIN_OUTPUT_FOLDER=C:\Path\To\Main\Output\Folder`
 
 ### Tip
+
 On Mac if you want to automatically close the terminal windows when this finishes open the `Terminal` application and go to `Preferences` > `Profiles` > `Shell` > `When the shell exits` and choose `Close if the shell exited cleanly`.
 
 ### Customizing the users
@@ -104,7 +106,7 @@ The user names that appear alongside the radio buttons can be customized/added b
 USERS=["user", "user 1", "user 2", "user 3"]
 ```
 
-### There are a few more options for customizing the output:
+### There are a few more options for customizing the output
 
 `COMPRESSION` (which is disabled by default) will run the output video through the H265 compression filter to help reduce video size while still maintaining quality. However, this was designed thinking it can render overnight so it may take about twice the length of the input video to finish rendering, but will reduce the output file size significantly.
 
@@ -146,3 +148,11 @@ SEPARATE_AUDIO_ONLY_FILE_OPTION=true
 ## Launching it
 
 To run the application on Mac double-click/open the `run.sh` file, but on Windows you need to open the `run_scripts` folder and double-click/open `run_server.sh` and `run_start.sh`. You can also add an alias to that file on the dock or desktop to speed up the start process. The application window should open automatically in the computer's default web browser, but it may take a few seconds. If it doesn't open automatically, open it manually by going to [localhost:3000](http://localhost:3000/).
+
+##### Debugging
+
+There's already a VS Code debug configuration in the repo so just select the configuration you'd like to use in the debugger and run it. However, I recommend adding this to your `.env`
+
+```sh
+SKIP_PREFLIGHT_CHECK=true
+```

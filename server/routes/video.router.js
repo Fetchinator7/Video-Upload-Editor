@@ -1,3 +1,8 @@
+/* eslint-disable no-negated-condition */
+/* eslint-disable require-unicode-regexp */
+/* eslint-disable prefer-named-capture-group */
+/* eslint-disable new-cap */
+
 const express = require('express');
 const router = express.Router();
 const { spawn } = require('child_process');
@@ -7,7 +12,17 @@ let invalidCharactersArrayPlatformSpecific = [];
 if (os.platform() === 'darwin' || os.platform() === 'linux') {
   invalidCharactersArrayPlatformSpecific = ['/'];
 } else if (os.platform() === 'win32') {
-  invalidCharactersArrayPlatformSpecific = ['\\', '/', ':', '*', '?', '"', '<', '>', '|'];
+  invalidCharactersArrayPlatformSpecific = [
+    '\\',
+    '/',
+    ':',
+    '*',
+    '?',
+    '"',
+    '<',
+    '>',
+    '|'
+  ];
 }
 
 // Confirm the input environment variable isn't undefined.
@@ -19,6 +34,7 @@ router.get('/invalid-filename-character-array', (req, res) => {
 router.get('/users', (req, res) => {
   const users = 'USERS';
   try {
+    // eslint-disable-next-line no-undefined
     if (process.env[users] === undefined) {
       res.sendStatus(204);
     } else {
@@ -32,6 +48,7 @@ router.get('/users', (req, res) => {
 router.get('/verify-output-path', (req, res) => {
   const path = 'MAIN_OUTPUT_FOLDER';
   try {
+    // eslint-disable-next-line no-undefined
     if (process.env[path] === undefined) {
       res.status(200).send(`Heads up! The main output path ${path} is undefined so this will application will fail to run until that's been specified.`);
     } else {
@@ -70,9 +87,9 @@ router.get('/invalid-filename-replacement-character', (req, res) => {
 
 router.post('/', (req, res) => {
   const mainOutputFolder = process.env.MAIN_OUTPUT_FOLDER;
-  const videoPath = req.body.videoPath;
-  const title = req.body.title;
-  const userName = req.body.userName;
+  const { videoPath } = req.body;
+  const { title } = req.body;
+  const { userName } = req.body;
   const exportSeparateAudio = String(req.body.exportSeparateAudio);
   const compress = process.env.COMPRESSION || false;
   const trimStart = req.body.trimStart || '';
@@ -82,7 +99,7 @@ router.post('/', (req, res) => {
   const compressionSpeedPreset = process.env.COMPRESSION_SPEED_PRESET || 'fast';
   const outputExtension = process.env.OUTPUT_EXTENSION || '.mp4';
   const renameInputFile = process.env.RENAME_INPUT_VIDEO || true;
-  const characterToReplaceInvalidFilenameCharactersWith = req.body.characterToReplaceInvalidFilenameCharactersWith;
+  const { characterToReplaceInvalidFilenameCharactersWith } = req.body;
   const description = req.body.description || '';
 
   // The python process will change these values as it goes through but define
@@ -94,24 +111,24 @@ router.post('/', (req, res) => {
 
   // Run the python file from the command line and pass it these arguments:
   const promise = new Promise((resolve, reject) => {
-    const pyProcess = spawn('python3',
-      ['server/dependencies/local_operations.py',
-        mainOutputFolder,
-        videoPath,
-        title,
-        userName,
-        exportSeparateAudio,
-        compress,
-        trimStart,
-        trimEnd,
-        codecCopy,
-        specifyPixelFormat,
-        compressionSpeedPreset,
-        outputExtension,
-        renameInputFile,
-        invalidCharactersArrayPlatformSpecific.join(''),
-        characterToReplaceInvalidFilenameCharactersWith
-      ]);
+    const pyProcess = spawn('python3', [
+      'server/dependencies/local_operations.py',
+      mainOutputFolder,
+      videoPath,
+      title,
+      userName,
+      exportSeparateAudio,
+      compress,
+      trimStart,
+      trimEnd,
+      codecCopy,
+      specifyPixelFormat,
+      compressionSpeedPreset,
+      outputExtension,
+      renameInputFile,
+      invalidCharactersArrayPlatformSpecific.join(''),
+      characterToReplaceInvalidFilenameCharactersWith
+    ]);
 
     pyProcess.stdout.setEncoding('utf8');
     pyProcess.stderr.setEncoding('utf8');
@@ -127,12 +144,16 @@ router.post('/', (req, res) => {
         //   without the path is: "New directory, \".../New Title\" was created!\nSession log created at \"...New Title-log.txt\"\nOpened file/folder: \"..." with the default application."
         // }
         // Since extra {} were injected to determine what the output path is remove those {} from the output message.
-        output = data.toString().replace(/{(.*?)}/, '').replace(/{{(.*?)}}/, '').slice(0, -2);
-        outputVideoPath = data.toString().match(/{(.*?)}/) ? data.toString().match(/{(.*?)}/)[1] : '';
+        output = data.toString().replace(/{(.*?)}/, '')
+          .replace(/{{(.*?)}}/, '')
+          .slice(0, -2);
+        outputVideoPath = data.toString().match(/{(.*?)}/)
+          ? data.toString().match(/{(.*?)}/)[1]
+          : '';
         bodyObj = {
           videoPath: outputVideoPath,
-          title: title,
-          description: description
+          title,
+          description
         };
       }
     });
@@ -147,7 +168,9 @@ router.post('/', (req, res) => {
         // path and bodyObj are used by the next operation so if there was an error don't include.
         res.status(500).send(pythonErr);
       } else {
-        res.status(200).send({ output: output, path: outputVideoPath, bodyObj: bodyObj });
+        res.status(200).send({ output,
+          path: outputVideoPath,
+          bodyObj });
       }
     });
   });
@@ -161,14 +184,14 @@ router.get('/file-picker', (req, res) => {
   let pythonErr = '';
   let output = '';
 
+  // eslint-disable-next-line no-unused-vars
   const promise = new Promise((resolve, reject) => {
     const pyProcess = spawn('python3', ['server/dependencies/file_picker.py']);
     pyProcess.stdout.setEncoding('utf8');
     pyProcess.stderr.setEncoding('utf8');
     pyProcess.stdout.on('data', data => {
       output = data.toString();
-    }
-    );
+    });
     // python encountered an error.
     pyProcess.stderr.on('data', data => {
       pythonErr = data;
@@ -207,7 +230,11 @@ router.get('/exit-process', (req, res) => {
     }
   } else if (os.platform() === 'win32') {
     try {
-      spawn('taskkill', ['/IM', 'node.exe', '/F']);
+      spawn('taskkill', [
+        '/IM',
+        'node.exe',
+        '/F'
+      ]);
       res.sendStatus(200);
     } catch (error) {
       console.log('taskkill error', error);

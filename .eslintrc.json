@@ -1,0 +1,166 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "node": true,
+        "jest": true
+    },
+    "extends": [
+        "eslint:all"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 11,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "max-len": "off",
+        "max-lines": "off",
+        "max-lines-per-function": "off",
+        "max-statements": "off",
+        "no-ternary": "off",
+        "no-nested-ternary": "off",
+        "class-methods-use-this": "off",
+        "indent": [
+            "error",
+            2,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "object-curly-spacing": [
+            "warn",
+            "always"
+        ],
+        "linebreak-style": [
+            "warn",
+            "unix"
+        ],
+        "no-undef": "warn",
+        "no-unused-vars": [
+            "warn",
+            {
+                "varsIgnorePattern": "(React)|(Route)|(App)"
+            }
+        ],
+        "no-extra-parens": "off",
+        "no-magic-numbers": "warn",
+        "quotes": [
+            "warn",
+            "single",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
+        "generator-star-spacing": [
+            "warn",
+            "after"
+        ],
+        "func-style": [
+            "warn",
+            "declaration",
+            {
+                "allowArrowFunctions": true
+            }
+        ],
+        "padded-blocks": [
+            "warn",
+            "never"
+        ],
+        "lines-around-comment": [
+            "warn",
+            {
+                "beforeBlockComment": false
+            }
+        ],
+        "function-call-argument-newline": [
+            "warn",
+            "never"
+        ],
+        "space-before-function-paren": [
+            "warn",
+            {
+                "asyncArrow": "always",
+                "named": "never"
+            }
+        ],
+        "dot-location": [
+            "warn",
+            "property"
+        ],
+        "arrow-parens": [
+            "warn",
+            "as-needed"
+        ],
+        "capitalized-comments": "off",
+        "no-shadow": "warn",
+        "multiline-comment-style": "off",
+        "no-lonely-if": "off",
+        "require-jsdoc": [
+            "warn",
+            {
+                "require": {
+                    "FunctionDeclaration": true,
+                    "MethodDefinition": false,
+                    "ClassDeclaration": false,
+                    "ArrowFunctionExpression": false,
+                    "FunctionExpression": false
+                }
+            }
+        ],
+        "quote-props": [
+            "warn",
+            "consistent-as-needed"
+        ],
+        "one-var": [
+            "warn",
+            "never"
+        ],
+        "semi": [
+            2,
+            "always"
+        ],
+        "sort-keys": "off",
+        "sort-imports": "off",
+        "default-param-last": "off",
+        "no-console": "warn"
+    },
+    "settings": {
+        "react": {
+            "createClass": "createReactClass", // Regex for Component Factory to use,
+            // default to "createReactClass"
+            "pragma": "React", // Pragma to use, default to "React"
+            "fragment": "Fragment", // Fragment to use (may be a property of <pragma>), default to "Fragment"
+            "version": "detect", // React version. "detect" automatically picks the version you have installed.
+            // You can also use `16.0`, `16.3`, etc, if you want to override the detected value.
+            // default to latest and warns if missing
+            // It will default to "detect" in the future
+            "flowVersion": "0.53" // Flow version
+        },
+        "propWrapperFunctions": [
+            // The names of any function used to wrap propTypes, e.g. `forbidExtraProps`. If this isn't set, any propTypes wrapped in a function will be skipped.
+            "forbidExtraProps",
+            {
+                "property": "freeze",
+                "object": "Object"
+            },
+            {
+                "property": "myFavoriteWrapper"
+            }
+        ],
+        "linkComponents": [
+            // Components used as alternatives to <a> for linking, eg. <Link to={ url } />
+            "Hyperlink",
+            {
+                "name": "Link",
+                "linkAttribute": "to"
+            }
+        ]
+    }
+}
