@@ -98,6 +98,21 @@
             "warn",
             "as-needed"
         ],
+        "object-property-newline": [
+            "warn",
+            {
+                "allowAllPropertiesOnSameLine": true
+            }
+        ],
+        "array-element-newline": [
+            "warn",
+            {
+                "ArrayExpression": "consistent",
+                "ArrayPattern": {
+                    "minItems": 3
+                }
+            }
+        ],
         "capitalized-comments": "off",
         "no-shadow": "warn",
         "multiline-comment-style": "off",

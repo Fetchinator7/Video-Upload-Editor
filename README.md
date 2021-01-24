@@ -122,6 +122,8 @@ USERS=["user", "user 1", "user 2", "user 3"]
 
 `RENAME_INPUT_VIDEO` (which is enabled by default) dictates if input video files will be renamed to the output video title or keep the same title. It's enabled by default because more often than not source files aren't named according to their content and just follow an automatic naming convention. However, you may not want to rename the source file, such as for specifying two different trimming ranges for the same input file to export two files for two separate Vimeo videos.
 
+`IGNORE_FILE_SELECTION_ERRORS` (which is disabled by default) for whatever reason, I've had inconsistent results where sometimes the python file picker will return an error, even if the output path is totally fine so this can be set to true to ignore those errors.
+
 `SEPARATE_AUDIO_ONLY_FILE_OPTION` (which is disabled by default) shows a checkbox with each video to toggle rendering an additional separate audio-only file with the audio of the output video.
 
 ### All in all the final `.env` file could look something like this

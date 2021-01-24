@@ -36,6 +36,7 @@ const invalidCharArrKey = 'invalidCharArr';
 const replaceInvalidCharacterWithKey = 'replaceInvalidCharacterWithKey';
 const characterToReplaceInvalidFilenameCharactersWith = 'characterToReplaceInvalidFilenameCharactersWith';
 const invalidCharactersArrayPlatformSpecific = 'invalidCharactersArrayPlatformSpecific';
+const fileSelection = 'fileSelection';
 
 const green = '#18bc3c';
 const yellow = '#dde238';
@@ -112,7 +113,7 @@ class Table extends React.Component {
   componentDidMount() {
     // Set a timer for the "Uploading To Vimeo" icon so it isn't static.
     setInterval(() => {
-      this.setState({ [uploadProgressExample]: this.state[uploadProgressExample] >= 100 ? 0 : this.state[uploadProgressExample] + 10 } );
+      this.setState({ [uploadProgressExample]: this.state[uploadProgressExample] >= 100 ? 0 : this.state[uploadProgressExample] + 10 });
     }, 1000);
   }
 
@@ -443,6 +444,7 @@ class Table extends React.Component {
     return (
       <>
         <MuiThemeProvider theme={useStyles}>
+          <div className='error'>{this.props[fileSelection]}</div>
           <MUIDataTable title='Video(s) To Upload' data={data} columns={columns} options={options} theme={theme} />
           <Dialog
             open={this.state[visibilityLevelOpenIndex] === null ? false : true}
@@ -545,18 +547,19 @@ class Table extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  videos: state.uploadFiles,
-  audioOnlyOption: state.audioOnlyOption,
-  [characterToReplaceInvalidFilenameCharactersWith]: state[characterToReplaceInvalidFilenameCharactersWith],
-  [invalidCharactersArrayPlatformSpecific]: state[invalidCharactersArrayPlatformSpecific],
-  rendering: state.rendering,
-  uploading: state.uploading,
-  uploaded: state.uploaded,
-  transCoding: state.transCoding,
-  uploadError: state.uploadError,
-  enableEditing: state.enableEditing,
-  outputMessage: state.outputMessage,
-  videoErrorMessage: state.videoErrorMessage,
+  videos: state.primary.uploadFiles,
+  audioOnlyOption: state.primary.audioOnlyOption,
+  [characterToReplaceInvalidFilenameCharactersWith]: state.primary[characterToReplaceInvalidFilenameCharactersWith],
+  [invalidCharactersArrayPlatformSpecific]: state.primary[invalidCharactersArrayPlatformSpecific],
+  rendering: state.primary.rendering,
+  uploading: state.primary.uploading,
+  uploaded: state.primary.uploaded,
+  transCoding: state.primary.transCoding,
+  uploadError: state.primary.uploadError,
+  enableEditing: state.primary.enableEditing,
+  outputMessage: state.primary.outputMessage,
+  videoErrorMessage: state.primary.videoErrorMessage,
+  fileSelection: state.errors.fileSelection
 });
 
 export default connect(mapStateToProps)(Table);

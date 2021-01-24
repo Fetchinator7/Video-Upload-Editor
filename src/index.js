@@ -8,7 +8,7 @@ import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 
 import rootSaga from './redux/sagas/sagaIndex';
-import rootReducer from './redux/reducers/reducer';
+import rootReducer from './redux/reducers/rootReducer';
 
 const sagaMiddleware = createSagaMiddleware();
 
