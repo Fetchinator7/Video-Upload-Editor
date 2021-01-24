@@ -12,13 +12,12 @@ import rootReducer from './redux/reducers/reducer';
 
 const sagaMiddleware = createSagaMiddleware();
 
-// NOTE: For debugging to work the Chrome Debugger needs the [Redux DevTools Extension](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en)
-const storeInstance = createStore(rootReducer, process.env.NODE_ENV === 'development'
+/** NOTE: To use the [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en) the extension needs to be added to the chrome debug window. */
+const storeInstance = createStore(rootReducer, process.env.NODE_ENV === 'development' && process.env.REACT_APP_USE_REDUX_DEV_TOOLS
   ? (
     compose(applyMiddleware(sagaMiddleware), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
   )
   : applyMiddleware(sagaMiddleware));
-
 
 sagaMiddleware.run(rootSaga);
 

@@ -102,6 +102,7 @@
         "no-shadow": "warn",
         "multiline-comment-style": "off",
         "no-lonely-if": "off",
+        "no-empty-function": "off",
         "require-jsdoc": [
             "warn",
             {

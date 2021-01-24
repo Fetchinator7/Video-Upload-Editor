@@ -126,7 +126,7 @@ USERS=["user", "user 1", "user 2", "user 3"]
 
 ### All in all the final `.env` file could look something like this
 
-```env
+```sh
 ACCESS_TOKEN=ca9b9rj...
 CLIENT_ID=1c61359178...
 CLIENT_SECRET=M9/Oyw...
@@ -147,12 +147,12 @@ SEPARATE_AUDIO_ONLY_FILE_OPTION=true
 
 ## Launching it
 
-To run the application on Mac double-click/open the `run.sh` file, but on Windows you need to open the `run_scripts` folder and double-click/open `run_server.sh` and `run_start.sh`. You can also add an alias to that file on the dock or desktop to speed up the start process. The application window should open automatically in the computer's default web browser, but it may take a few seconds. If it doesn't open automatically, open it manually by going to [localhost:3000](http://localhost:3000/).
+To run the application double-click/open the `run.sh` file. You can also add an alias to that file on the dock or desktop to speed up the start process. The application window should open automatically in the computer's default web browser, but it may take a few seconds. If it doesn't open automatically, open it manually by going to [localhost:3000](http://localhost:3000/).
 
-##### Debugging
+### Debugging
 
-There's already a VS Code debug configuration in the repo so just select the configuration you'd like to use in the debugger and run it. However, I recommend adding this to your `.env`
+There's already a VS Code debug configuration in the repo so just select the configuration you'd like to use (like "Both, Allons-y") in the debugger and run it. However, to take advantage of the redux dev tools they need to be enabled in the `.env` file because otherwise this wouldn't work in the browser without the extension installed.
 
 ```sh
-SKIP_PREFLIGHT_CHECK=true
+REACT_APP_USE_REDUX_DEV_TOOLS=true
 ```
