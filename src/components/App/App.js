@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import SearchTablePresets from '../VideosTable/VideosTableDefaults';
@@ -13,17 +14,14 @@ const characterToReplaceInvalidFilenameCharactersWith = 'characterToReplaceInval
 const displayInvalidFilenameCharacterWarning = 'displayInvalidFilenameCharacterWarning';
 const title = 'title';
 
-const useStyles = createMuiTheme(
-  SearchTablePresets.theme
-);
+const useStyles = createMuiTheme(SearchTablePresets.theme);
 
 const isDisabled = (user, videos, enableEditing) => {
   if (user === '' || videos.length === 0 || videos.some(videoObj => videoObj[title] === '') || videos.some(videoObj => String(videoObj[title]).slice(-1) === ' ' || !enableEditing)) {
     return true;
-  } else {
-    return false;
   }
-}
+  return false;
+};
 class HomePage extends Component {
   componentDidMount() {
     this.props.dispatch({ type: 'CONFIRM_VIDEO_CREDENTIALS_EXIST' });
@@ -35,13 +33,13 @@ class HomePage extends Component {
       <>
         {/* If an environment variable is undefined show warning text
         but still allow the application to be used as normal. */}
-        <h2 className='text'>{this.props.errorMessage}</h2>
+        <h2 className="text">{this.props.errorMessage}</h2>
         <MuiThemeProvider theme={useStyles}>
-          <header className='text'>
+          <header className="text">
             <h1>Select Video(s) To Upload:</h1>
           </header>
-          <FormControl component='fieldset'>
-            <FormLabel component='legend'>Select a user:</FormLabel>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Select a user:</FormLabel>
             <RadioGroup
               value={this.props.user}
               disabled={!this.props.enableEditing}
@@ -52,35 +50,37 @@ class HomePage extends Component {
                 })
               }
             >
-              {this.props.users.map((user, index) =>
-                <FormControlLabel
-                  value={user}
-                  control={userSelected ? <RadioButton.selectedRadioButton /> : <RadioButton.emptyRadioButton />}
-                  label={user}
-                  className='text'
-                  key={`user-radio-buttons-${index}`}
-                />
-              )}
+              {this.props.users.map((user, index) => <FormControlLabel
+                value={user}
+                control={userSelected
+                  ? <RadioButton.selectedRadioButton />
+                  : <RadioButton.emptyRadioButton />}
+                label={user}
+                className="text"
+                key={`user-radio-buttons-${index}`}
+              />)}
               <FormControlLabel
-                value='Other'
-                control={userSelected ? <RadioButton.selectedRadioButton /> : <RadioButton.emptyRadioButton />}
-                className='text'
-                label='Other'
+                value="Other"
+                control={userSelected
+                  ? <RadioButton.selectedRadioButton />
+                  : <RadioButton.emptyRadioButton />}
+                className="text"
+                label="Other"
               />
             </RadioGroup>
           </FormControl>
           <br />
           <Button
-            variant='contained'
-            color='primary'
+            variant="contained"
+            color="primary"
             disabled={!this.props.enableEditing}
             onClick={() => this.props.dispatch({ type: 'OPEN_PYTHON_FILE_PICKER' })}
           >
             Add File
           </Button>
           <Button
-            variant='contained'
-            color='primary'
+            variant="contained"
+            color="primary"
             // Confirm that a user has been selected, there's at least one video to upload,
             // and each video has a title (not an empty string).
             disabled={isDisabled(this.props.user, this.props.videos, this.props.enableEditing)}
@@ -100,7 +100,7 @@ class HomePage extends Component {
                     [characterToReplaceInvalidFilenameCharactersWith]: this.props[characterToReplaceInvalidFilenameCharactersWith]
                   },
                   visibility: videoObj.visibility,
-                  index: index,
+                  index,
                   password: videoObj.password
                 });
                 // Suppress "Expected to return a value in arrow function" compile warning.
@@ -111,7 +111,10 @@ class HomePage extends Component {
             Upload Video(s)
           </Button>
           <VideosTable />
-          <div id={this.props[displayInvalidFilenameCharacterWarning] ? 'invalidCharacterWarning' : undefined}>{this.props[displayInvalidFilenameCharacterWarning]}</div>
+          <div id={this.props[displayInvalidFilenameCharacterWarning]
+            ? 'invalidCharacterWarning'
+            // eslint-disable-next-line no-undefined
+            : undefined}>{this.props[displayInvalidFilenameCharacterWarning]}</div>
         </MuiThemeProvider>
       </>
     );
@@ -119,16 +122,16 @@ class HomePage extends Component {
 }
 
 const mapStateToProps = state => ({
-  user: state.user,
-  users: state.users,
-  enableEditing: state.enableEditing,
-  loading: state.loading,
-  videos: state.uploadFiles,
-  outputMessage: state.outputMessage,
-  videoErrorMessage: state.videoErrorMessage,
-  errorMessage: state.errorMessage,
-  [characterToReplaceInvalidFilenameCharactersWith]: state[characterToReplaceInvalidFilenameCharactersWith],
-  [displayInvalidFilenameCharacterWarning]: state[displayInvalidFilenameCharacterWarning]
+  user: state.primary.user,
+  users: state.primary.users,
+  enableEditing: state.primary.enableEditing,
+  loading: state.primary.loading,
+  videos: state.primary.uploadFiles,
+  outputMessage: state.primary.outputMessage,
+  videoErrorMessage: state.primary.videoErrorMessage,
+  errorMessage: state.primary.errorMessage,
+  [characterToReplaceInvalidFilenameCharactersWith]: state.primary[characterToReplaceInvalidFilenameCharactersWith],
+  [displayInvalidFilenameCharacterWarning]: state.primary[displayInvalidFilenameCharacterWarning]
 });
 
 export default connect(mapStateToProps)(HomePage);

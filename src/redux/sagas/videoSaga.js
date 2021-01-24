@@ -12,6 +12,7 @@ const OUTPUT_MESSAGE = 'OUTPUT_MESSAGE';
 const VIDEO_ERROR_MESSAGE = 'VIDEO_ERROR_MESSAGE';
 const HIDE_INVALID_CHARACTER_WARNING = 'HIDE_INVALID_CHARACTER_WARNING';
 
+/** Do a get to the route that will open the file picker and set the string of the path returned. */
 function* selectVideoFiles(action) {
   const globalState = yield select();
   let exportSeparateAudio;
@@ -34,19 +35,17 @@ function* selectVideoFiles(action) {
         visibility: 'anybody',
         uri: '',
         password: '',
-        exportSeparateAudio: exportSeparateAudio,
+        exportSeparateAudio,
         trimStart: '',
         trimEnd: ''
       }
     });
   } catch (error) {
-    console.log('Error selecting video', error);
+    yield put({ type: 'SET_FILE_SELECTION_ERROR', payload: error });
   }
 }
 
-const axiosPost = (argObj) => {
-  return axios.post(argObj.url, argObj.payload);
-};
+const axiosPost = argObj => axios.post(argObj.url, argObj.payload);
 
 function* uploadVideoFiles(action) {
   try {
@@ -86,7 +85,11 @@ function* uploadVideoFiles(action) {
     console.log('Error uploading video', error);
     console.log('error.response.data', error.response.data);
     yield put({ type: 'SET_UPLOAD_ERROR', payload: action.index });
-    yield put({ type: VIDEO_ERROR_MESSAGE, payload: error.response ? error.response.data : error, index: action.index });
+    yield put({ type: VIDEO_ERROR_MESSAGE,
+      payload: error.response
+        ? error.response.data
+        : error,
+      index: action.index });
   } finally {
     yield put({ type: 'CLEAR_LOADING', payload: action.index });
     yield put({ type: 'CLEAR_TRANSCODING', payload: action.index });
